@@ -3,3 +3,12 @@
 //
 
 #include "Cell.h"
+#include "Mesh.h"
+
+namespace charm {
+//    Cell::Cell() {}
+//
+//
+//    Cell::~Cell() {}
+
+}
