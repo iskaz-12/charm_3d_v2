@@ -6,6 +6,8 @@
 #include <sstream>
 #include <map>
 #include <set>
+#include <iostream>
+#include <iomanip>
 
 namespace charm {
 
@@ -146,7 +148,11 @@ namespace charm {
             i++;
         }
 
+
+
+        decomp(mesh);
         mesh->calcGeom();
+
 
         return mesh;
     }

@@ -29,6 +29,8 @@ namespace charm {
         void addCell(Int cellId);
 
 
+
+
         Index               id;
         ArrayIndex          nodesInd;
         ArrayIndex          cells;          // ячейка слева и справа

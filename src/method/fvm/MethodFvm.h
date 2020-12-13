@@ -7,6 +7,7 @@
 #define CHARM_3D_V2_METHODFVM_H
 
 #include <Flux.h>
+#include <method/Data.h>
 #include "Method.h"
 
 namespace charm {
@@ -18,14 +19,15 @@ namespace charm {
         void init() override;
         void run() override;
         void done() override;
+        Data* getData(Index iCell) override;
 
         Real calcDt();
 
         void save();
         void saveVtk();
 
-        Array<Data> data;
-        Array<Cons> integrals;
+        Array<DataFvm>  data;
+        Array<Cons>     integrals;
 
         Flux *flux;
 

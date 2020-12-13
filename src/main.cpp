@@ -4,14 +4,13 @@
 #include "Method.h"
 
 using namespace charm;
-int main() {
 
+
+int main(Int argc, char** argv) {
+    Parallel::init(&argc, &argv);
     try {
         Config *conf = Config::create("task.yaml");
-//        conf->read();
-
         Method *method = conf->createMethod();
-
         method->init();
         method->run();
         method->done();
@@ -23,8 +22,11 @@ int main() {
     catch (MethodException &e) {
         std::cerr << e.getMessage() << std::endl;
     }
+    catch (Exception &e) {
+        std::cerr << e.getMessage() << std::endl;
+    }
 
 
-
+    Parallel::done();
     return 0;
 }

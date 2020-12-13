@@ -39,6 +39,8 @@ namespace charm {
             return *this;
         }
 
+        ArrayIndex getNeigh();
+
         Index               id;
         ArrayIndex          nodesInd;
         ArrayIndex          facesInd;

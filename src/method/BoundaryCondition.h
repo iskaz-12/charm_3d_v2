@@ -9,7 +9,7 @@
 #include <map>
 #include "global.h"
 #include "Point.h"
-#include "Data.h"
+#include "DataFvm.h"
 
 namespace charm {
 

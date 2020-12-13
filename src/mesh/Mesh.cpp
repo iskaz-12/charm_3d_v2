@@ -292,6 +292,25 @@ namespace charm{
         return cellGetFaceVertices(cells[ic], fi);
     }
 
+
+    ArrayIndex Mesh::cellGetNeighIndexes(Index ci) {
+        Cell &cell = cells[ci];
+        ArrayIndex res;
+        for (auto fi : cell.facesInd) {
+            Face &face = faces[fi];
+            if (face.cells.size() == 2) {
+                if (face.cells[0] != ci) {
+                    res.push_back(face.cells[0]);
+                }
+                else {
+                    res.push_back(face.cells[1]);
+                }
+            }
+        }
+        return res;
+    }
+
+
     Mesh::FileType Mesh::getfileTypeByStr(String str)
     {
         if (str == "gmsh_msh") {
@@ -305,6 +324,30 @@ namespace charm{
         }
         else {
             return Mesh::UNKNOWN;
+        }
+    }
+
+    void Mesh::assign(const Mesh &msh) {
+        this->nCount    = msh.nCount;
+        this->nCountGhost  = msh.nCountGhost;
+        this->nodes.assign(msh.nodes.begin(), msh.nodes.end());
+
+        this->fCount    = msh.fCount;
+        this->fCountGhost  = msh.fCountGhost;
+        this->faces.assign(msh.faces.begin(), msh.faces.end());
+
+        this->cCount    = msh.cCount;
+        this->cCountGhost  = msh.cCountGhost;
+        this->cells.assign(msh.cells.begin(), msh.cells.end());
+
+        this->patchesCount = msh.patchesCount;
+        this->patches.assign(msh.patches.begin(), msh.patches.end());
+
+        this->recvCount.assign(msh.recvCount.begin(), msh.recvCount.end());
+        this->recvShift.assign(msh.recvShift.begin(), msh.recvShift.end());
+        this->sendInd.resize(msh.sendInd.size());
+        for (Index i = 0; i < this->sendInd.size(); i++) {
+            this->sendInd[i].assign(msh.sendInd[i].begin(), msh.sendInd[i].end());
         }
     }
 

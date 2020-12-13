@@ -40,7 +40,8 @@ namespace charm {
         Points cellGetVertices(Index ci);
         Points cellGetFaceVertices(Cell &c, Index fi);
         Points cellGetFaceVertices(Index ci, Index fi);
-        //void decomp();
+        ArrayIndex cellGetNeighIndexes(Index ci);
+        void assign(const Mesh &msh);
 
         static void cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);
         static void cellCalcGp(Cell &cell);
@@ -48,12 +49,25 @@ namespace charm {
 
         static FileType getfileTypeByStr(String str);
 
-        Points        nodes;     ///< Mesh nodes.
+
+        Index               nCount;
+        Index               nCountGhost;
+        Points              nodes;     ///< Mesh nodes.
+
+        Index               cCount;
+        Index               cCountGhost;
         Array<Cell>         cells;     ///< Mesh cells.
+
+        Index               fCount;
+        Index               fCountGhost;
         Array<Face>         faces;     ///< Mesh faces.
+
+        Index               patchesCount = 0;       ///< Number of boundary patches.
         Array<Patch>        patches;
 
-        Index patchesCount = 0;       ///< Number of boundary patches.
+        ArrayIndex          recvCount;
+        ArrayIndex          recvShift;
+        Array<ArrayIndex>   sendInd;
 
         static const Index ftv[6][4];// =
 //                                    {{ 0, 2, 4, 6 },
@@ -63,6 +77,7 @@ namespace charm {
 //                                     { 0, 1, 2, 3 },
 //                                     { 4, 5, 6, 7 }};
     };
+
 
 }
 

@@ -9,37 +9,37 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
-
+#include "mpi.h"
 
 namespace charm {
 
-    typedef double              Real;
-    typedef int                 Int;
-    typedef unsigned int        Uint;
-    typedef std::size_t         Index;
-    typedef std::int8_t         Byte;
-    typedef std::string         String;
+    typedef double Real;
+    typedef int Int;
+    typedef unsigned int Uint;
+    typedef std::size_t Index;
+    typedef std::int8_t Byte;
+    typedef std::string String;
 
     template<typename T>
     using Array = std::vector<T>;
 
-    typedef Array<Int>          ArrayInt;
-    typedef Array<Real>         ArrayReal;
-    typedef Array<Index>        ArrayIndex;
+    typedef Array<Byte> ArrayByte;
+    typedef Array<Int> ArrayInt;
+    typedef Array<Real> ArrayReal;
+    typedef Array<Index> ArrayIndex;
 
-    const Real      EPS         = 1.e-12;
-    const Int       DIM         = 3;
-
+    const Real EPS = 1.e-12;
+    const Int DIM = 3;
 
 
     Real matr3Det(Real a[3][3]);
+
     void matr3Inv(Real a[3][3], Real a_inv[3][3]);
 
     void delQuotes(String &s);
 
 
-    struct Tensor
-    {
+    struct Tensor {
         Real xx;
         Real yy;
         Real zz;
@@ -49,16 +49,63 @@ namespace charm {
     };
 
 
+    struct Parallel {
+        static void init(Int *argc, char ***argv);
 
+        static void done();
+
+        static bool isRoot() { return (procId == 0); }
+
+        static void barrier() { MPI_Barrier(MPI_COMM_WORLD); }
+
+        static void send(Int pid, Int tag, Int n, Real *data);
+
+        static void send(Int pid, Int tag, Int n, Int *data);
+
+        static void send(Int pid, Int tag, Int n, Byte *data);
+
+        static void recv(Int pid, Int tag, Int n, Real *data);
+
+        static void recv(Int pid, Int tag, Int n, Int *data);
+
+        static void recv(Int pid, Int tag, Int n, Byte *data);
+
+        static void bcast(Int root, Int n, Real *data);
+
+        static void bcast(Int root, Int n, Int *data);
+        //static void bcast(Int tag, Int n, VECTOR* data);
+
+        static void bcast(Int root, Int n, Index *x);
+
+        static Int procCount;
+        static Int procId;
+        static Real *buf;
+
+    };
+
+    class Log {
+    public:
+        static void print(const String &str) { if (Parallel::isRoot()) std::cout << str; }
+    };
 
     class Exception : std::exception {
     public:
-        explicit Exception(String message): msg(message) {}
+        explicit Exception(String message) : msg(message) {}
 
         String getMessage() { return msg; }
 
     protected:
         String msg;
     };
+
+
+    template<typename Base, typename T>
+    inline bool instanceof(const T *ptr) {
+        return dynamic_cast<const Base *>(ptr) != nullptr;
+    }
+
+
+
+
 }
 #endif //CHARM_3D_V2_GLOBAL_H

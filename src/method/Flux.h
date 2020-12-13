@@ -5,8 +5,8 @@
 #ifndef CHARM_3D_V2_FLUX_H
 #define CHARM_3D_V2_FLUX_H
 
-#include <mesh/Point.h>
-#include "Data.h"
+#include <Point.h>
+#include "DataFvm.h"
 
 namespace charm {
     class Flux {

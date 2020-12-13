@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.4)
 project(charm_3d_v2)
 
+
+set(CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib")
+
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     # Update submodules as needed
@@ -16,16 +19,19 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/contrib/yaml-cpp/CMakeLists.txt")
+if(NOT EXISTS "${CONTRIB_DIR}/yaml-cpp/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
-add_subdirectory(contrib/yaml-cpp)
+add_subdirectory(${CONTRIB_DIR}/yaml-cpp)
+add_subdirectory(${CONTRIB_DIR}/metis-5.1.0)
 
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_COMPILER mpicc)
+set(CMAKE_CXX_COMPILER mpicxx)
 
-
+set(METIS_INCLUDE "${CONTRIB_DIR}/metis-5.1.0/include")
 set(CHARM_INCLUDE
         "${CMAKE_SOURCE_DIR}/src"
         "${CMAKE_SOURCE_DIR}/src/mesh"
@@ -34,7 +40,7 @@ set(CHARM_INCLUDE
         "${CMAKE_SOURCE_DIR}/src/method/fvm"
         )
 
-include_directories(${CHARM_INCLUDE})
+include_directories(${METIS_INCLUDE} ${CHARM_INCLUDE})
 
 
 
@@ -54,6 +60,41 @@ add_executable( charm_3d_v2
         src/mesh/readers/MeshReader.h
         src/mesh/readers/MeshReaderMsh22ASCII.cpp
         src/mesh/readers/MeshReaderMsh22ASCII.h
-        src/method/Config.cpp src/method/Config.h src/method/Material.cpp src/method/Material.h src/method/Region.cpp src/method/Region.h src/method/Component.cpp src/method/Component.h src/method/Method.cpp src/method/Method.h src/method/fvm/MethodFvm.cpp src/method/fvm/MethodFvm.h src/method/fvm/ConfigFvm.cpp src/method/fvm/ConfigFvm.h src/method/Reaction.cpp src/method/Reaction.h src/method/BoundaryCondition.cpp src/method/BoundaryCondition.h src/method/MethodException.cpp src/method/MethodException.h src/method/fvm/MethodFvmException.cpp src/method/fvm/MethodFvmException.h src/method/ConfigException.cpp src/method/ConfigException.h src/method/Data.cpp src/method/Data.h src/method/Flux.cpp src/method/Flux.h src/method/FluxHllc.cpp src/method/FluxHllc.h src/method/FluxLf.cpp src/method/FluxLf.h src/method/EosException.cpp src/method/EosException.h)
+        src/method/Config.cpp
+        src/method/Config.h
+        src/method/Material.cpp
+        src/method/Material.h
+        src/method/Region.cpp
+        src/method/Region.h
+        src/method/Component.cpp
+        src/method/Component.h
+        src/method/Method.cpp
+        src/method/Method.h
+        src/method/fvm/MethodFvm.cpp
+        src/method/fvm/MethodFvm.h
+        src/method/fvm/ConfigFvm.cpp
+        src/method/fvm/ConfigFvm.h
+        src/method/fvm/DataFvm.cpp
+        src/method/fvm/DataFvm.h
+        src/method/Reaction.cpp
+        src/method/Reaction.h
+        src/method/BoundaryCondition.cpp
+        src/method/BoundaryCondition.h
+        src/method/MethodException.cpp
+        src/method/MethodException.h
+        src/method/fvm/MethodFvmException.cpp
+        src/method/fvm/MethodFvmException.h
+        src/method/ConfigException.cpp
+        src/method/ConfigException.h
+        src/method/Flux.cpp
+        src/method/Flux.h
+        src/method/FluxHllc.cpp
+        src/method/FluxHllc.h
+        src/method/FluxLf.cpp
+        src/method/FluxLf.h
+        src/method/EosException.cpp
+        src/method/EosException.h
+        src/method/VtkWriter.cpp src/method/VtkWriter.h src/method/Data.h src/mesh/readers/MeshReaderException.h src/mesh/readers/MeshDecompException.h)
 
-target_link_libraries(charm_3d_v2 yaml-cpp)
+target_link_libraries(charm_3d_v2 yaml-cpp metis)
+add_dependencies(charm_3d_v2  yaml-cpp metis)
