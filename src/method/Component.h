@@ -33,6 +33,9 @@ namespace charm {
         Real calcH(Real t);
         Real calcCpDt(Real t);
 
+        Real calcKp(Real t) const;
+        Real calcMl(Real t) const;
+
         String      name;
         Index       id;
         Real        m;

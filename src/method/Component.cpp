@@ -52,5 +52,29 @@ namespace charm {
         return h;
     }
 
+    Real Component::calcKp(Real t) const {
+        if (kpType == KP_CONST) {
+            return kp0;
+        }
+        else if (kpType == KP_SATHERLAND) {
+            return kp0 * sqrt( pow( t / t0, 3 ) ) * ( t0 + ts ) / ( t + ts );
+        }
+        else {
+            return kp0;
+        }
+    }
+
+    Real Component::calcMl(Real t) const {
+        if (mlType == ML_CONST) {
+            return ml0;
+        }
+        else if (mlType == ML_SATHERLAND) {
+            return ml0 * sqrt( pow( t / t0, 3 ) ) * ( t0 + ts ) / ( t + ts );
+        }
+        else {
+            return ml0;
+        }
+    }
+
 
 }

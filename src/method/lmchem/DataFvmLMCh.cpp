@@ -131,6 +131,17 @@ namespace charm {
         }
         prim.eos(Material::EOS_LOW_MACH_R_TO_T_E);
         prim.eTot = prim.e + 0.5 * prim.v2();
+        prim.ml = 0.;
+        prim.kp = 0.;
+        Real sm = 0.;
+        for (Index i = 0; i < cCount; i++) {
+            Component *comp = Config::getComponent(i);
+            Real cm = prim.c[i]/comp->m;
+            sm += cm;
+            prim.ml += cm * comp->calcMl(prim.t);
+            prim.kp += prim.c[i] * comp->calcKp(prim.t);
+        }
+        prim.ml /= sm;
         prim.shrink();
         return prim;
     }

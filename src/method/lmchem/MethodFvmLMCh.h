@@ -45,6 +45,7 @@ namespace charm {
         void calcConv();
         void calcDiff();
         void calcVisc();
+        void calcHeat();
         void calcPress();
         void correctVelosities();
 

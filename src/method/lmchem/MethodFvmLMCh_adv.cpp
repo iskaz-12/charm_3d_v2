@@ -21,8 +21,13 @@ namespace charm {
             i = 0.;
         }
 
+        calcDiff();
+        calcVisc();
+        calcHeat();
+        calcConv();
 
-        Real dt = conf->dt;
+
+        Real dt = calcDt();
 
         for (Index ic = 0; ic < mesh->cCount; ic++) {
             integrals[ic].normalize();

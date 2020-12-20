@@ -27,6 +27,8 @@ namespace charm {
         Real          cp;
         Real          cv;
         Real          m;
+        Real          ml;
+        Real          kp;
         Index         matId;
         ArrayReal     c;             ///< concentrations
 

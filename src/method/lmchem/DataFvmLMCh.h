@@ -25,7 +25,7 @@ namespace charm {
 
         class Cons
         {
-        protected:
+        public:
             Real          ru;
             Real          rv;
             Real          rw;
@@ -61,6 +61,13 @@ namespace charm {
         Vector          gradW;
         Array<Vector>   gradC;
         Array<Vector>   gradH;
+
+//        Real            tauXX;
+//        Real            tauXY;
+//        Real            tauXZ;
+//        Real            tauYY;
+//        Real            tauYZ;
+//        Real            tauZZ;
 
         explicit DataFvmLMCh(Index compCount): c(compCount) {}
 
