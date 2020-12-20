@@ -38,6 +38,13 @@ namespace charm {
             return *this;
         }
 
+        Point& operator = (const Real a) {
+            x = a;
+            y = a;
+            z = a;
+            return *this;
+        }
+
         inline Real &operator[](Int i) {
             return coords[i];
         }

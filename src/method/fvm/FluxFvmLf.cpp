@@ -2,13 +2,14 @@
 // Created by zhrv on 22.11.2020.
 //
 
-#include "FluxLf.h"
+#include "FluxFvmLf.h"
 #include "Config.h"
 
 namespace charm{
 
+    using Cons = DataFvm::Cons;
 
-    void FluxLf::calc(const Prim &_prim1, const Prim &_prim2, Cons &flux, const Vector &n) {
+    void FluxFvmLf::calc(const Prim &_prim1, const Prim &_prim2, Cons &flux, const Vector &n) {
         
         Index cCount = Config::getCompCount();
         Index  fCount = 4+cCount;

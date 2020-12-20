@@ -38,6 +38,7 @@ set(CHARM_INCLUDE
         "${CMAKE_SOURCE_DIR}/src/mesh/readers"
         "${CMAKE_SOURCE_DIR}/src/method"
         "${CMAKE_SOURCE_DIR}/src/method/fvm"
+        "${CMAKE_SOURCE_DIR}/src/method/lmchem"
         )
 
 include_directories(${METIS_INCLUDE} ${CHARM_INCLUDE})
@@ -86,15 +87,29 @@ add_executable( charm_3d_v2
         src/method/fvm/MethodFvmException.h
         src/method/ConfigException.cpp
         src/method/ConfigException.h
-        src/method/Flux.cpp
-        src/method/Flux.h
-        src/method/FluxHllc.cpp
-        src/method/FluxHllc.h
-        src/method/FluxLf.cpp
-        src/method/FluxLf.h
+        src/method/fvm/FluxFvm.cpp
+        src/method/fvm/FluxFvm.h
+        src/method/fvm/FluxFvmHllc.cpp
+        src/method/fvm/FluxFvmHllc.h
+        src/method/fvm/FluxFvmLf.cpp
+        src/method/fvm/FluxFvmLf.h
         src/method/EosException.cpp
         src/method/EosException.h
-        src/method/VtkWriter.cpp src/method/VtkWriter.h src/method/Data.h src/mesh/readers/MeshReaderException.h src/mesh/readers/MeshDecompException.h)
+        src/method/VtkWriter.cpp
+        src/method/VtkWriter.h
+        src/method/Data.h
+        src/mesh/readers/MeshReaderException.h
+        src/mesh/readers/MeshDecompException.h
+        src/method/Prim.h
+        src/method/Prim.cpp
+
+        src/method/lmchem/DataFvmLMCh.h
+        src/method/lmchem/DataFvmLMCh.cpp
+        src/method/lmchem/MethodFvmLMCh.h
+        src/method/lmchem/MethodFvmLMCh.cpp
+
+
+        src/method/lmchem/MethodFvmLMChException.h src/method/lmchem/ConfigFvmLMCh.cpp src/method/lmchem/ConfigFvmLMCh.h src/method/lmchem/FluxFvmLMCh.h src/method/lmchem/FluxFvmLMChLF.cpp src/method/lmchem/FluxFvmLMChLF.h src/method/lmchem/MethodFvmLMCh_chem.cpp src/method/lmchem/MethodFvmLMCh_adv.cpp src/method/lmchem/MethodFvmLMCh_visc.cpp src/method/lmchem/MethodFvmLMCh_diff.cpp src/method/lmchem/MethodFvmLMCh_press.cpp src/method/lmchem/MethodFvmLMCh_grad.cpp src/method/lmchem/MethodFvmMLCh_conv.cpp)
 
 target_link_libraries(charm_3d_v2 yaml-cpp metis)
 add_dependencies(charm_3d_v2  yaml-cpp metis)

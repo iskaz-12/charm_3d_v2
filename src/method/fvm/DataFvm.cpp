@@ -7,26 +7,21 @@
 #include "MethodException.h"
 
 namespace charm {
-    Prim& Prim::operator = (const Prim &prim) {
-        r           = prim.r;
-        v           = prim.v;
-        e           = prim.e;
-        eTot        = prim.eTot;
-        this->p     = prim.p;
-        t           = prim.t;
-        cz          = prim.cz;
-        gam         = prim.gam;
-        cp          = prim.cp;
-        cv          = prim.cv;
-        m           = prim.m;
-        matId       = prim.matId;
-        c.assign(prim.c.begin(), prim.c.end());
 
-        return *this;
+    using Cons = DataFvm::Cons;
+
+    Cons::Cons(Index compCount): ru(0.), rv(0.), rw(0.), re(0.), rc(compCount), matId(0) {}
+
+    Cons::Cons(const Cons& cons) {
+        *this = cons;
     }
 
-    void Prim::eos(Material::EosFlag flag) {
-        Config::getMaterial(matId)->eos(*this, flag);
+    inline void Cons::shrink() {
+        rc.shrink_to_fit();
+    }
+
+    inline Index Cons::size() const {
+        return sizeof(Real)*(4+rc.size())+sizeof(Index);
     }
 
 
@@ -40,6 +35,7 @@ namespace charm {
         return *this;
     }
 
+
     Cons& Cons::operator = (const Real& a) {
         ru      = a;
         rv      = a;
@@ -50,6 +46,7 @@ namespace charm {
         return *this;
     }
 
+
     void Cons::normalize() {
         if (::fabs(ru) < EPS) ru = 0.;
         if (::fabs(rv) < EPS) rv = 0.;
@@ -59,6 +56,7 @@ namespace charm {
             if (::fabs(c) < EPS) c = 0.;
         }
     }
+
 
     Cons &Cons::operator+=(const Cons &cons) {
         ru += cons.ru;
@@ -71,6 +69,7 @@ namespace charm {
         return *this;
     }
 
+
     Cons &Cons::operator-=(const Cons &cons) {
         ru -= cons.ru;
         rv -= cons.rv;
@@ -81,6 +80,7 @@ namespace charm {
         }
         return *this;
     }
+
 
     Cons &Cons::operator*=(const Real &a) {
         ru *= a;
@@ -93,6 +93,10 @@ namespace charm {
         return *this;
     }
 
+
+
+
+    DataFvm::DataFvm(Index compCount): c(compCount) {}
 
 
     /**
@@ -145,6 +149,7 @@ namespace charm {
         return c;
     }
 
+
     /**
      *
      * @param p
@@ -163,6 +168,12 @@ namespace charm {
         }
         c.shrink();
     }
+
+
+    Index DataFvm::size() const {
+        return c.size();
+    }
+
 
     void DataFvm::getBuffer(Byte *buf) {
         Index shift = 0;

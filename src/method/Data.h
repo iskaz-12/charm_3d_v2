@@ -6,6 +6,9 @@
 #ifndef CHARM_3D_V2_DATA_H
 #define CHARM_3D_V2_DATA_H
 
+#include "global.h"
+#include "Point.h"
+
 
 namespace charm {
 
@@ -13,7 +16,7 @@ namespace charm {
     public:
         virtual void getBuffer(Byte *) = 0;
         virtual void setBuffer(Byte *) = 0;
-        virtual Index size() = 0;
+        virtual Index size() const = 0;
 
         virtual Index getScalarFieldsCount() = 0;
         virtual String getScalarFieldName(Index) = 0;

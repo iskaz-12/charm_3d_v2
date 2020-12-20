@@ -1,35 +1,38 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 //
-// Created by zhrv on 19.11.2020.
+// Created by zhrv on 15.12.2020.
 //
 
-#ifndef CHARM_3D_V2_DATAFVM_H
-#define CHARM_3D_V2_DATAFVM_H
+#ifndef CHARM_3D_V2_DATAFVMLMCH_H
+#define CHARM_3D_V2_DATAFVMLMCH_H
 
-#include <Point.h>
-#include "global.h"
-#include "Material.h"
-#include <cmath>
 #include <Data.h>
-#include "Prim.h"
-#include "mpi.h"
-
+#include <Prim.h>
 
 namespace charm {
 
-
-    class DataFvm : public Data {
+    class DataFvmLMCh : public Data{
     public:
 
         class Cons
         {
-        public:
+        protected:
             Real          ru;
             Real          rv;
             Real          rw;
-            Real          re;
+            Real          rh;
             ArrayReal     rc;
-            Index         matId;
 
+        public:
             explicit Cons(Index compCount);
             Cons(const Cons& cons);
             inline void shrink();
@@ -40,22 +43,35 @@ namespace charm {
             Cons& operator *= (const Real& a);
             void normalize();
             inline Index size() const;
+
+            friend class DataFvmLMCh;
+            friend class FluxFvmLMChLF;
         };
 
 
-
     public:
-        Cons    c;
+        Cons        c;
+        Real        p0;
+        Real        p;
+        Index       matId;
 
-        explicit DataFvm(Index compCount);
-        
+        Vector          gradT;
+        Vector          gradU;
+        Vector          gradV;
+        Vector          gradW;
+        Array<Vector>   gradC;
+        Array<Vector>   gradH;
+
+        explicit DataFvmLMCh(Index compCount): c(compCount) {}
+
         void getPrim(Prim &p);
         Prim getPrim();
         Cons& getCons();
-        void setCons(const Prim &p);
+        void setCons(const Prim &prim);
         void getBuffer(Byte *) override;
         void setBuffer(Byte *) override;
-        Index size() const override;
+        inline Index size() const override;
+
         Index getScalarFieldsCount() override;
         String getScalarFieldName(Index) override;
         Real getScalarFieldValue(Index) override;
@@ -65,4 +81,5 @@ namespace charm {
     };
 
 }
-#endif //CHARM_3D_V2_DATAFVM_H
+
+#endif //CHARM_3D_V2_DATAFVMLMCH_H

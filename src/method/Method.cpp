@@ -3,21 +3,21 @@
  * @author R.V.Zhalnin, zhalnin@gmail.com
  */
 
-#include <MethodFvm.h>
-#include <iostream>
 #include "Method.h"
 
 namespace charm {
-    Method::Method(Config *_conf, Mesh *_mesh): conf(_conf), mesh(_mesh) {}
+    Method::Method(Config *_conf): conf(_conf) {
+        mesh = conf->mesh;
+    }
 
-    Method* Method::create(Config *conf, Mesh *mesh) {
-        if (conf->methodName == "CHARM_FVM") {
-            return new MethodFvm(conf, mesh);
-        }
-        else {
-            std::cerr << "Wrong method!!!\n";
-            exit(1);
-        }
+
+    Mesh* Method::getMesh() const {
+        return mesh;
+    }
+
+
+    Config* Method::getConfig() const {
+        return conf;
     }
 
 
@@ -64,8 +64,5 @@ namespace charm {
             }
         }
         Parallel::barrier();
-//        Log::print("OK!!!!!!!\n");
-//        Parallel::done();
-//        exit(0);
     }
 }

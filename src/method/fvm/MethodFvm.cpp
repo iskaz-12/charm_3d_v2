@@ -3,14 +3,19 @@
  * @author R.V.Zhalnin, zhalnin@gmail.com
  */
 
-#include <FluxHllc.h>
+#include <FluxFvmHllc.h>
 #include <iomanip>
 #include <fstream>
 #include <iostream>
-#include <FluxLf.h>
+#include <FluxFvmLf.h>
 #include "MethodFvm.h"
+#include "VtkWriter.h"
+
 
 namespace charm {
+
+    using Cons = DataFvm::Cons;
+
 
     void MethodFvm::init() {
         Index cN = mesh->cCountGhost;
@@ -34,7 +39,7 @@ namespace charm {
         integrals.resize(cN, Cons(compCount));
         integrals.shrink_to_fit();
 
-        flux = new FluxHllc(); ///< @todo @todo
+        flux = new FluxFvmHllc(); ///< @todo @todo
 
         exchange();
 
@@ -108,11 +113,7 @@ namespace charm {
 
     void MethodFvm::seroIntegrals() {
         for (auto &integral : integrals) {
-            integral.ru = 0.;
-            integral.rv = 0.;
-            integral.rw = 0.;
-            integral.re = 0.;
-            integral.rc.assign(Config::getCompCount(), 0.);
+            integral = 0.;
         }
     }
 

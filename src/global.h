@@ -1,3 +1,13 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 /**
  * @author R.V.Zhalnin zhalnin@gmail.com
  */
@@ -76,6 +86,10 @@ namespace charm {
         //static void bcast(Int tag, Int n, VECTOR* data);
 
         static void bcast(Int root, Int n, Index *x);
+
+        static void min(Real *x);
+
+        static void max(Real *x);
 
         static Int procCount;
         static Int procId;

@@ -30,6 +30,7 @@ namespace charm {
         } MlType;
 
         Real calcCp(Real t);
+        Real calcH(Real t);
         Real calcCpDt(Real t);
 
         String      name;

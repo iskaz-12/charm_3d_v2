@@ -2,7 +2,7 @@
 // Created by zhrv on 20.11.2020.
 //
 
-#include "FluxHllc.h"
+#include "FluxFvmHllc.h"
 #include "Config.h"
 
 namespace charm {
@@ -10,8 +10,9 @@ namespace charm {
 #define F_HLLC_V(UK, FK, SK, SS, PK, RK, VK) (((SS)*((SK)*(UK)-(FK))) / ((SK)-(SS)))
 #define F_HLLC_E(UK, FK, SK, SS, PK, RK, VK) (((SS)*((SK)*(UK)-(FK)) + (SK)*( (PK)+(RK)*((SK)-(VK))*((SS)-(VK)) )*(SS)) / ((SK)-(SS)))
 
+    using Cons = DataFvm::Cons;
 
-    void FluxHllc::x_1(const Prim &prim1, const Prim &prim2, Cons &flux) {
+    void FluxFvmHllc::x_1(const Prim &prim1, const Prim &prim2, Cons &flux) {
         Index         cCount = Config::getCompCount();
         Real          sl, sr, p_star, s_star, p_pvrs, ql, qr, tmp;
 
@@ -123,7 +124,7 @@ namespace charm {
         }
     }
 
-    void FluxHllc::calc(const Prim &prim1, const Prim &prim2, Cons &flux, const Vector &n) {
+    void FluxFvmHllc::calc(const Prim &prim1, const Prim &prim2, Cons &flux, const Vector &n) {
         Index cCount = Config::getCompCount();
         Real ri;
         Vector nt[3], vv[2], vn[2];

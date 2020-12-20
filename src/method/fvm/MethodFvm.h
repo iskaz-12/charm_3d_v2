@@ -6,7 +6,7 @@
 #ifndef CHARM_3D_V2_METHODFVM_H
 #define CHARM_3D_V2_METHODFVM_H
 
-#include <Flux.h>
+#include <FluxFvm.h>
 #include <method/Data.h>
 #include "Method.h"
 
@@ -14,7 +14,7 @@ namespace charm {
 
     class MethodFvm : public Method {
     public:
-        explicit MethodFvm(Config *conf, Mesh *mesh): Method(conf, mesh) {}
+        explicit MethodFvm(Config *conf): Method(conf) {}
 
         void init() override;
         void run() override;
@@ -24,12 +24,11 @@ namespace charm {
         Real calcDt();
 
         void save();
-        void saveVtk();
 
         Array<DataFvm>  data;
-        Array<Cons>     integrals;
+        Array<DataFvm::Cons>     integrals;
 
-        Flux *flux;
+        FluxFvm *flux;
 
         void seroIntegrals();
     };

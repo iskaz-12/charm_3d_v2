@@ -4,7 +4,9 @@
  */
 
 #include <iostream>
-#include <mesh/readers/MeshReader.h>
+#include <MeshReader.h>
+#include <ConfigFvmLMCh.h>
+#include <lmchem/ConfigFvmLMCh.h>
 #include "Config.h"
 #include "ConfigFvm.h"
 #include "Material.h"
@@ -69,6 +71,9 @@ namespace charm {
         String model = node["control"]["MODEL"]["name"].as<String>();
         if (model == "EULER_FVM") {
             config = new ConfigFvm(fileName);
+        }
+        if (model == "LOW_MACH_CHEM_FVM") {
+            config = new ConfigFvmLMCh(fileName);
         }
         else {
             throw ConfigException("Wrong model name.");

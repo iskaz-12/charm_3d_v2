@@ -20,7 +20,9 @@ namespace charm {
             EOS_R_P_TO_E_T,     // (r,p)    =>  (e,t)
             EOS_T_P_TO_R_CZ,    // (T,p)    =>  (r,cz)
             EOS_T_P_TO_R_CZ_E,  // (T,p)    =>  (r, cz, e)
-            EOS_R_E_TO_P_CZ_T   // (r,e)    =>  (p, cz, T)
+            EOS_R_E_TO_P_CZ_T,  // (r,e)    =>  (p, cz, T)
+
+            EOS_LOW_MACH_R_TO_T_E
         } EosFlag;
 
         Int     id;
@@ -32,32 +34,17 @@ namespace charm {
 
 
     class MaterialIdeal : public Material {
-        void eos(Prim &p, Material::EosFlag flag);
+        void eos(Prim &p, Material::EosFlag flag) override;
 
     };
 
 
     class MaterialMix : public Material {
-        void eos(Prim &p, Material::EosFlag flag);
+        void eos(Prim &p, Material::EosFlag flag) override;
 
     };
 
 }
 
-/*
-
- typedef struct charm_mat
-{
-    int                 id;
-    char                name[64];
-    charm_eos_fn_t      eos_fn;
-} charm_mat_t;
-
-
-
-
-
-
- */
 
 #endif //CHARM_3D_V2_MATERIAL_H

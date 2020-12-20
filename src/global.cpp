@@ -1,3 +1,13 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 /**
  * Created by zhrv on 17.11.2020.
  * @author R.V.Zhalnin, zhalnin@gmail.com
@@ -114,6 +124,18 @@ namespace charm {
 
     void Parallel::recv(Int pid, Int tag, Int n, Byte *data) {
         MPI_Recv(data, n, MPI_CHAR, pid, tag, MPI_COMM_WORLD, &mpiSt);
+    }
+
+    void Parallel::min(Real *x) {
+        Real tmp;
+        MPI_Allreduce(x, &tmp, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        *x = tmp;
+    }
+
+    void Parallel::max(Real *x) {
+        Real tmp;
+        MPI_Allreduce(x, &tmp, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        *x = tmp;
     }
 
 

@@ -17,7 +17,7 @@ namespace charm {
 
     Method *ConfigFvm::createMethod() {
         Config::createMethod();
-        return new MethodFvm(this, mesh);
+        return new MethodFvm(this);
     }
 
 }

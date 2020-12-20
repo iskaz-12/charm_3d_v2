@@ -9,10 +9,9 @@
 #include <map>
 #include "global.h"
 #include "Point.h"
-#include "DataFvm.h"
+#include "Prim.h"
 
 namespace charm {
-
 
     class BoundaryCondition {
     public:

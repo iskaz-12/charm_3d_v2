@@ -14,70 +14,81 @@ namespace charm {
     Real gR = 8.31446261815324; // Дж/(моль К)
 
 
-    void Material::calcT(Prim &p)
-    {
+    void Material::calcT(Prim &p) {
         Config *conf = Config::get();
-        Real tt = 1.0;		// начальное приближение для температуры
-        Real e  = p.e;		// энергия
-        //int c_count = charm_get_comp_count(p4est);
-        Real rm, cp, cp_dt, ft, ft_dt, tt1;
+        Real tt = 1.0;        // начальное приближение для температуры
+        Real h = p.h;        // энтальпия
+        Real cp, cp_dt, tt1;
 
-        Real m_ = 0.0;		//  формулы   M_ = 1 / M   где   M = 1 / SUM( Ci / Mi )
-
-
-        for (Index i = 0; i < conf->components.size(); i++)	{
-            m_ += p.c[i] / conf->components[i]->m;
-        }
-        rm = gR * m_;
-
-
-        for (Index j=0; j<100; j++ )
-        {
+        // Newton_Method
+        for (Index j = 0; j < 100; j++) {
             cp = 0.0;
             cp_dt = 0.0;
-            for (Index i = 0; i < conf->components.size(); i++)	{
+            for (Index i = 0; i < conf->components.size(); i++) {
                 Component *comp = conf->components[i];
-                cp  += p.c[i] * comp->calcCp(tt);
-                cp_dt += p.c[i] * comp->calcCpDt(tt);
+                cp    += p.c[i] * comp->calcH(tt);
+                cp_dt += p.c[i] * comp->calcCp(tt);
             }
 
-
-            ft    = ( cp - rm ) * tt - e;
-            ft_dt = ( cp - rm ) + cp_dt * tt;
-
-            tt1 = tt - ft / ft_dt;
-            if ( pow( tt1 - tt, 2 ) < EPS ) {
+            tt1 = tt - (cp - h) / cp_dt;
+            if (std::pow(tt1 - tt, 2) < EPS) {
                 tt = tt1;
                 break;
             }
             tt = tt1;
         }
         p.t = tt;
-    } // Newton_Method
+    }
 
 
     void MaterialIdeal::eos(Prim &p, Material::EosFlag flag) {
-        Config  *conf = Config::get();
         Component *comp = Config::getComponent(0);
-//        Real t;
-//
-//        if (comp->cpType == Component::CP_POLYNOM && (flag == EOS_R_P_TO_E_T || flag == EOS_R_E_TO_P_CZ_T)) {
-//            calcT(p);
-//            t = p.t;
-//        }
-//        else {
-//            t = p.t;
-//        }
+        Real t;
 
-        p.cp  = comp->cp[0];//comp->calcCp(t);
-        p.m   = comp->m;
-        p.cv  = p.cp-gR/p.m;
-        p.gam = p.cp/p.cv;
+        if (comp->cpType == Component::CP_POLYNOM &&
+            (flag == EOS_R_P_TO_E_T ||
+             flag == EOS_R_E_TO_P_CZ_T ||
+             flag == EOS_LOW_MACH_R_TO_T_E)) {
+            calcT(p);
+            t = p.t;
+        } else {
+            t = p.t;
+        }
+
+        p.cp = comp->calcCp(t);
+        p.m = comp->m;
+        p.cv = p.cp - gR / p.m;
+        p.gam = p.cp / p.cv;
         eosSwitch(p, flag);
     }
 
+
     void MaterialMix::eos(Prim &p, Material::EosFlag flag) {
-        //@todo
+        Index compCount = Config::getCompCount();
+        Component *comp = Config::getComponent(0);
+        Real t;
+
+        if (comp->cpType == Component::CP_POLYNOM &&
+            (flag == EOS_R_P_TO_E_T ||
+             flag == EOS_R_E_TO_P_CZ_T ||
+             flag == EOS_LOW_MACH_R_TO_T_E)) {
+            calcT(p);
+            t = p.t;
+        } else {
+            t = p.t;
+        }
+
+        p.cp  = 0.;
+        Real M_  = 0.;
+        for (Index i = 0; i < compCount; i++) {
+            comp = Config::getComponent(i);
+            M_ += p.c[i]/comp->m;
+            p.cp += p.c[i]*comp->calcCp(t);
+        }
+        p.m   = 1./M_;
+        p.cv = p.cp - gR / p.m;
+        p.gam = p.cp / p.cv;
+        eosSwitch(p, flag);
     }
 
     void Material::eosSwitch(Prim &p, Material::EosFlag flag) {
@@ -125,6 +136,10 @@ namespace charm {
                 p.p = p.r * p.e * (p.gam - 1);
                 p.cz = sqrt(p.gam * p.p / p.r);
                 p.t = p.e / p.cv;
+                break;
+
+            case EOS_LOW_MACH_R_TO_T_E:
+                p.e = p.t * p.cv;
                 break;
 
             default:
