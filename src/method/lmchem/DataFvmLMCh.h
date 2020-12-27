@@ -62,13 +62,6 @@ namespace charm {
         Array<Vector>   gradC;
         Array<Vector>   gradH;
 
-//        Real            tauXX;
-//        Real            tauXY;
-//        Real            tauXZ;
-//        Real            tauYY;
-//        Real            tauYZ;
-//        Real            tauZZ;
-
         explicit DataFvmLMCh(Index compCount): c(compCount) {}
 
         void getPrim(Prim &p);

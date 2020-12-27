@@ -187,51 +187,96 @@ namespace charm {
 
 
     inline Index DataFvmLMCh::size() const {
-        return c.size() + 2 * sizeof(Real) + sizeof(Index);
+        Index res = 0;
+        res += c.size();
+        res += 2*sizeof(Real);
+        res += sizeof(Index);
+        res += Vector::size()*(4+gradC.size() + gradH.size());
+
+        return res;
     }
 
     void DataFvmLMCh::getBuffer(Byte *buf) {
         Index shift = 0;
-        *(Real *) (&buf[shift]) = c.ru;
-        shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = c.rv;
-        shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = c.rw;
-        shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = c.rh;
-        shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = p0;
-        shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = p;
-        shift += sizeof(Real);
-        for (double rc : c.rc) {
-            *(Real *) (&buf[shift]) = rc;
-            shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = c.ru; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = c.rv; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = c.rw; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = c.rh; shift += sizeof(Real);
+        for (Real rc : c.rc) {
+            *(Real *) (&buf[shift]) = rc; shift += sizeof(Real);
         }
-        *(Index *) (&buf[shift]) = matId;
-        //shift += sizeof(Index);
+
+        *(Real *) (&buf[shift]) = p0; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = p; shift += sizeof(Real);
+
+        *(Real *) (&buf[shift]) = gradT[0]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradT[1]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradT[2]; shift += sizeof(Real);
+
+        *(Real *) (&buf[shift]) = gradU[0]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradU[1]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradU[2]; shift += sizeof(Real);
+
+        *(Real *) (&buf[shift]) = gradV[0]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradV[1]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradV[2]; shift += sizeof(Real);
+
+        *(Real *) (&buf[shift]) = gradW[0]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradW[1]; shift += sizeof(Real);
+        *(Real *) (&buf[shift]) = gradW[2]; shift += sizeof(Real);
+
+        for (Vector gc : gradC) {
+            *(Real *) (&buf[shift]) = gc[0]; shift += sizeof(Real);
+            *(Real *) (&buf[shift]) = gc[1]; shift += sizeof(Real);
+            *(Real *) (&buf[shift]) = gc[2]; shift += sizeof(Real);
+        }
+
+        for (Vector gh : gradH) {
+            *(Real *) (&buf[shift]) = gh[0]; shift += sizeof(Real);
+            *(Real *) (&buf[shift]) = gh[1]; shift += sizeof(Real);
+            *(Real *) (&buf[shift]) = gh[2]; shift += sizeof(Real);
+        }
+
+        *(Index *) (&buf[shift]) = matId; shift += sizeof(Index);
+
+        if (shift != size()) {
+            throw DataException("Size of copied to buffer data is diferent from data size.");
+        }
     }
 
     void DataFvmLMCh::setBuffer(Byte *buf) {
         Index shift = 0;
-        c.ru = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
-        c.rv = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
-        c.rw = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
-        c.rh = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
-        p0 = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
-        p = *(Real *) (&buf[shift]);
-        shift += sizeof(Real);
+        c.ru = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        c.rv = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        c.rw = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        c.rh = *(Real *) (&buf[shift]); shift += sizeof(Real);
         for (double &rc : c.rc) {
-            rc = *(Real *) (&buf[shift]);
-            shift += sizeof(Real);
+            rc = *(Real *) (&buf[shift]); shift += sizeof(Real);
         }
-        matId = *(Index *) (&buf[shift]);
-        //shift += sizeof(Index);
+
+        p0 = *(Real *) (&buf[shift]);  shift += sizeof(Real);
+        p = *(Real *) (&buf[shift]); shift += sizeof(Real);
+
+        gradT[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradT[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradT[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+
+        gradU[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradU[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradU[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+
+        gradV[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradV[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradV[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+
+        gradW[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradW[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+        gradW[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
+
+        matId = *(Index *) (&buf[shift]); shift += sizeof(Index);
+        if (shift != size()) {
+            throw DataException("Size of copied from buffer data is diferent from data size.");
+        }
     }
 
     Index DataFvmLMCh::getScalarFieldsCount() {

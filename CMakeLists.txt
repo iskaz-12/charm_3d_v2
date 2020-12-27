@@ -93,7 +93,6 @@ add_executable( charm_3d_v2
         src/method/fvm/FluxFvmHllc.h
         src/method/fvm/FluxFvmLf.cpp
         src/method/fvm/FluxFvmLf.h
-        src/method/EosException.cpp
         src/method/EosException.h
         src/method/VtkWriter.cpp
         src/method/VtkWriter.h

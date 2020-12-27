@@ -104,12 +104,18 @@ namespace charm {
 
     class Exception : std::exception {
     public:
-        explicit Exception(String message) : msg(message) {}
+        explicit Exception(const String &message) : msg(message) {}
 
         String getMessage() { return msg; }
 
     protected:
         String msg;
+    };
+
+
+    class NotImplementedException : public Exception {
+    public:
+        explicit NotImplementedException() : Exception("Calling of not implemented function") {}
     };
 
 
