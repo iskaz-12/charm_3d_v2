@@ -121,7 +121,7 @@ namespace charm {
         Config *conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
-            for (Index iCell = 0; iCell < mesh->cells.size(); iCell++) {
+            for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
                 Prim p = data[iCell].getPrim();
                 dt = std::min(dt, conf->cfl * mesh->cells[iCell].volume / (p.v.length() + p.cz));
             }
