@@ -26,6 +26,12 @@ namespace charm {
         virtual Vector getVectorFieldValue(Index) = 0;
     };
 
+
+    class DataException : public Exception {
+    public:
+        explicit DataException(const String &message) : Exception(message) {}
+    };
+
 }
 
 #endif //CHARM_3D_V2_DATA_H

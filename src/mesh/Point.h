@@ -97,7 +97,7 @@ namespace charm {
             return res;
         }
 
-        inline Index size() { return sizeof(Real)*3; }
+        static inline Index size() { return sizeof(Real)*3; }
 
 
     };

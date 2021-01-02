@@ -14,13 +14,32 @@ namespace charm {
     using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcVisc() {
-        Index compCount = Config::getCompCount();
-
         for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
             Face &face = mesh->faces[iFace];
             Vector n = face.n;
             if (face.cells.size() == 1) {
-                continue; // @todo for wall
+                if (instanceof<BoundaryConditionWallNoSlip>(face.bnd)) {
+                    Index c1 = face.cells[0];
+                    Prim p1 = data[c1].getPrim();
+
+                    Real un = scalarProd(p1.v, n);
+                    Vector vn = n;
+                    vn *= un;
+                    Vector vt = p1.v;
+                    vt -= vn;
+
+                    Vector l = face.center;
+                    l -= mesh->cells[c1].center;
+                    Real ll = l.length();
+
+                    Real qu = -p1.ml*vt[0]/ll;
+                    Real qv = -p1.ml*vt[1]/ll;
+                    Real qw = -p1.ml*vt[2]/ll;
+
+                    integrals[c1].ru -= qu;
+                    integrals[c1].rv -= qv;
+                    integrals[c1].rw -= qw;
+                }
             }
             else {
                 Index c1 = face.cells[0];

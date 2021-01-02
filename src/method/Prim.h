@@ -18,7 +18,6 @@ namespace charm {
         Real          e;             ///< energy
         Real          eTot;          ///< total energy
         Real          h;             ///< energy
-        Real          hTot;          ///< total energy
         Real          p0;            ///< pressure
         Real          p;             ///< pressure
         Real          t;             ///< temperature
@@ -79,7 +78,6 @@ namespace charm {
             res |= std::isnan(e);
             res |= std::isnan(eTot);
             res |= std::isnan(h);
-            res |= std::isnan(hTot);
             res |= std::isnan(p0);
             res |= std::isnan(p);
             res |= std::isnan(t);

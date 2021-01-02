@@ -34,26 +34,35 @@ namespace charm {
             Prim p1 = data[c1].getPrim();
             Prim p2(compCount);
 
+            Real vol1 = mesh->cells[c1].volume;
+            Real vol2;
+
             if (isBnd) {
                 face.bnd->calc(p1, p2, face.n);
+                vol2 = vol1;
             } else {
                 c2 = face.cells[1];
                 p2 = data[c2].getPrim();
+                vol2 = mesh->cells[c2].volume;
             }
+
+            Real s = face.area / (vol1 + vol2);
+            vol1 *= s;
+            vol2 *= s;
 
             Vector vT(n), vU(n), vV(n), vW(n);
             Array<Vector> vC(compCount, n);
             Array<Vector> vH(compCount, n);
-            Real s = face.area*0.5;
 
-            vT *= s*(p1.t+p2.t);
-            vU *= s*(p1.v.x+p2.v.x);
-            vV *= s*(p1.v.y+p2.v.y);
-            vW *= s*(p1.v.z+p2.v.z);
+
+            vT *= vol1 * p1.t   + vol2 * p2.t;
+            vU *= vol1 * p1.v.x + vol2 * p2.v.x;
+            vV *= vol1 * p1.v.y + vol2 * p2.v.y;
+            vW *= vol1 * p1.v.z + vol2 * p2.v.z;
             for (Index i = 0; i < compCount; i++) {
                 Component *comp = Config::getComponent(i);
-                vC[i] *= s*(p1.c[i]+p2.c[i]);
-                vH[i] *= s*(comp->calcH(p1.t)+comp->calcH(p2.t));
+                vC[i] *= vol1 * p1.c[i]           + vol2 * p2.c[i];
+                vH[i] *= vol1 * comp->calcH(p1.t) + vol2 * comp->calcH(p2.t);
             }
 
 
