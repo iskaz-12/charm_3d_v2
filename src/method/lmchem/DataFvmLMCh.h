@@ -53,14 +53,9 @@ namespace charm {
         Cons        c;
         Real        p0;
         Real        p;
+        ArrayReal   d;
         Index       matId;
 
-        Vector          gradT;
-        Vector          gradU;
-        Vector          gradV;
-        Vector          gradW;
-        Array<Vector>   gradC;
-        Array<Vector>   gradH;
 
         explicit DataFvmLMCh(Index compCount): c(compCount) {}
 

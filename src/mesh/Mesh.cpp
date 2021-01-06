@@ -1,7 +1,9 @@
 
 #include "Mesh.h"
+#include "MeshException.h"
 #include <cmath>
 #include <set>
+#include <cassert>
 
 
 namespace charm{
@@ -349,6 +351,29 @@ namespace charm{
         for (Index i = 0; i < this->sendInd.size(); i++) {
             this->sendInd[i].assign(msh.sendInd[i].begin(), msh.sendInd[i].end());
         }
+    }
+
+    Real Mesh::getCellVolume(Index iCell) {
+        return getCell(iCell).volume;
+    }
+
+    Cell &Mesh::getCell(Index iCell) {
+        assert(iCell < cCountGhost && "Wrong cell number for getCell().");
+        return cells[iCell];
+    }
+
+    Point &Mesh::getNode(Index iNode) {
+        assert(iNode < nCountGhost && "Wrong node number for getNode().");
+        return nodes[iNode];
+    }
+
+    Face &Mesh::getFace(Index iFace) {
+        assert(iFace < fCountGhost && "Wrong face number for getFace().");
+        return faces[iFace];
+    }
+
+    Real Mesh::getFaceArea(Index iFace) {
+        return getFace(iFace).area;
     }
 
 

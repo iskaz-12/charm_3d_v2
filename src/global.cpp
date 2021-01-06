@@ -126,6 +126,46 @@ namespace charm {
         MPI_Recv(data, n, MPI_CHAR, pid, tag, MPI_COMM_WORLD, &mpiSt);
     }
 
+    void Parallel::send(Int pid, Int tag, Int n, Vector *data) {
+        ArrayReal x(n*3);
+        for (Index i = 0; i < n; i++) {
+            x[i*3+0] = data[i][0];
+            x[i*3+1] = data[i][1];
+            x[i*3+2] = data[i][2];
+        }
+        MPI_Send(x.data(), n*3, MPI_DOUBLE, pid, tag, MPI_COMM_WORLD);
+    }
+
+    void Parallel::recv(Int pid, Int tag, Int n, Vector *data) {
+        ArrayReal x(n*3);
+        MPI_Recv(x.data(), n*3, MPI_DOUBLE, pid, tag, MPI_COMM_WORLD, &mpiSt);
+        for (Index i = 0; i < n; i++) {
+            data[i][0] = x[i*3+0];
+            data[i][1] = x[i*3+1];
+            data[i][2] = x[i*3+2];
+        }
+    }
+
+    void Parallel::bcast(Int root, Int n, Vector* data)
+    {
+        ArrayReal x(n*3);
+        if (procId == root) {
+            for (Index i = 0; i < n; i++) {
+                x[i * 3 + 0] = data[i][0];
+                x[i * 3 + 1] = data[i][1];
+                x[i * 3 + 2] = data[i][2];
+            }
+        }
+        MPI_Bcast(x.data(), n, MPI_DOUBLE, root, MPI_COMM_WORLD);
+        if (procId != root) {
+            for (Index i = 0; i < n; i++) {
+                data[i][0] = x[i * 3 + 0];
+                data[i][1] = x[i * 3 + 1];
+                data[i][2] = x[i * 3 + 2];
+            }
+        }
+    }
+
     void Parallel::min(Real *x) {
         Real tmp;
         MPI_Allreduce(x, &tmp, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
@@ -135,6 +175,12 @@ namespace charm {
     void Parallel::max(Real *x) {
         Real tmp;
         MPI_Allreduce(x, &tmp, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        *x = tmp;
+    }
+
+    void Parallel::sum(Real *x) {
+        Real tmp;
+        MPI_Allreduce(x, &tmp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         *x = tmp;
     }
 

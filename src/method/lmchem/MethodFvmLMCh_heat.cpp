@@ -20,13 +20,13 @@ namespace charm {
                 if (instanceof<BoundaryConditionWallNoSlip>(face.bnd)) {
                     Index c1 = face.cells[0];
                     Prim p1 = data[c1].getPrim();
-                    Vector gradT = data[c1].gradT;
+                    Vector _gradT = gradT[c1];
 
                     Vector l = face.center;
                     l -= mesh->cells[c1].center;
                     Real ll = l.length();
 
-                    Vector qt = gradT;
+                    Vector qt = _gradT;
                     qt *= -p1.kp;
                     Real qn = scalarProd(qt, n); // @todo проверить знаки
 
@@ -38,8 +38,8 @@ namespace charm {
                 Index c2 = face.cells[1];
                 Prim p1 = data[c1].getPrim();
                 Prim p2 = data[c2].getPrim();
-                Vector gradT1 = data[c1].gradT;
-                Vector gradT2 = data[c2].gradT;
+                Vector gradT1 = gradT[c1];
+                Vector gradT2 = gradT[c2];
                 Real vol1 = mesh->cells[c1].volume;
                 Real vol2 = mesh->cells[c2].volume;
 

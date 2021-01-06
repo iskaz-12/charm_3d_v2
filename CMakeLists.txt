@@ -53,7 +53,6 @@ add_executable( charm_3d_v2
         src/mesh/Cell.h
         src/global.h
         src/global.cpp
-        src/mesh/Point.cpp
         src/mesh/Point.h
         src/mesh/Face.cpp
         src/mesh/Face.h
@@ -108,7 +107,7 @@ add_executable( charm_3d_v2
         src/method/lmchem/MethodFvmLMCh.cpp
 
 
-        src/method/lmchem/MethodFvmLMChException.h src/method/lmchem/ConfigFvmLMCh.cpp src/method/lmchem/ConfigFvmLMCh.h src/method/lmchem/FluxFvmLMCh.h src/method/lmchem/FluxFvmLMChLF.cpp src/method/lmchem/FluxFvmLMChLF.h src/method/lmchem/MethodFvmLMCh_chem.cpp src/method/lmchem/MethodFvmLMCh_adv.cpp src/method/lmchem/MethodFvmLMCh_visc.cpp src/method/lmchem/MethodFvmLMCh_diff.cpp src/method/lmchem/MethodFvmLMCh_press.cpp src/method/lmchem/MethodFvmLMCh_grad.cpp src/method/lmchem/MethodFvmLMCh_heat.cpp src/method/lmchem/MethodFvmLMCh_conv.cpp)
+        src/method/lmchem/MethodFvmLMChException.h src/method/lmchem/ConfigFvmLMCh.cpp src/method/lmchem/ConfigFvmLMCh.h src/method/lmchem/FluxFvmLMCh.h src/method/lmchem/FluxFvmLMChLF.cpp src/method/lmchem/FluxFvmLMChLF.h src/method/lmchem/MethodFvmLMCh_chem.cpp src/method/lmchem/MethodFvmLMCh_adv.cpp src/method/lmchem/MethodFvmLMCh_visc.cpp src/method/lmchem/MethodFvmLMCh_diff.cpp src/method/lmchem/MethodFvmLMCh_press.cpp src/method/lmchem/MethodFvmLMCh_grad.cpp src/method/lmchem/MethodFvmLMCh_heat.cpp src/method/lmchem/MethodFvmLMCh_conv.cpp src/mesh/MeshException.h src/method/lmchem/MethodFvmLMCh_operators.cpp)
 
 target_link_libraries(charm_3d_v2 yaml-cpp metis)
 add_dependencies(charm_3d_v2  yaml-cpp metis)

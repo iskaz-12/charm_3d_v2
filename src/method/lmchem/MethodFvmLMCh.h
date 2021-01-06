@@ -28,6 +28,19 @@ namespace charm {
         FluxFvmLMCh                *flux;
 
 
+        ArrayReal               p;
+        ArrayReal               oldP;
+        ArrayReal               rhsP;
+        ArrayReal               S;
+
+        ArrayVector             gradP;
+        ArrayVector             gradT;
+        ArrayVector             gradU;
+        ArrayVector             gradV;
+        ArrayVector             gradW;
+        Array<ArrayVector>      gradC;
+        Array<ArrayVector>      gradH;
+
         explicit MethodFvmLMCh(Config *conf);
         ~MethodFvmLMCh();
 
@@ -47,12 +60,27 @@ namespace charm {
         void calcVisc();
         void calcHeat();
         void calcPress();
+        void calcS();
         void correctVelosities();
+        void caldDiffCoeff();
+
+        using Method::exchange;
+        void exchange(Array<ArrayVector> &field);
 
         void save();
 
         Real calcDt();
 
+    protected:
+        void opLaplace(ArrayReal &out, ArrayReal &in);
+        Real opScProd(ArrayReal &a, ArrayReal &b);
+
+        Real opCopy(ArrayReal &dest, ArrayReal &src);
+        void opSub(ArrayReal &a, ArrayReal &b); //< a -= b;
+        void opAdd(ArrayReal &a, ArrayReal &b); //< a += b;
+
+        void opMult(ArrayReal &a, Real b);
+        Real opNorm(ArrayReal &a);
 
     };
 

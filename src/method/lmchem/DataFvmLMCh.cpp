@@ -191,7 +191,6 @@ namespace charm {
         res += c.size();
         res += 2*sizeof(Real);
         res += sizeof(Index);
-        res += Vector::size()*(4+gradC.size() + gradH.size());
 
         return res;
     }
@@ -208,34 +207,6 @@ namespace charm {
 
         *(Real *) (&buf[shift]) = p0; shift += sizeof(Real);
         *(Real *) (&buf[shift]) = p; shift += sizeof(Real);
-
-        *(Real *) (&buf[shift]) = gradT[0]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradT[1]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradT[2]; shift += sizeof(Real);
-
-        *(Real *) (&buf[shift]) = gradU[0]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradU[1]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradU[2]; shift += sizeof(Real);
-
-        *(Real *) (&buf[shift]) = gradV[0]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradV[1]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradV[2]; shift += sizeof(Real);
-
-        *(Real *) (&buf[shift]) = gradW[0]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradW[1]; shift += sizeof(Real);
-        *(Real *) (&buf[shift]) = gradW[2]; shift += sizeof(Real);
-
-        for (Vector gc : gradC) {
-            *(Real *) (&buf[shift]) = gc[0]; shift += sizeof(Real);
-            *(Real *) (&buf[shift]) = gc[1]; shift += sizeof(Real);
-            *(Real *) (&buf[shift]) = gc[2]; shift += sizeof(Real);
-        }
-
-        for (Vector gh : gradH) {
-            *(Real *) (&buf[shift]) = gh[0]; shift += sizeof(Real);
-            *(Real *) (&buf[shift]) = gh[1]; shift += sizeof(Real);
-            *(Real *) (&buf[shift]) = gh[2]; shift += sizeof(Real);
-        }
 
         *(Index *) (&buf[shift]) = matId; shift += sizeof(Index);
 
@@ -256,22 +227,6 @@ namespace charm {
 
         p0 = *(Real *) (&buf[shift]);  shift += sizeof(Real);
         p = *(Real *) (&buf[shift]); shift += sizeof(Real);
-
-        gradT[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradT[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradT[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-
-        gradU[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradU[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradU[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-
-        gradV[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradV[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradV[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-
-        gradW[0] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradW[1] = *(Real *) (&buf[shift]); shift += sizeof(Real);
-        gradW[2] = *(Real *) (&buf[shift]); shift += sizeof(Real);
 
         matId = *(Index *) (&buf[shift]); shift += sizeof(Index);
         if (shift != size()) {

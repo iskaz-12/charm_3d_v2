@@ -49,6 +49,12 @@ namespace charm {
 
         static FileType getfileTypeByStr(String str);
 
+        Point &getNode(Index iNode);
+        Face &getFace(Index iFace);
+        Cell &getCell(Index iCell);
+        Real getCellVolume(Index iCell);
+        Real getFaceArea(Index iFace);
+
 
         Index               nCount;
         Index               nCountGhost;

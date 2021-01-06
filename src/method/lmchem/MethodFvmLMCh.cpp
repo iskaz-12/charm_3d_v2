@@ -15,6 +15,7 @@
 #include "MethodFvmLMCh.h"
 #include "FluxFvmLMChLF.h"
 #include "VtkWriter.h"
+#include "MethodFvmLMChException.h"
 
 namespace charm {
 
@@ -44,6 +45,18 @@ namespace charm {
             p.eTot = p.e + 0.5 * p.v.sqr();
             data[ic].setCons(p);
         }
+
+        gradP.resize(cN, {0, 0, 0});
+        gradT.resize(cN, {0, 0, 0});
+        gradU.resize(cN, {0, 0, 0});
+        gradV.resize(cN, {0, 0, 0});
+        gradW.resize(cN, {0, 0, 0});
+        gradC.resize(cN, ArrayVector(compCount, {0, 0, 0}));
+        gradH.resize(cN, ArrayVector(compCount, {0, 0, 0}));
+
+        p.resize(cN);
+        oldP.resize(cN);
+        rhsP.resize(cN);
 
         integrals.resize(cN, Cons(compCount));
         integrals.shrink_to_fit();
@@ -119,5 +132,59 @@ namespace charm {
             delete flux;
         }
     }
+
+    void MethodFvmLMCh::exchange(Array<ArrayVector> &field) {
+        if (field.size() != mesh->cCountGhost) {
+            throw MethodException("Wrong fields count for exchange.");
+        }
+        Index compCount = Config::getCompCount();
+        for (int p = 0; p < Parallel::procCount; p++) {
+            if (p < Parallel::procId) {
+                if (mesh->recvCount[p] > 0) {
+                    ArrayVector buf(mesh->recvCount[p] * compCount);
+                    Parallel::recv(p, 0, mesh->recvCount[p], buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        for (Index j = 0; j < compCount; j++) {
+                            field[mesh->recvShift[p] + i][j] = buf[i*compCount+j];
+                        }
+                    }
+                }
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayVector buf(n*compCount);
+                    for (int i = 0; i < n; i++) {
+                        for (Index j = 0; j < compCount; j++) {
+                            buf[i*compCount+j] = field[mesh->sendInd[p][i]][j];
+                        }
+                    }
+                    Parallel::send(p, 1, n, buf.data());
+                }
+            }
+            else if (p > Parallel::procId) {
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayVector buf(n*compCount);
+                    for (int i = 0; i < n; i++) {
+                        for (Index j = 0; j < compCount; j++) {
+                            buf[i*compCount+j] = field[mesh->sendInd[p][i]][j];
+                        }
+                    }
+                    Parallel::send(p, 0, n, buf.data());
+                }
+                if (mesh->recvCount[p] > 0) {
+                    ArrayVector buf(mesh->recvCount[p]);
+                    Parallel::recv(p, 1, mesh->recvCount[p], buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        for (Index j = 0; j < compCount; j++) {
+                            field[mesh->recvShift[p] + i][j] = buf[i*compCount+j];
+                        }
+                    }
+                }
+            }
+        }
+        Parallel::barrier();
+
+    }
+
 
 }

@@ -47,21 +47,21 @@ namespace charm {
                 Prim p1 = data[c1].getPrim();
                 Prim p2 = data[c2].getPrim();
 
-                Real tt1 = (-2. / 3.) * p1.ml * (data[c1].gradU.x + data[c1].gradV.y + data[c1].gradW.z);
-                Real txx1 = tt1 + 2. * p1.ml * data[c1].gradU.x;
-                Real tyy1 = tt1 + 2. * p1.ml * data[c1].gradV.y;
-                Real tzz1 = tt1 + 2. * p1.ml * data[c1].gradW.z;
-                Real txy1 = p1.ml * (data[c1].gradU.y + data[c1].gradV.x);
-                Real txz1 = p1.ml * (data[c1].gradU.z + data[c1].gradW.x);
-                Real tyz1 = p1.ml * (data[c1].gradW.y + data[c1].gradV.z);
+                Real tt1 = (-2. / 3.) * p1.ml * (gradU[c1].x + gradV[c1].y + gradW[c1].z);
+                Real txx1 = tt1 + 2. * p1.ml * gradU[c1].x;
+                Real tyy1 = tt1 + 2. * p1.ml * gradV[c1].y;
+                Real tzz1 = tt1 + 2. * p1.ml * gradW[c1].z;
+                Real txy1 = p1.ml * (gradU[c1].y + gradV[c1].x);
+                Real txz1 = p1.ml * (gradU[c1].z + gradW[c1].x);
+                Real tyz1 = p1.ml * (gradW[c1].y + gradV[c1].z);
 
-                Real tt2 = (-2. / 3.) * p2.ml * (data[c2].gradU.x + data[c2].gradV.y + data[c2].gradW.z);
-                Real txx2 = tt2 + 2. * p2.ml * data[c2].gradU.x;
-                Real tyy2 = tt2 + 2. * p2.ml * data[c2].gradV.y;
-                Real tzz2 = tt2 + 2. * p2.ml * data[c2].gradW.z;
-                Real txy2 = p2.ml * (data[c2].gradU.y + data[c2].gradV.x);
-                Real txz2 = p2.ml * (data[c2].gradU.z + data[c2].gradW.x);
-                Real tyz2 = p2.ml * (data[c2].gradW.y + data[c2].gradV.z);
+                Real tt2 = (-2. / 3.) * p2.ml * (gradU[c2].x + gradV[c2].y + gradW[c2].z);
+                Real txx2 = tt2 + 2. * p2.ml * gradU[c2].x;
+                Real tyy2 = tt2 + 2. * p2.ml * gradV[c2].y;
+                Real tzz2 = tt2 + 2. * p2.ml * gradW[c2].z;
+                Real txy2 = p2.ml * (gradU[c2].y + gradV[c2].x);
+                Real txz2 = p2.ml * (gradU[c2].z + gradW[c2].x);
+                Real tyz2 = p2.ml * (gradW[c2].y + gradV[c2].z);
 
                 Real tu1 = txx1 * n.x + txy1 * n.y + txz1 * n.z;
                 Real tv1 = txy1 * n.x + tyy1 * n.y + tyz1 * n.z;

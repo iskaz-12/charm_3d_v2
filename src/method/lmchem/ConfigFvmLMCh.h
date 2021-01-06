@@ -20,7 +20,7 @@
 namespace charm {
     class ConfigFvmLMCh : public Config  {
     public:
-        ConfigFvmLMCh(const String &fileName);
+        explicit ConfigFvmLMCh(const String &fileName);
 
         void read() override;
 
@@ -29,6 +29,9 @@ namespace charm {
         Int     useVisc;
         Int     useDiff;
         Real    tRef;
+
+        Real    pressEps;
+        Index   pressMaxIter;
     };
 }
 

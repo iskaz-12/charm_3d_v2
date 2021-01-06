@@ -28,6 +28,8 @@ namespace charm {
         virtual void done() = 0;
         virtual Data *getData(Index iCell) = 0;
         void exchange();
+        void exchange(ArrayReal &field);
+        void exchange(ArrayVector &field);
     };
 
 }

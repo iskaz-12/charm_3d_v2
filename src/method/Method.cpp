@@ -4,6 +4,7 @@
  */
 
 #include "Method.h"
+#include "MethodException.h"
 
 namespace charm {
     Method::Method(Config *_conf): conf(_conf) {
@@ -64,5 +65,103 @@ namespace charm {
             }
         }
         Parallel::barrier();
+    }
+
+
+    void Method::exchange(ArrayVector &field) {
+        if (field.size() != mesh->cCountGhost) {
+            throw MethodException("Wrong fields count for exchange.");
+        }
+        for (int p = 0; p < Parallel::procCount; p++) {
+            if (p < Parallel::procId) {
+                if (mesh->recvCount[p] > 0) {
+                    ArrayReal buf(mesh->recvCount[p]*3);
+                    Parallel::recv(p, 0, mesh->recvCount[p]*3, buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        field[mesh->recvShift[p]+i][0] = buf[i*3+0];
+                        field[mesh->recvShift[p]+i][1] = buf[i*3+1];
+                        field[mesh->recvShift[p]+i][2] = buf[i*3+2];
+                    }
+                }
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayReal buf(n*3);
+                    for (int i = 0; i < n; i++) {
+                        buf[i*3+0] = field[mesh->sendInd[p][i]][0];
+                        buf[i*3+1] = field[mesh->sendInd[p][i]][1];
+                        buf[i*3+2] = field[mesh->sendInd[p][i]][2];
+                    }
+                    Parallel::send(p, 1, n, buf.data());
+                }
+            }
+            else if (p > Parallel::procId) {
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayReal buf(n*3);
+                    for (int i = 0; i < n; i++) {
+                        buf[i*3+0] = field[mesh->sendInd[p][i]][0];
+                        buf[i*3+1] = field[mesh->sendInd[p][i]][1];
+                        buf[i*3+2] = field[mesh->sendInd[p][i]][2];
+                    }
+                    Parallel::send(p, 0, n, buf.data());
+                }
+                if (mesh->recvCount[p] > 0) {
+                    ArrayReal buf(mesh->recvCount[p]*3);
+                    Parallel::recv(p, 1, mesh->recvCount[p], buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        field[mesh->recvShift[p]+i][0] = buf[i*3+0];
+                        field[mesh->recvShift[p]+i][1] = buf[i*3+1];
+                        field[mesh->recvShift[p]+i][2] = buf[i*3+2];
+                    }
+                }
+            }
+        }
+        Parallel::barrier();
+
+    }
+
+
+    void Method::exchange(ArrayReal &field) {
+        if (field.size() != mesh->cCountGhost) {
+            throw MethodException("Wrong fields count for exchange.");
+        }
+        for (int p = 0; p < Parallel::procCount; p++) {
+            if (p < Parallel::procId) {
+                if (mesh->recvCount[p] > 0) {
+                    ArrayReal buf(mesh->recvCount[p]);
+                    Parallel::recv(p, 0, mesh->recvCount[p], buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        field[mesh->recvShift[p]+i] = buf[i];
+                    }
+                }
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayReal buf(n);
+                    for (int i = 0; i < n; i++) {
+                        buf[i] = field[mesh->sendInd[p][i]];
+                    }
+                    Parallel::send(p, 1, n, buf.data());
+                }
+            }
+            else if (p > Parallel::procId) {
+                int n = mesh->sendInd[p].size();
+                if (n > 0) {
+                    ArrayReal buf(n);
+                    for (int i = 0; i < n; i++) {
+                        buf[i] = field[mesh->sendInd[p][i]];
+                    }
+                    Parallel::send(p, 0, n, buf.data());
+                }
+                if (mesh->recvCount[p] > 0) {
+                    ArrayReal buf(mesh->recvCount[p]);
+                    Parallel::recv(p, 1, mesh->recvCount[p], buf.data());
+                    for (Index i = 0; i < mesh->recvCount[p]; i++) {
+                        field[mesh->recvShift[p]+i] = buf[i];
+                    }
+                }
+            }
+        }
+        Parallel::barrier();
+
     }
 }

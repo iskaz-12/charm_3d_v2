@@ -16,13 +16,13 @@ namespace charm {
     void MethodFvmLMCh::calcGrad() {
         Index compCount = Config::getCompCount();
 
-        for (auto &d : data) {
-            d.gradT = 0.;
-            d.gradU = 0.;
-            d.gradV = 0.;
-            d.gradW = 0.;
-            d.gradC.resize(compCount, {0., 0., 0.});
-            d.gradH.resize(compCount, {0., 0., 0.});
+        for (Index i = 0; i < mesh->cCountGhost; i++) {
+            gradT[i] = 0.;
+            gradU[i] = 0.;
+            gradV[i] = 0.;
+            gradW[i] = 0.;
+            gradC[i].resize(compCount, {0., 0., 0.});
+            gradH[i].resize(compCount, {0., 0., 0.});
         }
 
         for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
@@ -66,40 +66,45 @@ namespace charm {
             }
 
 
-            data[c1].gradT += vT;
-            data[c1].gradU += vU;
-            data[c1].gradV += vV;
-            data[c1].gradW += vW;
+            gradT[c1] += vT;
+            gradU[c1] += vU;
+            gradV[c1] += vV;
+            gradW[c1] += vW;
             for (Index i = 0; i < compCount; i++) {
-                data[c1].gradC[i] += vC[i];
-                data[c1].gradH[i] += vH[i];
+                gradC[c1][i] += vC[i];
+                gradH[c1][i] += vH[i];
             }
             if (!isBnd) {
-                data[c2].gradT -= vT;
-                data[c2].gradU -= vU;
-                data[c2].gradV -= vV;
-                data[c2].gradW -= vW;
+                gradT[c2] -= vT;
+                gradU[c2] -= vU;
+                gradV[c2] -= vV;
+                gradW[c2] -= vW;
                 for (Index i = 0; i < compCount; i++) {
-                    data[c2].gradC[i] -= vC[i];
-                    data[c2].gradH[i] -= vH[i];
+                    gradC[c2][i] -= vC[i];
+                    gradH[c2][i] -= vH[i];
                 }
             }
         }
 
         for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
             Real vol = mesh->cells[iCell].volume;
-            data[iCell].gradT /= vol;
-            data[iCell].gradU /= vol;
-            data[iCell].gradV /= vol;
-            data[iCell].gradW /= vol;
+            gradT[iCell] /= vol;
+            gradU[iCell] /= vol;
+            gradV[iCell] /= vol;
+            gradW[iCell] /= vol;
             for (Index i = 0; i < compCount; i++) {
-                data[iCell].gradC[i] /= vol;
-                data[iCell].gradH[i] /= vol;
+                gradC[iCell][i] /= vol;
+                gradH[iCell][i] /= vol;
             }
         }
 
-        exchange(); // @todo only gradients
+        exchange(gradT);
+        exchange(gradU);
+        exchange(gradV);
+        exchange(gradW);
 
+        exchange(gradC);
+        exchange(gradH);
     }
 
 }
