@@ -23,7 +23,8 @@ namespace charm {
         Int numPatches, numVert, numCells;
 
         std::map<String, BoundaryCondition*> bndPatchMap;
-        for (auto b: config->boundaries) {
+        for (Index i = 0; i < Config::getBndCount(); i++) {
+            auto b = Config::getBnd(i);
             bndPatchMap[b->name] = b;
         }
 
@@ -37,32 +38,32 @@ namespace charm {
                 if (line.find("$PHYSICALNAMES") != String::npos) {
                     ss << getlineUpper(fin);
                     ss >> numPatches; //sscanf(line, "%d", &numPatches);
-                    mesh->patches.resize(numPatches);
+                    patches.resize(numPatches);
                     for (int i = 0; i < numPatches; i++) {
                         ss << getlineUpper(fin);
                         Patch patch;
                         ss >> patch.dim >> patch.id >> patch.name;
                         delQuotes(patch.name);
                         patch.id--;
-                        mesh->patches[patch.id] = patch;
+                        patches[patch.id] = patch;
                     }
                 } else if (line.find("$NODES") != String::npos) {
                     ss << getlineUpper(fin);
                     ss >> numVert;
-                    mesh->nodes.resize(numVert);
+                    mesh->nodesResize(numVert);
                     for (int i = 0; i < numVert; i++) {
                         ss << getlineUpper(fin);
                         Real x, y, z;
                         Int node;
                         Point p;
                         ss >> node >> p.x >> p.y >> p.z;
-                        mesh->nodes[node-1] = p;
+                        mesh->getNode(node-1) = p;
                     }
                 } else if (line.find("$ELEMENTS") != String::npos) {
                     Index cid = 0;
                     ss << getlineUpper(fin);
                     ss >> numCells;
-                    mesh->cells.clear();
+                    mesh->cellsClear();
                     for (int i = 0; i < numCells; i++) {
                         line = getlineUpper(fin);
                         Int node, type;
@@ -87,7 +88,7 @@ namespace charm {
                                 --cell.nodesInd[j];
                             }
                             cell.id = cid++;
-                            mesh->cells.push_back(cell);
+                            mesh->cellPush(cell);
                         }
                         else if (type == 3) {
                             Face face;
@@ -105,7 +106,7 @@ namespace charm {
                                 fNodes.insert(--face.nodesInd[i]);
                             }
                             face.id = fid++;
-                            face.bnd = bndPatchMap[mesh->patches[face.tag].name];
+                            face.bnd = bndPatchMap[patches[face.tag].name];
                             faceMap[fNodes] = face;
                         }
                     }
@@ -113,15 +114,15 @@ namespace charm {
             }
         }
 
-        mesh->patchesCount = fid;
+        patchesCount = fid;
 
-        for (int ic = 0; ic < mesh->cells.size(); ic++) {
-            Cell &cell = mesh->cells[ic];
+        for (Index ic = 0; ic < mesh->getCellsSize(); ic++) {
+            Cell &cell = mesh->getCell(ic);
             if (cell.type == 5) {
-                for (int i = 0; i < 6; i++) {
+                for (Int i = 0; i < 6; i++) {
                     std::set<Index> fNodes;
 
-                    for (int j = 0; j < 4; j++) {
+                    for (Int j = 0; j < 4; j++) {
                         fNodes.insert(cell.nodesInd[Mesh::ftv[i][j]]);
                     }
                     auto it = faceMap.find(fNodes);
@@ -130,7 +131,7 @@ namespace charm {
                         f.id = fid++;
                     }
                     f.nodesInd.resize(4);
-                    for (int j = 0; j < 4; j++) {
+                    for (Int j = 0; j < 4; j++) {
                         f.nodesInd[j] = cell.nodesInd[Mesh::ftv[i][j]];
                     }
                     f.addCell(ic);
@@ -140,11 +141,11 @@ namespace charm {
                 }
             }
         }
-        mesh->faces.resize(faceMap.size());
+        mesh->facesResize(faceMap.size());
         int i = 0;
         for (auto &item : faceMap) {
             Face &f = item.second;
-            mesh->faces[f.id] = f;
+            mesh->getFace(f.id) = f;
             i++;
         }
 

@@ -24,8 +24,8 @@ namespace charm {
         for (Index j = 0; j < 100; j++) {
             cp = 0.0;
             cp_dt = 0.0;
-            for (Index i = 0; i < conf->components.size(); i++) {
-                Component *comp = conf->components[i];
+            for (Index i = 0; i < Config::getCompCount(); i++) {
+                Component *comp = Config::getComponent(i);
                 cp    += p.c[i] * comp->calcH(tt);
                 cp_dt += p.c[i] * comp->calcCp(tt);
             }

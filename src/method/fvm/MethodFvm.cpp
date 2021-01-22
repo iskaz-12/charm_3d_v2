@@ -18,12 +18,12 @@ namespace charm {
 
 
     void MethodFvm::init() {
-        Index cN = mesh->cCountGhost;
+        Index cN = mesh->getCellsCountWithGhost();
         Index compCount = Config::getCompCount();
         data.resize(cN, DataFvm(compCount));
         data.shrink_to_fit();
         for (Index ic = 0; ic < cN; ic++) {
-            Cell &cell = mesh->cells[ic];
+            Cell &cell = mesh->getCell(ic);
             Region *reg = Config::getRegion(cell.tag);
             Prim p(compCount);
             p.matId = reg->matId;
@@ -55,8 +55,8 @@ namespace charm {
 
 
             seroIntegrals();
-            for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
-                Face &face = mesh->faces[iFace];
+            for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
+                Face &face = mesh->getFace(iFace);
                 bool isBnd = face.cells.size() == 1;
                 Index c1 = face.cells[0];
                 Index c2;
@@ -81,9 +81,9 @@ namespace charm {
             }
 
             Real dt = calcDt();
-            for (Index ic = 0; ic < mesh->cCount; ic++) {
+            for (Index ic = 0; ic < mesh->getCellsCount(); ic++) {
                 integrals[ic].normalize();
-                Real cfl = dt / mesh->cells[ic].volume;
+                Real cfl = dt / mesh->getCell(ic).volume;
                 integrals[ic] *= cfl;
                 data[ic].c -= integrals[ic];
             }
@@ -121,9 +121,9 @@ namespace charm {
         Config *conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
-            for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
+            for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
                 Prim p = data[iCell].getPrim();
-                dt = std::min(dt, conf->cfl * mesh->cells[iCell].volume / (p.v.length() + p.cz));
+                dt = std::min(dt, conf->cfl * mesh->getCell(iCell).volume / (p.v.length() + p.cz));
             }
         } else {
             dt = conf->dt;

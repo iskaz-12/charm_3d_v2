@@ -16,7 +16,7 @@ namespace charm {
     void MethodFvmLMCh::calcGrad() {
         Index compCount = Config::getCompCount();
 
-        for (Index i = 0; i < mesh->cCountGhost; i++) {
+        for (Index i = 0; i < mesh->getCellsCountWithGhost(); i++) {
             gradT[i] = 0.;
             gradU[i] = 0.;
             gradV[i] = 0.;
@@ -25,8 +25,8 @@ namespace charm {
             gradH[i].resize(compCount, {0., 0., 0.});
         }
 
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
-            Face &face = mesh->faces[iFace];
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
+            Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             bool isBnd = face.cells.size() == 1;
             Index c1 = face.cells[0];
@@ -34,7 +34,7 @@ namespace charm {
             Prim p1 = data[c1].getPrim();
             Prim p2(compCount);
 
-            Real vol1 = mesh->cells[c1].volume;
+            Real vol1 = mesh->getCell(c1).volume;
             Real vol2;
 
             if (isBnd) {
@@ -43,7 +43,7 @@ namespace charm {
             } else {
                 c2 = face.cells[1];
                 p2 = data[c2].getPrim();
-                vol2 = mesh->cells[c2].volume;
+                vol2 = mesh->getCell(c2).volume;
             }
 
             Real s = face.area / (vol1 + vol2);
@@ -86,8 +86,8 @@ namespace charm {
             }
         }
 
-        for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
-            Real vol = mesh->cells[iCell].volume;
+        for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
+            Real vol = mesh->getCell(iCell).volume;
             gradT[iCell] /= vol;
             gradU[iCell] /= vol;
             gradV[iCell] /= vol;

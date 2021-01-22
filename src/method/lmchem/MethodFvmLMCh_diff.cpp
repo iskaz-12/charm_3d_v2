@@ -16,7 +16,7 @@ namespace charm {
     void MethodFvmLMCh::caldDiffCoeff() {
         Index cC = Config::getCompCount();
         ArrayReal x(cC, 0.);
-        for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
+        for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
             Prim prim = data[iCell].getPrim();
             Real pabs = prim.p/101325.0;
             Real s = 0.;

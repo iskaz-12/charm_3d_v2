@@ -20,7 +20,7 @@ namespace charm {
         VtkWriter *vtkWriter;
 
     public:
-        Method(Config *conf);
+        explicit Method(Config *conf);
         Mesh* getMesh() const;
         Config* getConfig() const;
         virtual void init() = 0;
@@ -30,6 +30,7 @@ namespace charm {
         void exchange();
         void exchange(ArrayReal &field);
         void exchange(ArrayVector &field);
+        void exchange(Array<ArrayVector> &field);
     };
 
 }

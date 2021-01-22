@@ -342,9 +342,6 @@ namespace charm{
         this->cCountGhost  = msh.cCountGhost;
         this->cells.assign(msh.cells.begin(), msh.cells.end());
 
-        this->patchesCount = msh.patchesCount;
-        this->patches.assign(msh.patches.begin(), msh.patches.end());
-
         this->recvCount.assign(msh.recvCount.begin(), msh.recvCount.end());
         this->recvShift.assign(msh.recvShift.begin(), msh.recvShift.end());
         this->sendInd.resize(msh.sendInd.size());

@@ -13,8 +13,8 @@ namespace charm {
     using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcHeat() {
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
-            Face &face = mesh->faces[iFace];
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
+            Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
                 if (instanceof<BoundaryConditionWallNoSlip>(face.bnd)) {
@@ -23,7 +23,7 @@ namespace charm {
                     Vector _gradT = gradT[c1];
 
                     Vector l = face.center;
-                    l -= mesh->cells[c1].center;
+                    l -= mesh->getCell(c1).center;
                     Real ll = l.length();
 
                     Vector qt = _gradT;
@@ -40,8 +40,8 @@ namespace charm {
                 Prim p2 = data[c2].getPrim();
                 Vector gradT1 = gradT[c1];
                 Vector gradT2 = gradT[c2];
-                Real vol1 = mesh->cells[c1].volume;
-                Real vol2 = mesh->cells[c2].volume;
+                Real vol1 = mesh->getCell(c1).volume;
+                Real vol2 = mesh->getCell(c2).volume;
 
                 gradT1 *= vol1*p1.kp; // @todo проверить вычисление KP
                 gradT2 *= vol2*p2.kp; // @todo проверить вычисление KP

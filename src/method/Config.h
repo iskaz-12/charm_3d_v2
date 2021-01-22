@@ -82,6 +82,17 @@ namespace charm {
             return config->regions.size();
         }
 
+        inline static Index getBndCount() {
+            return config->boundaries.size();
+        }
+
+        inline static BoundaryCondition* getBnd(Index i) {
+            if (i >= getBndCount()) {
+                throw Exception("Wrong boundary condition index...");
+            }
+            return config->boundaries[i];
+        }
+
     protected:
         void readBoundaries(const YAML::Node &node);
         void readMaterials(const YAML::Node &node);
@@ -122,6 +133,7 @@ namespace charm {
             String           fileName;
         } msh;
 
+    protected:
         Array<BoundaryCondition*>   boundaries;
         Array<Material*>            materials;       ///< materials */
         Array<Region*>              regions;       ///< regions */

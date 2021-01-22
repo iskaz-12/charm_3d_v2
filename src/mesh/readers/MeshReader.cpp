@@ -106,8 +106,8 @@ namespace charm {
         locMesh.cCountGhost  = pm.cCountEx;
         locMesh.cells.resize(pm.cCountEx);
 
-        locMesh.patchesCount = mesh->patchesCount;
-        locMesh.patches.assign(mesh->patches.begin(), mesh->patches.end());
+//        locMesh.patchesCount = mesh->patchesCount;
+//        locMesh.patches.assign(mesh->patches.begin(), mesh->patches.end());
 
         for (Index i = 0; i < pm.nCountEx; i++) {
             locMesh.nodes[i] = mesh->nodes[pm.gNodes[i]];

@@ -65,7 +65,6 @@ namespace charm {
         void caldDiffCoeff();
 
         using Method::exchange;
-        void exchange(Array<ArrayVector> &field);
 
         void save();
 
@@ -75,7 +74,7 @@ namespace charm {
         void opLaplace(ArrayReal &out, ArrayReal &in);
         Real opScProd(ArrayReal &a, ArrayReal &b);
 
-        Real opCopy(ArrayReal &dest, ArrayReal &src);
+        void opCopy(ArrayReal &dest, ArrayReal &src);
         void opSub(ArrayReal &a, ArrayReal &b); //< a -= b;
         void opAdd(ArrayReal &a, ArrayReal &b); //< a += b;
 

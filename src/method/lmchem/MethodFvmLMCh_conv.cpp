@@ -16,8 +16,8 @@ namespace charm{
     void MethodFvmLMCh::calcConv(){
         Index compCount = Config::getCompCount();
 
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
-            Face &face = mesh->faces[iFace];
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
+            Face &face = mesh->getFace(iFace);
             bool isBnd = face.cells.size() == 1;
             Index c1 = face.cells[0];
             Index c2;

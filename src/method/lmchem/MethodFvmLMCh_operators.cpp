@@ -15,12 +15,12 @@ namespace charm {
     void MethodFvmLMCh::opLaplace(ArrayReal &out, ArrayReal &in) {
         assert(
                 in.size() == out.size() &&
-                in.size() == mesh->cCountGhost &&
+                in.size() == mesh->getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
                 );
 
-        ArrayVector gradIn(mesh->cCountGhost, {0., 0., 0.});
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
+        ArrayVector gradIn(mesh->getCellsCountWithGhost(), {0., 0., 0.});
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
             Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             bool isBnd = face.cells.size() == 1;
@@ -54,18 +54,18 @@ namespace charm {
             }
         }
 
-        for (Index iCell = 0; iCell < mesh->cCount; iCell++) {
+        for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
             Real vol = mesh->getCellVolume(iCell);
             gradIn[iCell] /= vol;
         }
 
         exchange(gradIn);
 
-        for (Index iCell = 0; iCell < mesh->cCountGhost; iCell++) {
+        for (Index iCell = 0; iCell < mesh->getCellsCountWithGhost(); iCell++) {
             out[iCell] = 0.;
         }
 
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
             Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             bool isBnd = face.cells.size() == 1;
@@ -113,13 +113,13 @@ namespace charm {
     }
 
 
-    Real MethodFvmLMCh::opCopy(ArrayReal &dest, ArrayReal &src) {
-        assert( src.size() == mesh->cCountGhost &&
+    void MethodFvmLMCh::opCopy(ArrayReal &dest, ArrayReal &src) {
+        assert( src.size() == mesh->getCellsCountWithGhost() &&
                         src.size() == dest.size() &&
                         "Size of array must be equal to cells count"
                 );
 
-        for (Index i = 0; i < mesh->cCount; i++) {
+        for (Index i = 0; i < mesh->getCellsCount(); i++) {
             dest[i] *= src[i];
         }
         exchange(dest);
@@ -127,11 +127,11 @@ namespace charm {
 
 
     void MethodFvmLMCh::opMult(ArrayReal &a, Real b) {
-        assert( a.size() == mesh->cCountGhost &&
+        assert( a.size() == mesh->getCellsCountWithGhost() &&
                 "Size of array must be equal to cells count"
                 );
 
-        for (Index i = 0; i < mesh->cCount; i++) {
+        for (Index i = 0; i < mesh->getCellsCount(); i++) {
             a[i] *= b;
         }
         exchange(a);
@@ -140,12 +140,12 @@ namespace charm {
 
     Real MethodFvmLMCh::opScProd(ArrayReal &a, ArrayReal &b) {
         assert( a.size() == b.size() &&
-                a.size() == mesh->cCountGhost &&
+                a.size() == mesh->getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
                 );
 
         Real s = 0.;
-        for (Index i = 0; i < mesh->cCount; i++) {
+        for (Index i = 0; i < mesh->getCellsCount(); i++) {
             s += a[i]*b[i];
         }
 
@@ -156,10 +156,10 @@ namespace charm {
 
     void MethodFvmLMCh::opAdd(ArrayReal &a, ArrayReal &b) {
         assert( a.size() == b.size() &&
-                a.size() == mesh->cCountGhost &&
+                a.size() == mesh->getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
         );
-        for (Index i = 0; i < mesh->cCount; i++) {
+        for (Index i = 0; i < mesh->getCellsCount(); i++) {
             a[i] += b[i];
         }
         exchange(a);
@@ -168,10 +168,10 @@ namespace charm {
 
     void MethodFvmLMCh::opSub(ArrayReal &a, ArrayReal &b) {
         assert( a.size() == b.size() &&
-                a.size() == mesh->cCountGhost &&
+                a.size() == mesh->getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
         );
-        for (Index i = 0; i < mesh->cCount; i++) {
+        for (Index i = 0; i < mesh->getCellsCount(); i++) {
             a[i] -= b[i];
         }
         exchange(a);
@@ -179,7 +179,7 @@ namespace charm {
 
 
     Real MethodFvmLMCh::opNorm(ArrayReal &a) {
-        assert( a.size() == mesh->cCountGhost &&
+        assert( a.size() == mesh->getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
         );
         return sqrt(opScProd(a, a));

@@ -88,12 +88,12 @@ namespace charm {
         fprintf(fp, "<?xml version=\"1.0\"?>\n");
         fprintf(fp, "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n");
         fprintf(fp, "  <UnstructuredGrid GhostLevel=\"0\">\n");
-        fprintf(fp, "    <Piece NumberOfPoints=\"%lu\" NumberOfCells=\"%lu\">\n", mesh->nCount, mesh->cCount);
+        fprintf(fp, "    <Piece NumberOfPoints=\"%lu\" NumberOfCells=\"%lu\">\n", mesh->getNodesCount(), mesh->getCellsCount());
         fprintf(fp, "      <Points>\n");
         fprintf(fp, "        <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int iNode = 0; iNode < mesh->nCount; iNode++) {
-            fprintf(fp, "%25.15f %25.15f %25.15f ", mesh->nodes[iNode].x, mesh->nodes[iNode].y, mesh->nodes[iNode].z);
+        for (int iNode = 0; iNode < mesh->getNodesCount(); iNode++) {
+            fprintf(fp, "%25.15f %25.15f %25.15f ", mesh->getNode(iNode).x, mesh->getNode(iNode).y, mesh->getNode(iNode).z);
         }
         fprintf(fp, "\n");
         fprintf(fp, "        </DataArray>\n");
@@ -101,15 +101,15 @@ namespace charm {
         fprintf(fp, "      <Cells>\n");
         fprintf(fp, "        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int i = 0; i < mesh->cCount; i++) {
+        for (int i = 0; i < mesh->getCellsCount(); i++) {
             fprintf(fp, "%d ", (i + 1) * 8);
         }
         fprintf(fp, "\n");
         fprintf(fp, "        </DataArray>\n");
         fprintf(fp, "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int i = 0; i < mesh->cCount; i++) {
-            Cell &c = mesh->cells[i];
+        for (int i = 0; i < mesh->getCellsCount(); i++) {
+            Cell &c = mesh->getCell(i);
             fprintf(fp, "%lu %lu %lu %lu %lu %lu %lu %lu ", c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3],
                     c.nodesInd[4], c.nodesInd[5], c.nodesInd[6], c.nodesInd[7]);
         }
@@ -117,7 +117,7 @@ namespace charm {
         fprintf(fp, "        </DataArray>\n");
         fprintf(fp, "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int i = 0; i < mesh->cCount; i++) {
+        for (int i = 0; i < mesh->getCellsCount(); i++) {
             fprintf(fp, "%d ", 11);
         }
         fprintf(fp, "\n");
@@ -133,9 +133,9 @@ namespace charm {
             fprintf(fp, "        <DataArray type=\"Float32\" Name=\"%s\" format=\"ascii\">\n",
                     scalarFieldNames[iFld].c_str());
             fprintf(fp, "          ");
-            for (int i = 0; i < mesh->cCount; i++) {
+            for (int i = 0; i < mesh->getCellsCount(); i++) {
                 fprintf(fp, "%f ", method->getData(i)->getScalarFieldValue(iFld));
-                if (i + 1 % 8 == 0 || i + 1 == mesh->cCount) fprintf(fp, "\n");
+                if (i + 1 % 8 == 0 || i + 1 == mesh->getCellsCount()) fprintf(fp, "\n");
             }
             fprintf(fp, "        </DataArray>\n");
         }
@@ -143,18 +143,18 @@ namespace charm {
             fprintf(fp, "        <DataArray type=\"Float32\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"3\">\n",
                     vectorFieldNames[iFld].c_str());
             fprintf(fp, "          ");
-            for (int i = 0; i < mesh->cCount; i++) {
+            for (int i = 0; i < mesh->getCellsCount(); i++) {
                 Vector v = method->getData(i)->getVectorFieldValue(iFld);
                 fprintf(fp, "%f %f %f ", v.x, v.y, v.z);
-                if (i + 1 % 8 == 0 || i + 1 == mesh->cCount) fprintf(fp, "\n");
+                if (i + 1 % 8 == 0 || i + 1 == mesh->getCellsCount()) fprintf(fp, "\n");
             }
             fprintf(fp, "        </DataArray>\n");
         }
         fprintf(fp, "        <DataArray type=\"Int32\" Name=\"ProcId\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int i = 0; i < mesh->cCount; i++) {
+        for (int i = 0; i < mesh->getCellsCount(); i++) {
             fprintf(fp, "%d ", Parallel::procId);
-            if (i + 1 % 8 == 0 || i + 1 == mesh->cCount) fprintf(fp, "\n");
+            if (i + 1 % 8 == 0 || i + 1 == mesh->getCellsCount()) fprintf(fp, "\n");
         }
         fprintf(fp, "        </DataArray>\n");
 

@@ -14,8 +14,8 @@ namespace charm {
     using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcVisc() {
-        for (Index iFace = 0; iFace < mesh->fCount; iFace++) {
-            Face &face = mesh->faces[iFace];
+        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
+            Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
                 if (instanceof<BoundaryConditionWallNoSlip>(face.bnd)) {
@@ -29,7 +29,7 @@ namespace charm {
                     vt -= vn;
 
                     Vector l = face.center;
-                    l -= mesh->cells[c1].center;
+                    l -= mesh->getCell(c1).center;
                     Real ll = l.length();
 
                     Real qu = -p1.ml*vt[0]/ll;
@@ -71,8 +71,8 @@ namespace charm {
                 Real tv2 = txy2 * n.x + tyy2 * n.y + tyz2 * n.z;
                 Real tw2 = txz2 * n.x + tyz2 * n.y + tzz2 * n.z;
 
-                Real vol1 = mesh->cells[c1].volume;
-                Real vol2 = mesh->cells[c2].volume;
+                Real vol1 = mesh->getCell(c1).volume;
+                Real vol2 = mesh->getCell(c2).volume;
                 Real vols = vol1 + vol2;
                 Real tu = (vol1 * tu1 + vol2 * tu2) / vols;
                 Real tv = (vol1 * tv1 + vol2 * tv2) / vols;

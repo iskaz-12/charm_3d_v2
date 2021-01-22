@@ -7,6 +7,7 @@
 
 #ifndef CHARM_3D_V2_MESH_H
 #define CHARM_3D_V2_MESH_H
+
 #include "global.h"
 #include "Point.h"
 #include "Cell.h"
@@ -14,13 +15,7 @@
 
 namespace charm {
 
-    struct Patch {
-        String name;
-        Int id;
-        Int dim;
-    };
-
-
+    class MeshReader;
 
     class Mesh {
     public:
@@ -55,7 +50,58 @@ namespace charm {
         Real getCellVolume(Index iCell);
         Real getFaceArea(Index iFace);
 
+        inline Index getNodesCount() const {
+            return nCount;
+        }
 
+        inline Index getNodesCountWithGhost() const {
+            return nCountGhost;
+        }
+
+        inline void nodesResize(Index size) {
+            nodes.resize(size);
+        }
+
+        inline Index getCellsCount() const {
+            return cCount;
+        }
+
+        inline Index getCellsCountWithGhost() const {
+            return cCountGhost;
+        }
+
+        inline Index getCellsSize() const {
+            return cells.size();
+        }
+
+        inline void cellsResize(Index size) {
+            nodes.resize(size);
+        }
+
+        inline void cellsClear() {
+            nodes.clear();
+        }
+
+        inline void cellPush(Cell &c) {
+            cells.push_back(c);
+        }
+
+        inline Index getFacesCount() const {
+            return fCount;
+        }
+
+        inline Index getFacesCountWithGhost() const {
+            return fCountGhost;
+        }
+
+        inline void facesResize(Index size) {
+            nodes.resize(size);
+        }
+
+
+        static const Index ftv[6][4];
+
+    protected:
         Index               nCount;
         Index               nCountGhost;
         Points              nodes;     ///< Mesh nodes.
@@ -68,20 +114,13 @@ namespace charm {
         Index               fCountGhost;
         Array<Face>         faces;     ///< Mesh faces.
 
-        Index               patchesCount = 0;       ///< Number of boundary patches.
-        Array<Patch>        patches;
-
         ArrayIndex          recvCount;
         ArrayIndex          recvShift;
         Array<ArrayIndex>   sendInd;
 
-        static const Index ftv[6][4];// =
-//                                    {{ 0, 2, 4, 6 },
-//                                     { 1, 3, 5, 7 },
-//                                     { 0, 1, 4, 5 },
-//                                     { 2, 3, 6, 7 },
-//                                     { 0, 1, 2, 3 },
-//                                     { 4, 5, 6, 7 }};
+
+        friend class MeshReader;
+        friend class Method;
     };
 
 

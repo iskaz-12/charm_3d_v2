@@ -29,9 +29,9 @@ namespace charm {
 
         Real dt = calcDt();
 
-        for (Index ic = 0; ic < mesh->cCount; ic++) {
+        for (Index ic = 0; ic < mesh->getCellsCount(); ic++) {
             integrals[ic].normalize();
-            Real cfl = dt / mesh->cells[ic].volume;
+            Real cfl = dt / mesh->getCell(ic).volume;
             integrals[ic] *= cfl;
             data[ic].c -= integrals[ic];
         }
