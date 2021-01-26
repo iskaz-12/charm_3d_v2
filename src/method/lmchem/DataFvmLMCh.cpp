@@ -135,7 +135,7 @@ namespace charm {
         prim.kp = 0.;
         Real sm = 0.;
         for (Index i = 0; i < cCount; i++) {
-            Component *comp = Config::getComponent(i);
+            ComponentPtr comp = Config::getComponent(i);
             Real cm = prim.c[i]/comp->m;
             sm += cm;
             prim.ml += cm * comp->calcMl(prim.t);

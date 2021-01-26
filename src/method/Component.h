@@ -53,6 +53,8 @@ namespace charm {
 
     };
 
+    typedef std::shared_ptr<Component> ComponentPtr;
+
 }
 
 

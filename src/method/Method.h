@@ -33,6 +33,8 @@ namespace charm {
         void exchange(Array<ArrayVector> &field);
     };
 
+    typedef std::shared_ptr<Method> MethodPtr;
+
 }
 
 #endif //CHARM_3D_V2_METHOD_H

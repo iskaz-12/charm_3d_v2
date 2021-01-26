@@ -23,6 +23,8 @@ namespace charm {
 
     };
 
+    typedef std::shared_ptr<Region> RegionPtr;
+
 }
 
 /*

@@ -34,7 +34,7 @@ namespace charm {
         data.shrink_to_fit();
         for (Index ic = 0; ic < cN; ic++) {
             Cell &cell = mesh->getCell(ic);
-            Region *reg = Config::getRegion(cell.tag);
+            RegionPtr reg = Config::getRegion(cell.tag);
             Prim p(compCount);
             p.matId = reg->matId;
             p.v = reg->v;
@@ -113,7 +113,7 @@ namespace charm {
 
 
     Real MethodFvmLMCh::calcDt() {
-        Config *conf = Config::get();
+        ConfigPtr conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
             for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {

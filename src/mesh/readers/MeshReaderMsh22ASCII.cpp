@@ -22,7 +22,7 @@ namespace charm {
         std::stringstream ss;
         Int numPatches, numVert, numCells;
 
-        std::map<String, BoundaryCondition*> bndPatchMap;
+        std::map<String, BoundaryConditionPtr> bndPatchMap;
         for (Index i = 0; i < Config::getBndCount(); i++) {
             auto b = Config::getBnd(i);
             bndPatchMap[b->name] = b;

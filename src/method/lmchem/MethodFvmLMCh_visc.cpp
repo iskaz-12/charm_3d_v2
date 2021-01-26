@@ -18,7 +18,7 @@ namespace charm {
             Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
-                if (instanceof<BoundaryConditionWallNoSlip>(face.bnd)) {
+                if (instanceof<std::shared_ptr<BoundaryConditionWallNoSlip>>(face.bnd.get())) {
                     Index c1 = face.cells[0];
                     Prim p1 = data[c1].getPrim();
 

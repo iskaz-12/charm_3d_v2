@@ -7,6 +7,7 @@
 #define CHARM_3D_V2_BOUNDARYCONDITION_H
 
 #include <map>
+#include <memory>
 #include "global.h"
 #include "Point.h"
 #include "Prim.h"
@@ -40,7 +41,7 @@ namespace charm {
     };
 
     typedef BoundaryCondition BC;
-
+    typedef std::shared_ptr<BoundaryCondition> BoundaryConditionPtr;
 
 
     class BoundaryConditionInlet : public BoundaryCondition {

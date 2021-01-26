@@ -60,7 +60,7 @@ namespace charm {
             vV *= vol1 * p1.v.y + vol2 * p2.v.y;
             vW *= vol1 * p1.v.z + vol2 * p2.v.z;
             for (Index i = 0; i < compCount; i++) {
-                Component *comp = Config::getComponent(i);
+                ComponentPtr comp = Config::getComponent(i);
                 vC[i] *= vol1 * p1.c[i]           + vol2 * p2.c[i];
                 vH[i] *= vol1 * comp->calcH(p1.t) + vol2 * comp->calcH(p2.t);
             }

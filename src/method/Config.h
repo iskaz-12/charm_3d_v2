@@ -6,6 +6,7 @@
 #ifndef CHARM_3D_V2_CONFIG_H
 #define CHARM_3D_V2_CONFIG_H
 
+#include <cassert>
 #include "global.h"
 #include "yaml-cpp/yaml.h"
 #include "Mesh.h"
@@ -17,6 +18,9 @@
 
 namespace charm {
     class Method;
+    class Config;
+    typedef std::shared_ptr<Config> ConfigPtr;
+    typedef std::shared_ptr<Method> MethodPtr;
 
     class Config {
     public:
@@ -24,46 +28,40 @@ namespace charm {
         Config(const String &fileName);
         virtual void read();
 
-        static Config* get();
+        static ConfigPtr get();
 
         /**
          *
          * @param fileName
          * @return
          */
-        static Config* create(const String &fileName);
+        static ConfigPtr create(const String &fileName);
 
         /**
          *
          * @return
          */
-        virtual Method* createMethod();
+        virtual MethodPtr createMethod();
 
         /**
          *
          * @param i
          * @return
          */
-        inline static Component* getComponent(Index i) {
-            if (i >= getCompCount()) {
-                throw Exception("Wrong component index...");
-            }
+        inline static ComponentPtr getComponent(Index i) {
+            assert(i < getCompCount() && "Wrong component index...");
             return config->components[i];
         }
 
 
-        inline static Material*  getMaterial(Index i)  {
-            if (i >= getMatCount()) {
-                throw Exception("Wrong material index...");
-            }
+        inline static MaterialPtr  getMaterial(Index i)  {
+            assert(i < getMatCount() && "Wrong material index...");
             return config->materials[i];
         }
 
 
-        inline static Region*    getRegion(Index i)    {
-            if (i >= getRegCount()) {
-                throw Exception("Wrong region index...");
-            }
+        inline static RegionPtr    getRegion(Index i)    {
+            assert(i < getRegCount() && "Wrong region index...");
             return config->regions[i];
         }
 
@@ -86,10 +84,8 @@ namespace charm {
             return config->boundaries.size();
         }
 
-        inline static BoundaryCondition* getBnd(Index i) {
-            if (i >= getBndCount()) {
-                throw Exception("Wrong boundary condition index...");
-            }
+        inline static BoundaryConditionPtr getBnd(Index i) {
+            assert(i < getBndCount() && "Wrong boundary condition index...");
             return config->boundaries[i];
         }
 
@@ -101,14 +97,14 @@ namespace charm {
         void readMeshInfo(const YAML::Node &node);
         void readReactions(const YAML::Node &node); //@todo
 
-        BoundaryCondition*    fetchBoundary(const YAML::Node &node);
-        Region*     fetchRegion(const YAML::Node &node);
-        Material*   fetchMaterial(const YAML::Node &node);
-        Component*  fetchComponent(const YAML::Node &node);
-        Reaction*   fetchReaction(const YAML::Node &node);
+        BoundaryConditionPtr    fetchBoundary(const YAML::Node &node);
+        RegionPtr               fetchRegion(const YAML::Node &node);
+        MaterialPtr             fetchMaterial(const YAML::Node &node);
+        ComponentPtr            fetchComponent(const YAML::Node &node);
+        ReactionPtr             fetchReaction(const YAML::Node &node);
     public:
 
-        static Config* config;
+        static ConfigPtr config;
         YAML::Node  confYaml;
 
         Mesh       *mesh;
@@ -134,71 +130,14 @@ namespace charm {
         } msh;
 
     protected:
-        Array<BoundaryCondition*>   boundaries;
-        Array<Material*>            materials;       ///< materials */
-        Array<Region*>              regions;       ///< regions */
-        Array<Component*>           components;      ///< components */
-        Array<Reaction*>            reactions; ///< reactions */
-
-//        union {
-//            struct {
-//
-//            } euler;
-//
-//            struct {
-//                Int                         use_visc;
-//                Int                         use_diff;
-//                Real                t_ref;
-//                struct {
-//                    charm_init_fn_t             init_cond_fn;
-//                    charm_turb_model_fn_t       model_fn;
-//                    charm_turb_models_t         model_type;
-//                    union {
-//                        struct {
-//                            Real a1;
-//                            Real sigma_k1;
-//                            Real sigma_k2;
-//                            Real sigma_w1;
-//                            Real sigma_w2;
-//                            Real beta_star;
-//                            Real beta_1;
-//                            Real beta_2;
-//                            Real kappa;
-//                        } sst;
-//
-//                        struct {
-//                            Real sigma;
-//                            Real kappa;
-//                            Real cb1;
-//                            Real cb2;
-//                            Real cw1;
-//                            Real cw2;
-//                            Real cw3;
-//                            Real cv1;
-//                            Real ct1;
-//                            Real ct2;
-//                            Real ct3;
-//                            Real ct4;
-//                        } sa;
-//                    } param;
-//                } turb;
-//
-//            } ns;
-//        } model;
-////    Real              visc_m;
-////    Real              visc_l;
-
-
-//        charm_mesh_info_t          *msh;
-//        charm_timestep_single_fn_t  timestep_single_fn;
-//        charm_get_timestep_fn_t     get_dt_fn;
-//        charm_flux_fn_t             flux_fn;
-//        charm_limiter_fn_t          lim_fn;
-//        charm_amr_init_fn_t         amr_init_fn;
-//        charm_amr_fn_t              amr_fn;
-//        charm_init_fn_t             model_init_cond_fn;
-
+        Array<BoundaryConditionPtr>   boundaries;
+        Array<MaterialPtr>            materials;       ///< materials */
+        Array<RegionPtr>              regions;       ///< regions */
+        Array<ComponentPtr>           components;      ///< components */
+        Array<ReactionPtr>            reactions; ///< reactions */
     };
+
+    typedef std::shared_ptr<Config> ConfigPtr;
 
 }
 

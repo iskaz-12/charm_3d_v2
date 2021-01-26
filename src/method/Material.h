@@ -32,6 +32,7 @@ namespace charm {
         static void calcT(Prim &p);
     };
 
+    typedef std::shared_ptr<Material> MaterialPtr;
 
     class MaterialIdeal : public Material {
         void eos(Prim &p, Material::EosFlag flag) override;

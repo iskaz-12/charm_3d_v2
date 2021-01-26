@@ -31,17 +31,17 @@ namespace charm {
 
 
 
-        Index               id;
-        ArrayIndex          nodesInd;
-        ArrayIndex          cells;          // ячейка слева и справа
-        Int                 tag = 0;
-        Point               n;              // нормаль к грани
-        Real                area;           // длина грани
-        Point               center;         // центр грани
-        Points              gp;
-        ArrayReal           gw;
-        Int                 type;           // тип грани (внутр., гранич.)
-        BC                 *bnd = NULL;
+        Index                   id;
+        ArrayIndex              nodesInd;
+        ArrayIndex              cells;          // ячейка слева и справа
+        Int                     tag = 0;
+        Point                   n;              // нормаль к грани
+        Real                    area;           // длина грани
+        Point                   center;         // центр грани
+        Points                  gp;
+        ArrayReal               gw;
+        Int                     type;           // тип грани (внутр., гранич.)
+        BoundaryConditionPtr    bnd = NULL;
 
         friend class Mesh;
     };
