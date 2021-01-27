@@ -17,9 +17,9 @@ namespace charm {
 
     class MeshReaderMsh22ASCII : public MeshReader {
     public:
-        MeshReaderMsh22ASCII(Config *config);
+        MeshReaderMsh22ASCII(Ptr<Config> config);
 
-        virtual Mesh* read();
+        virtual Ptr<Mesh> read();
 
     protected:
 

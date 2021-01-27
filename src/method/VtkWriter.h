@@ -13,12 +13,12 @@ namespace charm {
 
     class VtkWriter {
     public:
-        VtkWriter(Method *method);
+        VtkWriter(Ptr<Method> method);
 
         void write(Index step);
 
     protected:
-        Method *method;
+        Ptr<Method> method;
     };
 
 }

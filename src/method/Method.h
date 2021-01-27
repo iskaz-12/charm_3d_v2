@@ -15,25 +15,24 @@ namespace charm {
 
     class Method {
     public:
-        Config *conf;
-        Mesh *mesh;
-        VtkWriter *vtkWriter;
+        Ptr<Config>    conf;
+        Ptr<Mesh>      mesh;
+        Ptr<VtkWriter> vtkWriter;
 
     public:
-        explicit Method(Config *conf);
-        Mesh* getMesh() const;
-        Config* getConfig() const;
+        explicit Method(Ptr<Config> conf);
+        Ptr<Mesh> getMesh() const;
+        Ptr<Config> getConfig() const;
         virtual void init() = 0;
         virtual void run() = 0;
         virtual void done() = 0;
-        virtual Data *getData(Index iCell) = 0;
+        virtual Ptr<Data> getData(Index iCell) = 0;
         void exchange();
         void exchange(ArrayReal &field);
         void exchange(ArrayVector &field);
         void exchange(Array<ArrayVector> &field);
     };
 
-    typedef std::shared_ptr<Method> MethodPtr;
 
 }
 

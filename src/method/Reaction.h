@@ -14,7 +14,6 @@ namespace charm {
 
     };
 
-    typedef std::shared_ptr<Reaction> ReactionPtr;
 
 }
 

@@ -15,9 +15,9 @@ namespace charm {
         tRef    = model["t_ref"].as<Real>();
     }
 
-    MethodPtr ConfigFvm::createMethod() {
+    Ptr<Method> ConfigFvm::createMethod() {
         Config::createMethod();
-        return MethodPtr(new MethodFvm(this));
+        return Ptr<Method>(new MethodFvm(Ptr<Config>(this)));
     }
 
 }

@@ -15,7 +15,7 @@ namespace charm {
 
 
     void Material::calcT(Prim &p) {
-        ConfigPtr conf = Config::get();
+        Ptr<Config> conf = Config::get();
         Real tt = 1.0;        // начальное приближение для температуры
         Real h = p.h;        // энтальпия
         Real cp, cp_dt, tt1;
@@ -25,7 +25,7 @@ namespace charm {
             cp = 0.0;
             cp_dt = 0.0;
             for (Index i = 0; i < Config::getCompCount(); i++) {
-                ComponentPtr comp = Config::getComponent(i);
+                Ptr<Component> comp = Config::getComponent(i);
                 cp    += p.c[i] * comp->calcH(tt);
                 cp_dt += p.c[i] * comp->calcCp(tt);
             }
@@ -42,7 +42,7 @@ namespace charm {
 
 
     void MaterialIdeal::eos(Prim &p, Material::EosFlag flag) {
-        ComponentPtr comp = Config::getComponent(0);
+        Ptr<Component> comp = Config::getComponent(0);
         Real t;
 
         if (comp->cpType == Component::CP_POLYNOM &&
@@ -65,7 +65,7 @@ namespace charm {
 
     void MaterialMix::eos(Prim &p, Material::EosFlag flag) {
         Index compCount = Config::getCompCount();
-        ComponentPtr comp = Config::getComponent(0);
+        Ptr<Component> comp = Config::getComponent(0);
         Real t;
 
         if (comp->cpType == Component::CP_POLYNOM &&

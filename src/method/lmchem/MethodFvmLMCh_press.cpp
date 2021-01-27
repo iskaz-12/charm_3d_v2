@@ -28,7 +28,7 @@ namespace charm {
             Face &face = mesh->getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
-                if (instanceof<BoundaryConditionWallNoSlip>(face.bnd.get())) {
+                if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                     Index c1 = face.cells[0];
                     Prim p1 = data[c1].getPrim();
                     Vector _gradT = gradT[c1];
@@ -67,7 +67,7 @@ namespace charm {
         }
 
         for (Index m = 0; m < Config::getCompCount(); m++) {
-            ComponentPtr comp = Config::getComponent(m);
+            Ptr<Component> comp = Config::getComponent(m);
             for (Index i = 0; i < gN; i++) {
                 tmp1[i] = 0.;
             }
@@ -75,7 +75,7 @@ namespace charm {
                 Face &face = mesh->getFace(iFace);
                 Vector n = face.n;
                 if (face.cells.size() == 1) {
-                    if (instanceof<BoundaryConditionWallNoSlip>(face.bnd.get())) {
+                    if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                         Index c1 = face.cells[0];
                         Prim p1 = data[c1].getPrim();
 

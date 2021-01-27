@@ -135,7 +135,7 @@ namespace charm {
         prim.kp = 0.;
         Real sm = 0.;
         for (Index i = 0; i < cCount; i++) {
-            ComponentPtr comp = Config::getComponent(i);
+            Ptr<Component> comp = Config::getComponent(i);
             Real cm = prim.c[i]/comp->m;
             sm += cm;
             prim.ml += cm * comp->calcMl(prim.t);
@@ -195,7 +195,7 @@ namespace charm {
         return res;
     }
 
-    void DataFvmLMCh::getBuffer(Byte *buf) {
+    void DataFvmLMCh::getBuffer(Byte buf[]) {
         Index shift = 0;
         *(Real *) (&buf[shift]) = c.ru; shift += sizeof(Real);
         *(Real *) (&buf[shift]) = c.rv; shift += sizeof(Real);
@@ -215,7 +215,7 @@ namespace charm {
         }
     }
 
-    void DataFvmLMCh::setBuffer(Byte *buf) {
+    void DataFvmLMCh::setBuffer(Byte buf[]) {
         Index shift = 0;
         c.ru = *(Real *) (&buf[shift]); shift += sizeof(Real);
         c.rv = *(Real *) (&buf[shift]); shift += sizeof(Real);

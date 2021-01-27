@@ -21,7 +21,7 @@ namespace charm {
             Real pabs = prim.p/101325.0;
             Real s = 0.;
             for (Index i = 0; i < cC; i++) {
-                ComponentPtr ci = Config::getComponent(i);
+                Ptr<Component> ci = Config::getComponent(i);
                 x[i] = prim.c[i] / ci->m;
                 s += x[i];
             }
@@ -32,10 +32,10 @@ namespace charm {
                 if (fabs(prim.c[i] - 1.) <= EPS) {
                     data[iCell].d[i] = 0.;
                 } else {
-                    ComponentPtr ci = Config::getComponent(i);
+                    Ptr<Component> ci = Config::getComponent(i);
                     Real s_xd = 0.;
                     for (Index j = 0; j < cC; j++) {
-                        ComponentPtr cj = Config::getComponent(j);
+                        Ptr<Component> cj = Config::getComponent(j);
                         Real td = prim.t / sqrt(ci->ek * cj->ek);
                         Real wd = 1.06036 / pow(td, 0.1561) + 0.1930 / exp(0.47635 * td) + 1.03587 / exp(1.52996 * td) +
                              1.76474 / exp(3.89411 * td);

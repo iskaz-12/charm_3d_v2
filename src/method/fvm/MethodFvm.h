@@ -14,12 +14,12 @@ namespace charm {
 
     class MethodFvm : public Method {
     public:
-        explicit MethodFvm(Config *conf): Method(conf) {}
+        explicit MethodFvm(Ptr<Config> conf): Method(conf) {}
 
         void init() override;
         void run() override;
         void done() override;
-        Data* getData(Index iCell) override;
+        Ptr<Data> getData(Index iCell) override;
 
         Real calcDt();
 

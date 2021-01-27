@@ -14,8 +14,8 @@ namespace charm {
 
     struct Data {
     public:
-        virtual void getBuffer(Byte *) = 0;
-        virtual void setBuffer(Byte *) = 0;
+        virtual void getBuffer(Byte[]) = 0;
+        virtual void setBuffer(Byte[]) = 0;
         virtual Index size() const = 0;
 
         virtual Index getScalarFieldsCount() = 0;

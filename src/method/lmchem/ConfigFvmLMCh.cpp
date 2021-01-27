@@ -33,8 +33,8 @@ namespace charm {
     }
 
 
-    MethodPtr ConfigFvmLMCh::createMethod() {
+    Ptr<Method> ConfigFvmLMCh::createMethod() {
         Config::createMethod();
-        return MethodPtr(new MethodFvmLMCh(this));
+        return newPtr<MethodFvmLMCh>(Ptr<Config>(this));
     }
 }

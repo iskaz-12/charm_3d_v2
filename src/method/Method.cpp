@@ -7,17 +7,17 @@
 #include "MethodException.h"
 
 namespace charm {
-    Method::Method(Config *_conf): conf(_conf) {
+    Method::Method(Ptr<Config> _conf): conf(_conf) {
         mesh = conf->mesh;
     }
 
 
-    Mesh* Method::getMesh() const {
+    Ptr<Mesh> Method::getMesh() const {
         return mesh;
     }
 
 
-    Config* Method::getConfig() const {
+    Ptr<Config> Method::getConfig() const {
         return conf;
     }
 

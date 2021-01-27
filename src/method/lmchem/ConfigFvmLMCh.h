@@ -24,7 +24,7 @@ namespace charm {
 
         void read() override;
 
-        MethodPtr createMethod() override;
+        Ptr<Method> createMethod() override;
 
         Int     useVisc;
         Int     useDiff;

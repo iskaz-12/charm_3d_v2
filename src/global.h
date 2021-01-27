@@ -36,6 +36,12 @@ namespace charm {
     template<typename T>
     using Array = std::vector<T>;
 
+    template<typename T>
+    using Ptr = std::shared_ptr<T>;
+
+    template <typename T, typename... Args>
+    inline Ptr<T> newPtr(Args&&... args) { return std::make_shared<T>(std::forward<Args>(args)...); }
+
     typedef Array<Byte> ArrayByte;
     typedef Array<Int> ArrayInt;
     typedef Array<Real> ArrayReal;
@@ -225,7 +231,7 @@ namespace charm {
 
 
     template<typename Base, typename T>
-    inline bool instanceof(const T *ptr) {
+    inline bool instanceof1(const T *ptr) {
         return dynamic_cast<const Base *>(ptr) != nullptr;
     }
 

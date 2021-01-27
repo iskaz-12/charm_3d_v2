@@ -63,8 +63,8 @@ namespace charm {
         Prim getPrim();
         Cons& getCons();
         void setCons(const Prim &prim);
-        void getBuffer(Byte *) override;
-        void setBuffer(Byte *) override;
+        void getBuffer(Byte[]) override;
+        void setBuffer(Byte[]) override;
         inline Index size() const override;
 
         Index getScalarFieldsCount() override;

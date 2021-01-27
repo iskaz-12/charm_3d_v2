@@ -22,7 +22,7 @@ namespace charm {
     using Cons = DataFvmLMCh::Cons;
 
 
-    MethodFvmLMCh::MethodFvmLMCh(Config *conf): Method(conf) {
+    MethodFvmLMCh::MethodFvmLMCh(Ptr<Config> conf): Method(conf) {
         flux = nullptr;
     }
 
@@ -34,7 +34,7 @@ namespace charm {
         data.shrink_to_fit();
         for (Index ic = 0; ic < cN; ic++) {
             Cell &cell = mesh->getCell(ic);
-            RegionPtr reg = Config::getRegion(cell.tag);
+            Ptr<Region> reg = Config::getRegion(cell.tag);
             Prim p(compCount);
             p.matId = reg->matId;
             p.v = reg->v;
@@ -61,11 +61,11 @@ namespace charm {
         integrals.resize(cN, Cons(compCount));
         integrals.shrink_to_fit();
 
-        flux = new FluxFvmLMChLF(); ///< @todo @todo
+        flux = newPtr<FluxFvmLMChLF>(); ///< @todo @todo
 
         exchange();
 
-        vtkWriter = new VtkWriter(this);
+        vtkWriter = newPtr<VtkWriter>(Ptr<Method>(this));
 
         save();
 
@@ -100,7 +100,7 @@ namespace charm {
     }
 
 
-    Data *MethodFvmLMCh::getData(Index iCell) {
+    Ptr<Data> MethodFvmLMCh::getData(Index iCell) {
         return nullptr;
     }
 
@@ -113,7 +113,7 @@ namespace charm {
 
 
     Real MethodFvmLMCh::calcDt() {
-        ConfigPtr conf = Config::get();
+        Ptr<Config> conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
             for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
@@ -128,9 +128,7 @@ namespace charm {
 
     MethodFvmLMCh::~MethodFvmLMCh() {
         integrals.clear();
-        if (flux != nullptr) {
-            delete flux;
-        }
+
     }
 
 
