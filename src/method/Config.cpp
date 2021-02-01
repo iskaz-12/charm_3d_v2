@@ -16,7 +16,7 @@
 
 namespace charm {
 
-    Ptr<Config> Config::config = Ptr<Config>(nullptr);
+    Config* Config::config = nullptr;
 
 
     /**
@@ -61,7 +61,7 @@ namespace charm {
      * @param fileName
      * @return
      */
-    Ptr<Config> Config::create(const String &fileName = "task.xml") {
+    Config* Config::create(const String &fileName = "task.xml") {
         YAML::Node node = YAML::LoadFile("task.yaml");
         String str = node["method"].as<std::string>();
 
@@ -70,10 +70,10 @@ namespace charm {
         }
         String model = node["control"]["MODEL"]["name"].as<String>();
         if (model == "EULER_FVM") {
-            config = newPtr<ConfigFvm>(fileName);
+            config = new ConfigFvm(fileName);
         }
-        if (model == "LOW_MACH_CHEM_FVM") {
-            config = newPtr<ConfigFvmLMCh>(fileName);
+        else if (model == "LOW_MACH_CHEM_FVM") {
+            config = new ConfigFvmLMCh(fileName);
         }
         else {
             throw ConfigException("Wrong model name.");
@@ -164,15 +164,14 @@ namespace charm {
      * @param node
      * @return
      */
-    Ptr<Region> Config::fetchRegion(const YAML::Node &node)
+    Region* Config::fetchRegion(const YAML::Node &node)
     {
         YAML::Node n1;
         Index id;
-        Index idx;
         Real c;
 
         String str;
-        auto reg = newPtr<Region>();
+        auto reg = new Region();
 
         reg->id     = node["id"].as<Int>();
         reg->name   = node["name"].as<std::string>();
@@ -222,8 +221,8 @@ namespace charm {
      * @param node
      * @return
      */
-    Ptr<BoundaryCondition> Config::fetchBoundary(const YAML::Node &node) {
-        Ptr<BoundaryCondition> bnd;
+    BoundaryCondition* Config::fetchBoundary(const YAML::Node &node) {
+        BoundaryCondition* bnd;
         YAML::Node n2, n3;
         BoundaryCondition::Type bndType = BoundaryCondition::getTypeByName(node["type"].as<std::string>().c_str());
         String bndName = node["name"].as<String>();
@@ -265,21 +264,21 @@ namespace charm {
             if (fabs(s - 1.) > EPS) {
                 throw ConfigException("Sum of concentrations for boundary '" + bndName + "' is not equal to 1");
             }
-            bnd = newPtr<BoundaryConditionInlet>(bndName, v, t, p, c, matId);
+            bnd = new BoundaryConditionInlet(bndName, v, t, p, c, matId);
         }
         else if (bndType == BoundaryCondition::OUTLET) {
-            bnd = newPtr<BoundaryConditionOutlet>(bndName);
+            bnd = new BoundaryConditionOutlet(bndName);
         }
         else if (bndType == BoundaryCondition::SYMMETRY) {
-            bnd = newPtr<BoundaryConditionSymmetry>(bndName);
+            bnd = new BoundaryConditionSymmetry(bndName);
         }
         else if (bndType == BoundaryCondition::WALL_SLIP) {
-            bnd = newPtr<BoundaryConditionWallSlip>(bndName);
+            bnd = new BoundaryConditionWallSlip(bndName);
         }
         else if (bndType == BoundaryCondition::WALL_NO_SLIP) {
             n2 = node["parameters"];
             Real t = n2["T"].as<Real>();
-            bnd = newPtr<BoundaryConditionWallNoSlip>(bndName, t);
+            bnd = new BoundaryConditionWallNoSlip(bndName, t);
         }
 //        else if (bndType == BoundaryCondition::MASS_FLOW) {
 //            bnd->bnd_fn = charm_bnd_cond_fn_mass_flow;
@@ -413,18 +412,18 @@ namespace charm {
      * @param node
      * @return
      */
-    Ptr<Material> Config::fetchMaterial(const YAML::Node &node) {
+    Material* Config::fetchMaterial(const YAML::Node &node) {
         std::string str;
-        Ptr<Material> mat;
+        Material* mat;
         str = node["eof_type"].as<std::string>();
         if (str == "IDEAL") {
-            mat = newPtr<MaterialIdeal>();
+            mat = new MaterialIdeal();
             if (components.size() > 1) {
                 Log::print("WARNING! There is more than one componen. First component's parameters is used for EOS.\n");
             }
         }
         else if (str == "MIX") {
-            mat = newPtr<MaterialMix>();
+            mat = new MaterialMix();
         }
         else {
             throw ConfigException("Unknown EOS type '" + str + "'. Use: LF, GODUNOV.");
@@ -440,9 +439,9 @@ namespace charm {
      * @param node
      * @return
      */
-    Ptr<Component> Config::fetchComponent(const YAML::Node &node) {
+    Component* Config::fetchComponent(const YAML::Node &node) {
         String str;
-        auto comp = newPtr<Component>();
+        auto comp = new Component();
         comp->id = node["id"].as<Int>();
         comp->name = node["name"].as<String>();
 
@@ -504,16 +503,16 @@ namespace charm {
      * @param node
      * @return
      */
-    Ptr<Reaction> Config::fetchReaction(const YAML::Node &node) {
+    Reaction* Config::fetchReaction(const YAML::Node &node) {
         return nullptr;
     }
 
-    Ptr<Method> Config::createMethod() {
+    Method* Config::createMethod() {
         mesh = MeshReader::create(config)->read();
         return nullptr;
     }
 
-    Ptr<Config> Config::get() {
+    Config* Config::get() {
         if (config == nullptr) {
             config = Config::create();
         }

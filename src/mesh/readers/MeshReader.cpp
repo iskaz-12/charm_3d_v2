@@ -18,12 +18,12 @@ namespace charm {
 
 
 
-    Ptr<MeshReader> MeshReader::create(Ptr<Config> config) {
+    MeshReader* MeshReader::create(Config* config) {
         // @todo
-        return newPtr<MeshReaderMsh22ASCII>(config);
+        return new MeshReaderMsh22ASCII(config);
     }
 
-    void MeshReader::decomp(Ptr<Mesh> mesh) {
+    void MeshReader::decomp(Mesh* mesh) {
         mesh->cCount = mesh->cCountGhost = mesh->cells.size();
         mesh->fCount = mesh->fCountGhost = mesh->faces.size();
         mesh->nCount = mesh->nCountGhost = mesh->nodes.size();
@@ -159,7 +159,7 @@ namespace charm {
 
 
 
-    void MeshReader::buildProcMesh(Ptr<Mesh> mesh, const Array<idx_t> &epart, ProcMesh &pm) {
+    void MeshReader::buildProcMesh(Mesh* mesh, const Array<idx_t> &epart, ProcMesh &pm) {
         ArrayInt procCellEx;
         idx_t ne = epart.size();
 

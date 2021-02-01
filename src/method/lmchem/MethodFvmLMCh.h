@@ -25,7 +25,7 @@ namespace charm {
     public:
         Array<DataFvmLMCh>          data;
         Array<DataFvmLMCh::Cons>    integrals;
-        Ptr<FluxFvmLMCh>            flux;
+        FluxFvmLMCh*                flux;
 
 
         ArrayReal               p;
@@ -41,7 +41,7 @@ namespace charm {
         Array<ArrayVector>      gradC;
         Array<ArrayVector>      gradH;
 
-        explicit MethodFvmLMCh(Ptr<Config> conf);
+        explicit MethodFvmLMCh(Config* conf);
         ~MethodFvmLMCh();
 
         void init() override;
@@ -50,7 +50,7 @@ namespace charm {
 
         void done() override;
 
-        Ptr<Data> getData(Index iCell) override;
+        Data* getData(Index iCell) override;
 
         void calcChem();
         void calcAdv();

@@ -19,8 +19,8 @@ using namespace charm;
 int main(Int argc, char** argv) {
     Parallel::init(&argc, &argv);
     try {
-        auto conf = std::shared_ptr<Config>(Config::create("task.yaml"));
-        auto method = std::shared_ptr<Method>(conf->createMethod());
+        auto conf = Config::create("task.yaml");
+        auto method = conf->createMethod();
         method->init();
         method->run();
         method->done();

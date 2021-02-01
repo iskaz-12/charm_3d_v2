@@ -29,6 +29,8 @@ namespace charm {
             TETGEN
         } FileType;
 
+        explicit Mesh();
+
         void calcGeom();
 
         Points cellGetVertices(Cell &c);
@@ -59,6 +61,8 @@ namespace charm {
         }
 
         inline void nodesResize(Index size) {
+            nCount = size;
+            nCountGhost = size;
             nodes.resize(size);
         }
 
@@ -75,15 +79,20 @@ namespace charm {
         }
 
         inline void cellsResize(Index size) {
-            nodes.resize(size);
+            cCount = size;
+            cCountGhost = size;
+            cells.resize(size);
         }
 
         inline void cellsClear() {
-            nodes.clear();
+            cells.clear();
         }
 
         inline void cellPush(Cell &c) {
             cells.push_back(c);
+            cCount++;
+            cCountGhost++;
+
         }
 
         inline Index getFacesCount() const {
@@ -95,7 +104,9 @@ namespace charm {
         }
 
         inline void facesResize(Index size) {
-            nodes.resize(size);
+            fCount = size;
+            fCountGhost = size;
+            faces.resize(size);
         }
 
 

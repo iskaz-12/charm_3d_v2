@@ -13,8 +13,8 @@ namespace charm {
 
 
 
-    Ptr<Mesh> MeshReaderMsh22ASCII::read() {
-        auto mesh = newPtr<Mesh>();
+    Mesh* MeshReaderMsh22ASCII::read() {
+        auto mesh = new Mesh();
         std::map<std::set<Index>, Face> faceMap;
         Index fid = 0;
         String line;
@@ -22,7 +22,7 @@ namespace charm {
         std::stringstream ss;
         Int numPatches, numVert, numCells;
 
-        std::map<String, Ptr<BoundaryCondition>> bndPatchMap;
+        std::map<String, BoundaryCondition*> bndPatchMap;
         for (Index i = 0; i < Config::getBndCount(); i++) {
             auto b = Config::getBnd(i);
             bndPatchMap[b->name] = b;
@@ -158,7 +158,7 @@ namespace charm {
         return mesh;
     }
 
-    MeshReaderMsh22ASCII::MeshReaderMsh22ASCII(Ptr<Config> config) {
+    MeshReaderMsh22ASCII::MeshReaderMsh22ASCII(Config* config) {
 
         this->config      = config;
         //this->mesh        = mesh;

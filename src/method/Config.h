@@ -25,39 +25,39 @@ namespace charm {
         Config(const String &fileName);
         virtual void read();
 
-        static Ptr<Config> get();
+        static Config* get();
 
         /**
          *
          * @param fileName
          * @return
          */
-        static Ptr<Config> create(const String &fileName);
+        static Config* create(const String &fileName);
 
         /**
          *
          * @return
          */
-        virtual Ptr<Method> createMethod();
+        virtual Method* createMethod();
 
         /**
          *
          * @param i
          * @return
          */
-        inline static Ptr<Component> getComponent(Index i) {
+        inline static Component* getComponent(Index i) {
             assert(i < getCompCount() && "Wrong component index...");
             return config->components[i];
         }
 
 
-        inline static Ptr<Material>  getMaterial(Index i)  {
+        inline static Material*  getMaterial(Index i)  {
             assert(i < getMatCount() && "Wrong material index...");
             return config->materials[i];
         }
 
 
-        inline static Ptr<Region>    getRegion(Index i)    {
+        inline static Region*    getRegion(Index i)    {
             assert(i < getRegCount() && "Wrong region index...");
             return config->regions[i];
         }
@@ -81,7 +81,7 @@ namespace charm {
             return config->boundaries.size();
         }
 
-        inline static Ptr<BoundaryCondition> getBnd(Index i) {
+        inline static BoundaryCondition* getBnd(Index i) {
             assert(i < getBndCount() && "Wrong boundary condition index...");
             return config->boundaries[i];
         }
@@ -94,17 +94,17 @@ namespace charm {
         void readMeshInfo(const YAML::Node &node);
         void readReactions(const YAML::Node &node); //@todo
 
-        Ptr<BoundaryCondition>  fetchBoundary(const YAML::Node &node);
-        Ptr<Region>             fetchRegion(const YAML::Node &node);
-        Ptr<Material>           fetchMaterial(const YAML::Node &node);
-        Ptr<Component>          fetchComponent(const YAML::Node &node);
-        Ptr<Reaction>           fetchReaction(const YAML::Node &node);
+        BoundaryCondition*  fetchBoundary(const YAML::Node &node);
+        Region*             fetchRegion(const YAML::Node &node);
+        Material*           fetchMaterial(const YAML::Node &node);
+        Component*          fetchComponent(const YAML::Node &node);
+        Reaction*           fetchReaction(const YAML::Node &node);
     public:
 
-        static Ptr<Config> config;
+        static Config* config;
         YAML::Node  confYaml;
 
-        Ptr<Mesh> mesh;
+        Mesh* mesh;
 
         String      methodName;
         Real        maxErr;            ///< maximum allowed global interpolation error
@@ -127,11 +127,11 @@ namespace charm {
         } msh;
 
     protected:
-        Array<Ptr<BoundaryCondition>>   boundaries;
-        Array<Ptr<Material>>            materials;       ///< materials */
-        Array<Ptr<Region>>              regions;       ///< regions */
-        Array<Ptr<Component>>           components;      ///< components */
-        Array<Ptr<Reaction>>            reactions; ///< reactions */
+        Array<BoundaryCondition*>   boundaries;
+        Array<Material*>            materials;       ///< materials */
+        Array<Region*>              regions;       ///< regions */
+        Array<Component*>           components;      ///< components */
+        Array<Reaction*>            reactions; ///< reactions */
     };
 
 

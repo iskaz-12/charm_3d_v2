@@ -67,7 +67,7 @@ namespace charm {
         }
 
         for (Index m = 0; m < Config::getCompCount(); m++) {
-            Ptr<Component> comp = Config::getComponent(m);
+            Component* comp = Config::getComponent(m);
             for (Index i = 0; i < gN; i++) {
                 tmp1[i] = 0.;
             }
@@ -193,7 +193,7 @@ namespace charm {
 
 
         Real rhsNorm2 = opScProd(rhsP, rhsP);
-        Real eps2 = dynamic_cast<ConfigFvmLMCh*>(Config::get().get())->pressEps;
+        Real eps2 = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressEps;
         eps2 *= eps2;
 
         for (Index i = 0; i < lN; i++) {
@@ -208,7 +208,7 @@ namespace charm {
         opCopy(r_tilde, rk);
         rok = alphak = omegak = 0.;
 
-        Index iterK = dynamic_cast<ConfigFvmLMCh*>(Config::get().get())->pressMaxIter;
+        Index iterK = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressMaxIter;
         while (iterK--) {
             opCopy(xk_1, xk);
             opCopy(rk_1, rk);

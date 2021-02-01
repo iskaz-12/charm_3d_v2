@@ -41,7 +41,7 @@ namespace charm {
         Points                  gp;
         ArrayReal               gw;
         Int                     type;           // тип грани (внутр., гранич.)
-        Ptr<BoundaryCondition>  bnd = nullptr;
+        BoundaryCondition*      bnd = nullptr;
 
         friend class Mesh;
     };

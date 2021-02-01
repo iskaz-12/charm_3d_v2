@@ -43,7 +43,7 @@ namespace charm {
 
         exchange();
 
-        vtkWriter = newPtr<VtkWriter>(Ptr<Method>(this));
+        vtkWriter = new VtkWriter(this);
 
         save();
     }
@@ -118,7 +118,7 @@ namespace charm {
     }
 
     Real MethodFvm::calcDt() {
-        Ptr<Config> conf = Config::get();
+        Config* conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
             for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
@@ -139,8 +139,8 @@ namespace charm {
     }
 
 
-    Ptr<Data> MethodFvm::getData(Index iCell) {
-        return Ptr<Data>(&(data[iCell]));
+    Data* MethodFvm::getData(Index iCell) {
+        return &(data[iCell]);
     }
 
 }

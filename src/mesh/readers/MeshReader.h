@@ -12,11 +12,11 @@
 namespace charm {
     class MeshReader {
     public:
-        static Ptr<MeshReader> create(Ptr<Config> config);
+        static MeshReader* create(Config* config);
 
-        virtual Ptr<Mesh> read() = 0;
+        virtual Mesh* read() = 0;
 
-        void decomp(Ptr<Mesh> mesh);
+        void decomp(Mesh* mesh);
 
 
     protected:
@@ -34,13 +34,13 @@ namespace charm {
             Array<ArrayIndex>   sendInd;
         };
 
-        void buildProcMesh(Ptr<Mesh> mesh, const Array<idx_t> &epart, ProcMesh &procMesh);
+        void buildProcMesh(Mesh* mesh, const Array<idx_t> &epart, ProcMesh &procMesh);
 
 
     protected:
         //Mesh* mesh;
         String fileName;
-        Ptr<Config> config;
+        Config* config;
     };
 }
 

@@ -22,7 +22,7 @@ namespace charm {
     using Cons = DataFvmLMCh::Cons;
 
 
-    MethodFvmLMCh::MethodFvmLMCh(Ptr<Config> conf): Method(conf) {
+    MethodFvmLMCh::MethodFvmLMCh(Config* conf): Method(conf) {
         flux = nullptr;
     }
 
@@ -34,12 +34,13 @@ namespace charm {
         data.shrink_to_fit();
         for (Index ic = 0; ic < cN; ic++) {
             Cell &cell = mesh->getCell(ic);
-            Ptr<Region> reg = Config::getRegion(cell.tag);
+            Region* reg = Config::getRegion(cell.tag);
             Prim p(compCount);
             p.matId = reg->matId;
             p.v = reg->v;
             p.t = reg->t;
-            p.p = reg->p;
+            p.p0 = reg->p;
+            p.p = 0.0;
             p.c.assign(reg->c.begin(), reg->c.end());
             p.eos(Material::EOS_T_P_TO_R_CZ_E);
             p.eTot = p.e + 0.5 * p.v.sqr();
@@ -61,11 +62,11 @@ namespace charm {
         integrals.resize(cN, Cons(compCount));
         integrals.shrink_to_fit();
 
-        flux = newPtr<FluxFvmLMChLF>(); ///< @todo @todo
+        flux = new FluxFvmLMChLF(); ///< @todo @todo
 
         exchange();
 
-        vtkWriter = newPtr<VtkWriter>(Ptr<Method>(this));
+        vtkWriter = new VtkWriter(this);
 
         save();
 
@@ -100,8 +101,8 @@ namespace charm {
     }
 
 
-    Ptr<Data> MethodFvmLMCh::getData(Index iCell) {
-        return nullptr;
+    Data* MethodFvmLMCh::getData(Index iCell) {
+        return &(data[iCell]);
     }
 
 
@@ -113,7 +114,7 @@ namespace charm {
 
 
     Real MethodFvmLMCh::calcDt() {
-        Ptr<Config> conf = Config::get();
+        Config* conf = Config::get();
         Real dt = conf->dt;
         if (conf->cfl > 0) {
             for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {

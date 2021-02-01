@@ -10,10 +10,10 @@
 
 namespace charm {
 
-    VtkWriter::VtkWriter(Ptr<Method> m) : method(m) {}
+    VtkWriter::VtkWriter(Method* m) : method(m) {}
 
     void VtkWriter::write(Index step) {
-        Ptr<Mesh> mesh = method->getMesh();
+        Mesh* mesh = method->getMesh();
         Index cScalarFields = method->getData(0)->getScalarFieldsCount();
         Index cVectorFields = method->getData(0)->getVectorFieldsCount();
 

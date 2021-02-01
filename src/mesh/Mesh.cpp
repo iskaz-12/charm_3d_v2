@@ -16,6 +16,11 @@ namespace charm{
              { 0, 1, 2, 3 },
              { 4, 5, 6, 7 }};
 
+    Mesh::Mesh() {
+        nCount = nCountGhost = 0;
+        fCount = fCountGhost = 0;
+        cCount = cCountGhost = 0;
+    }
 
     Point Mesh::unitCubeToReal(Points vertices, Real x, Real y, Real z) {
         Point res = {0, 0, 0};
