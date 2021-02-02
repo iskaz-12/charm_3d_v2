@@ -42,7 +42,7 @@ namespace charm {
             p.p0 = reg->p;
             p.p = 0.0;
             p.c.assign(reg->c.begin(), reg->c.end());
-            p.eos(Material::EOS_T_P_TO_R_CZ_E);
+            p.eos(Material::EOS_LOW_MACH_T_P_TO_R_CZ_E);
             p.eTot = p.e + 0.5 * p.v.sqr();
             data[ic].setCons(p);
         }
@@ -58,6 +58,7 @@ namespace charm {
         p.resize(cN);
         oldP.resize(cN);
         rhsP.resize(cN);
+        S.resize(cN);
 
         integrals.resize(cN, Cons(compCount));
         integrals.shrink_to_fit();

@@ -30,6 +30,9 @@ namespace charm {
         useVisc = model["use_visc"].as<Int>();
         useDiff = model["use_diffusion"].as<Int>();
         tRef    = model["t_ref"].as<Real>();
+
+        pressEps        = model["press_eps"].as<Real>();
+        pressMaxIter    = model["press_max_iter"].as<Real>();
     }
 
 

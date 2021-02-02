@@ -138,6 +138,16 @@ namespace charm {
                 p.t = p.e / p.cv;
                 break;
 
+            // Low Mach flow
+            case EOS_LOW_MACH_T_P_TO_R_CZ_E:
+                if (p.p0 < EPS) {
+                    throw EosException("EOS_T_P_TO_R_CZ_E: p.p0 < EPS");
+                }
+                p.r = p.p0 * p.m / (p.t * gR);
+                p.cz = sqrt(p.gam * p.p0 / p.r);
+                p.e = p.p0 / (p.r * (p.gam - 1));
+                break;
+
             case EOS_LOW_MACH_R_TO_T_E:
                 p.e = p.t * p.cv;
                 break;

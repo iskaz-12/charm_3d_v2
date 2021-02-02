@@ -57,7 +57,7 @@ namespace charm {
         Index       matId;
 
 
-        explicit DataFvmLMCh(Index compCount): c(compCount) {}
+        explicit DataFvmLMCh(Index compCount): c(compCount), d(compCount) {}
 
         void getPrim(Prim &p);
         Prim getPrim();

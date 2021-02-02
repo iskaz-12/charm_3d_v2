@@ -22,6 +22,7 @@ namespace charm {
             EOS_T_P_TO_R_CZ_E,  // (T,p)    =>  (r, cz, e)
             EOS_R_E_TO_P_CZ_T,  // (r,e)    =>  (p, cz, T)
 
+            EOS_LOW_MACH_T_P_TO_R_CZ_E,
             EOS_LOW_MACH_R_TO_T_E
         } EosFlag;
 
