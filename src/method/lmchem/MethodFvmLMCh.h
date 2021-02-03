@@ -28,8 +28,8 @@ namespace charm {
         FluxFvmLMCh*                flux;
 
 
-        ArrayReal               p;
-        ArrayReal               oldP;
+        ArrayReal               fld;
+        ArrayVector             vecFld;
         ArrayReal               rhsP;
         ArrayReal               S;
 
@@ -81,6 +81,8 @@ namespace charm {
         void opMult(ArrayReal &a, Real b);
         Real opNorm(ArrayReal &a);
 
+        void opGrad(ArrayVector &out, ArrayReal &in);
+        void opDiv(ArrayReal &out, ArrayVector &in);
     };
 
 }

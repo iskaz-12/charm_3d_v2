@@ -145,45 +145,17 @@ namespace charm {
 
         Real dt = calcDt();
         calcS();
+
+
         for (Index i = 0; i < mesh->getCellsCount(); i++) {
-            oldP[i]     = data[i].p;
+            Prim prim = data[i].getPrim();
             rhsP[i]     = 0.;
+            vecFld[i] = prim.v;
         }
 
-        // calc rhsP...
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
-            Vector n = face.n;
-            bool isBnd = face.cells.size() == 1;
-            Index c1 = face.cells[0];
-            Index c2;
-            Prim p1 = data[c1].getPrim();
-            Prim p2(compCount);
+        exchange(vecFld);
 
-            Real vol1 = mesh->getCell(c1).volume;
-            Real vol2;
-
-            if (isBnd) {
-                face.bnd->calc(p1, p2, face.n);
-                vol2 = vol1;
-            } else {
-                c2 = face.cells[1];
-                p2 = data[c2].getPrim();
-                vol2 = mesh->getCell(c2).volume;
-            }
-
-            Real s = face.area / (vol1 + vol2);
-            vol1 *= s;
-            vol2 *= s;
-
-            Real vn = vol1 * scalarProd(p1.v, n) + vol2 * scalarProd(p2.v, n);
-
-
-            rhsP[c1] += vn;
-            if (!isBnd) {
-                rhsP[c2] -= vn;
-            }
-        }
+        opDiv(rhsP, vecFld);
 
         for (Index i = 0; i < lN; i++) {
             rhsP[i] -= S[i];
@@ -197,16 +169,16 @@ namespace charm {
         eps2 *= eps2;
 
         for (Index i = 0; i < lN; i++) {
-            xk[i] = data[i].p;
+            xk[i] = 0.;//data[i].p;
         }
         exchange(xk);
 
         opCopy(rk, rhsP);
-        opLaplace(xk, tmp1);
+        opLaplace(tmp1, xk);
         opSub(rk, tmp1);
 
         opCopy(r_tilde, rk);
-        rok = alphak = omegak = 0.;
+        rok = alphak = omegak = 1.;
 
         Index iterK = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressMaxIter;
         while (iterK--) {
@@ -267,6 +239,18 @@ namespace charm {
 
 
     void MethodFvmLMCh::correctVelosities() {
+        Index compCount = Config::getCompCount();
+        Index lN = mesh->getCellsCount();
+        Index gN = mesh->getCellsCountWithGhost();
+//        ArrayVector gradIn(mesh->getCellsCountWithGhost(), {0., 0., 0.});
+
+        for (Index i = 0; i < lN; i++) {
+            fld[i] = data[i].p;
+        }
+        exchange(fld);
+
+        opGrad(vecFld, fld);
+
 
     }
 

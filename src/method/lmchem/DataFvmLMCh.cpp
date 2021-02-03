@@ -235,7 +235,7 @@ namespace charm {
     }
 
     Index DataFvmLMCh::getScalarFieldsCount() {
-        return 5 + Config::getCompCount();
+        return 6 + Config::getCompCount();
     }
 
     String DataFvmLMCh::getScalarFieldName(Index iFld) {
@@ -253,7 +253,7 @@ namespace charm {
             return "Mach_num";
         }
         for (Index i = 0; i < Config::getCompCount(); i++) {
-            if (iFld == 5 + i) {
+            if (iFld == 6 + i) {
                 return "C_" + Config::getComponent(i)->name;
             }
         }
@@ -277,7 +277,7 @@ namespace charm {
             return prim.v.length() / prim.cz;
         }
         for (Index i = 0; i < Config::getCompCount(); i++) {
-            if (iFld == 5 + i) {
+            if (iFld == 6 + i) {
                 return prim.c[i];
             }
         }

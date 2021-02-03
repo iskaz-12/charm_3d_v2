@@ -149,7 +149,9 @@ namespace charm {
                 break;
 
             case EOS_LOW_MACH_R_TO_T_E:
-                p.e = p.t * p.cv;
+                p.e = p.p0 / (p.r * (p.gam - 1));
+                p.t = p.e / p.cv;
+                p.cz = ::sqrt(p.gam * p.p0 / p.r);
                 break;
 
             default:

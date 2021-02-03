@@ -55,8 +55,8 @@ namespace charm {
         gradC.resize(cN, ArrayVector(compCount, {0, 0, 0}));
         gradH.resize(cN, ArrayVector(compCount, {0, 0, 0}));
 
-        p.resize(cN);
-        oldP.resize(cN);
+        fld.resize(cN);
+        vecFld.resize(cN);
         rhsP.resize(cN);
         S.resize(cN);
 
@@ -132,7 +132,5 @@ namespace charm {
         integrals.clear();
 
     }
-
-
 
 }
