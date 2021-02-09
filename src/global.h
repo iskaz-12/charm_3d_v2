@@ -160,57 +160,8 @@ namespace charm {
         Real yz;
     };
 
-    struct Parallel {
-        static void init(Int *argc, char ***argv);
-
-        static void done();
-
-        static bool isRoot() { return (procId == 0); }
-
-        static void barrier() { MPI_Barrier(MPI_COMM_WORLD); }
-
-        static void send(Int pid, Int tag, Int n, Real *data);
-
-        static void send(Int pid, Int tag, Int n, Int *data);
-
-        static void send(Int pid, Int tag, Int n, Byte *data);
-
-        static void recv(Int pid, Int tag, Int n, Real *data);
-
-        static void recv(Int pid, Int tag, Int n, Int *data);
-
-        static void recv(Int pid, Int tag, Int n, Byte *data);
-
-        static void send(Int pid, Int tag, Int n, Vector *data);
-
-        static void recv(Int pid, Int tag, Int n, Vector *data);
-
-        static void bcast(Int root, Int n, Vector *data);
-
-        static void bcast(Int root, Int n, Real *data);
-
-        static void bcast(Int root, Int n, Int *data);
-        //static void bcast(Int tag, Int n, VECTOR* data);
-
-        static void bcast(Int root, Int n, Index *x);
-
-        static void sum(Real *x);
-
-        static void min(Real *x);
-
-        static void max(Real *x);
-
-        static Int procCount;
-        static Int procId;
-        static Real *buf;
-
-    };
 
 
-    class Log {
-    public:
-        static void print(const String &str) { if (Parallel::isRoot()) std::cout << str; }
-    };
 
 
     class Exception : std::exception {

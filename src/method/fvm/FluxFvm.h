@@ -6,12 +6,12 @@
 #define CHARM_3D_V2_FLUXFVM_H
 
 #include <Point.h>
-#include "DataFvm.h"
+#include <Prim.h>
 
 namespace charm {
     class FluxFvm {
     public:
-        virtual void calc(const Prim &prim1, const Prim &prim2, DataFvm::Cons &flux, const Vector &n) = 0;
+        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re, const Vector &n) = 0;
     };
 }
 

@@ -25,7 +25,7 @@ namespace charm {
         Config(const String &fileName);
         virtual void read();
 
-        static Config* get();
+        static Config & get();
 
         /**
          *
@@ -39,6 +39,28 @@ namespace charm {
          * @return
          */
         virtual Method* createMethod();
+
+//        /**
+//         *
+//         * @param i
+//         * @return
+//         */
+//        inline static Mesh & getMesh() {
+//            assert(config->mesh != nullptr && "Mesh is NULL in Config...");
+//            return config->mesh;
+//        }
+
+
+        /**
+         *
+         * @param i
+         * @return
+         */
+        inline static Mesh& getMesh() {
+            assert(config->mesh != nullptr && "Mesh is NULL in Config...");
+            return *(config->mesh);
+        }
+
 
         /**
          *

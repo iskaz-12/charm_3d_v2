@@ -12,6 +12,7 @@
 #include <ConfigException.h>
 #include "Config.h"
 #include "Method.h"
+#include "Parallel.h"
 
 using namespace charm;
 

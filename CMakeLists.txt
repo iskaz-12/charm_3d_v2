@@ -47,19 +47,30 @@ include_directories(${METIS_INCLUDE} ${CHARM_INCLUDE})
 
 add_executable( charm_3d_v2
         src/main.cpp
+        src/global.h
+        src/global.cpp
+        src/Operators.cpp
+        src/Operators.h
+        src/Parallel.cpp
+        src/Parallel.h
+        src/Log.cpp
+        src/Log.h
+
         src/mesh/Mesh.cpp
         src/mesh/Mesh.h
         src/mesh/Cell.cpp
         src/mesh/Cell.h
-        src/global.h
-        src/global.cpp
         src/mesh/Point.h
         src/mesh/Face.cpp
         src/mesh/Face.h
+        src/mesh/MeshException.h
+        src/mesh/readers/MeshReaderException.h
+        src/mesh/readers/MeshDecompException.h
         src/mesh/readers/MeshReader.cpp
         src/mesh/readers/MeshReader.h
         src/mesh/readers/MeshReaderMsh22ASCII.cpp
         src/mesh/readers/MeshReaderMsh22ASCII.h
+
         src/method/Config.cpp
         src/method/Config.h
         src/method/Material.cpp
@@ -70,44 +81,53 @@ add_executable( charm_3d_v2
         src/method/Component.h
         src/method/Method.cpp
         src/method/Method.h
-        src/method/fvm/MethodFvm.cpp
-        src/method/fvm/MethodFvm.h
-        src/method/fvm/ConfigFvm.cpp
-        src/method/fvm/ConfigFvm.h
-        src/method/fvm/DataFvm.cpp
-        src/method/fvm/DataFvm.h
         src/method/Reaction.cpp
         src/method/Reaction.h
         src/method/BoundaryCondition.cpp
         src/method/BoundaryCondition.h
         src/method/MethodException.cpp
         src/method/MethodException.h
-        src/method/fvm/MethodFvmException.cpp
-        src/method/fvm/MethodFvmException.h
         src/method/ConfigException.cpp
         src/method/ConfigException.h
+        src/method/EosException.h
+        src/method/VtkWriter.cpp
+        src/method/VtkWriter.h
+#        src/method/Data.h
+        src/method/Prim.h
+        src/method/Prim.cpp
+
+        src/method/fvm/MethodFvm.cpp
+        src/method/fvm/MethodFvm.h
+        src/method/fvm/ConfigFvm.cpp
+        src/method/fvm/ConfigFvm.h
         src/method/fvm/FluxFvm.cpp
         src/method/fvm/FluxFvm.h
         src/method/fvm/FluxFvmHllc.cpp
         src/method/fvm/FluxFvmHllc.h
-        src/method/fvm/FluxFvmLf.cpp
-        src/method/fvm/FluxFvmLf.h
-        src/method/EosException.h
-        src/method/VtkWriter.cpp
-        src/method/VtkWriter.h
-        src/method/Data.h
-        src/mesh/readers/MeshReaderException.h
-        src/mesh/readers/MeshDecompException.h
-        src/method/Prim.h
-        src/method/Prim.cpp
+        src/method/fvm/MethodFvmException.cpp
+        src/method/fvm/MethodFvmException.h
 
-        src/method/lmchem/DataFvmLMCh.h
-        src/method/lmchem/DataFvmLMCh.cpp
-        src/method/lmchem/MethodFvmLMCh.h
-        src/method/lmchem/MethodFvmLMCh.cpp
+#        src/method/lmchem/DataFvmLMCh.h
+#        src/method/lmchem/DataFvmLMCh.cpp
+#        src/method/lmchem/MethodFvmLMCh.h
+#        src/method/lmchem/MethodFvmLMCh.cpp
+#        src/method/lmchem/MethodFvmLMChException.h
+#        src/method/lmchem/ConfigFvmLMCh.cpp
+#        src/method/lmchem/ConfigFvmLMCh.h
+#        src/method/lmchem/FluxFvmLMCh.h
+#        src/method/lmchem/FluxFvmLMChLF.cpp
+#        src/method/lmchem/FluxFvmLMChLF.h
+#        src/method/lmchem/MethodFvmLMCh_chem.cpp
+#        src/method/lmchem/MethodFvmLMCh_adv.cpp
+#        src/method/lmchem/MethodFvmLMCh_visc.cpp
+#        src/method/lmchem/MethodFvmLMCh_diff.cpp
+#        src/method/lmchem/MethodFvmLMCh_press.cpp
+#        src/method/lmchem/MethodFvmLMCh_grad.cpp
+#        src/method/lmchem/MethodFvmLMCh_heat.cpp
+#        src/method/lmchem/MethodFvmLMCh_conv.cpp
 
 
-        src/method/lmchem/MethodFvmLMChException.h src/method/lmchem/ConfigFvmLMCh.cpp src/method/lmchem/ConfigFvmLMCh.h src/method/lmchem/FluxFvmLMCh.h src/method/lmchem/FluxFvmLMChLF.cpp src/method/lmchem/FluxFvmLMChLF.h src/method/lmchem/MethodFvmLMCh_chem.cpp src/method/lmchem/MethodFvmLMCh_adv.cpp src/method/lmchem/MethodFvmLMCh_visc.cpp src/method/lmchem/MethodFvmLMCh_diff.cpp src/method/lmchem/MethodFvmLMCh_press.cpp src/method/lmchem/MethodFvmLMCh_grad.cpp src/method/lmchem/MethodFvmLMCh_heat.cpp src/method/lmchem/MethodFvmLMCh_conv.cpp src/mesh/MeshException.h src/method/lmchem/MethodFvmLMCh_operators.cpp)
+)
 
 target_link_libraries(charm_3d_v2 yaml-cpp metis)
 add_dependencies(charm_3d_v2  yaml-cpp metis)

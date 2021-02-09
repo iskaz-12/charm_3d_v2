@@ -7,7 +7,6 @@
 #define CHARM_3D_V2_METHODFVM_H
 
 #include <FluxFvm.h>
-#include <method/Data.h>
 #include "Method.h"
 
 namespace charm {
@@ -19,18 +18,37 @@ namespace charm {
         void init() override;
         void run() override;
         void done() override;
-        Data* getData(Index iCell) override;
 
         Real calcDt();
 
         void save();
 
-        Array<DataFvm>  data;
-        Array<DataFvm::Cons>     integrals;
+        ArrayReal           ro;
+        ArrayReal           ru;
+        ArrayReal           rv;
+        ArrayReal           rw;
+        ArrayReal           re;
+        ArrayReal           matId;
+
+        ArrayReal           roInt;
+        ArrayReal           ruInt;
+        ArrayReal           rvInt;
+        ArrayReal           rwInt;
+        ArrayReal           reInt;
 
         FluxFvm *flux;
 
         void seroIntegrals();
+
+        Prim getPrim(Index) override;
+        void setCons(Index i, Prim &p);
+
+        Index getScalarFieldsCount() override;
+        String getScalarFieldName(Index) override;
+        Real getScalarFieldValue(Index) override;
+        Index getVectorFieldsCount() override;
+        String getVectorFieldName(Index) override;
+        Vector getVectorFieldValue(Index) override;
     };
 
 }

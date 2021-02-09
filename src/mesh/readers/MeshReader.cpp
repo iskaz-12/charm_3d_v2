@@ -2,6 +2,7 @@
 // Created by zhrv on 13.11.2020.
 //
 #include <iostream>
+#include <Parallel.h>
 #include "global.h"
 #include "MeshReader.h"
 #include "MeshReaderMsh22ASCII.h"

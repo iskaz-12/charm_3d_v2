@@ -132,6 +132,7 @@ namespace charm {
 
         friend class MeshReader;
         friend class Method;
+        friend class Parallel;
     };
 
 

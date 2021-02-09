@@ -7,6 +7,7 @@
  *
  */
 
+#include <Parallel.h>
 #include "MethodFvmLMCh.h"
 
 
@@ -98,13 +99,13 @@ namespace charm {
             }
         }
 
-        exchange(gradT);
-        exchange(gradU);
-        exchange(gradV);
-        exchange(gradW);
+        Parallel::exchange(gradT);
+        Parallel::exchange(gradU);
+        Parallel::exchange(gradV);
+        Parallel::exchange(gradW);
 
-        exchange(gradC);
-        exchange(gradH);
+        Parallel::exchange(gradC);
+        Parallel::exchange(gradH);
     }
 
 }

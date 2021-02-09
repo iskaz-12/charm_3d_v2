@@ -72,17 +72,6 @@ namespace charm {
 
     protected:
         void opLaplace(ArrayReal &out, ArrayReal &in);
-        Real opScProd(ArrayReal &a, ArrayReal &b);
-
-        void opCopy(ArrayReal &dest, ArrayReal &src);
-        void opSub(ArrayReal &a, ArrayReal &b); //< a -= b;
-        void opAdd(ArrayReal &a, ArrayReal &b); //< a += b;
-
-        void opMult(ArrayReal &a, Real b);
-        Real opNorm(ArrayReal &a);
-
-        void opGrad(ArrayVector &out, ArrayReal &in);
-        void opDiv(ArrayReal &out, ArrayVector &in);
     };
 
 }
