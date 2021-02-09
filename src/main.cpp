@@ -13,11 +13,15 @@
 #include "Config.h"
 #include "Method.h"
 #include "Parallel.h"
+#include <fenv.h>
 
 using namespace charm;
 
 
 int main(Int argc, char** argv) {
+    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
+
+
     Parallel::init(&argc, &argv);
     try {
         auto conf = Config::create("task.yaml");

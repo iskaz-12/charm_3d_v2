@@ -135,7 +135,7 @@ namespace charm {
                     scalarFieldNames[iFld].c_str());
             fprintf(fp, "          ");
             for (int i = 0; i < mesh.getCellsCount(); i++) {
-                fprintf(fp, "%f ", method->getScalarFieldValue(iFld));
+                fprintf(fp, "%f ", method->getScalarFieldValue(i, iFld));
                 if (i + 1 % 8 == 0 || i + 1 == mesh.getCellsCount()) fprintf(fp, "\n");
             }
             fprintf(fp, "        </DataArray>\n");
@@ -145,7 +145,7 @@ namespace charm {
                     vectorFieldNames[iFld].c_str());
             fprintf(fp, "          ");
             for (int i = 0; i < mesh.getCellsCount(); i++) {
-                Vector v = method->getVectorFieldValue(iFld);
+                Vector v = method->getVectorFieldValue(i, iFld);
                 fprintf(fp, "%f %f %f ", v.x, v.y, v.z);
                 if (i + 1 % 8 == 0 || i + 1 == mesh.getCellsCount()) fprintf(fp, "\n");
             }

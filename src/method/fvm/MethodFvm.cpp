@@ -18,6 +18,7 @@ namespace charm {
         Mesh& mesh = Config::getMesh();
         Index cN = Config::getMesh().getCellsCountWithGhost();
         Index compCount = Config::getCompCount();
+        matId.resize(cN);
         ro.resize(cN);
         ru.resize(cN);
         rv.resize(cN);
@@ -71,17 +72,14 @@ namespace charm {
     void MethodFvm::run() {
         Mesh& mesh = Config::getMesh();
         while (true) {
-            Index compCount = Config::getCompCount();
-
-
-            seroIntegrals();
+            zeroIntegrals();
             for (Index iFace = 0; iFace < mesh.getFacesCount(); iFace++) {
                 Face &face = mesh.getFace(iFace);
                 bool isBnd = face.cells.size() == 1;
                 Index c1 = face.cells[0];
                 Index c2;
                 Prim p1 = getPrim(c1);
-                Prim p2(compCount);
+                Prim p2(1);
 
                 if (isBnd) {
                     face.bnd->calc(p1, p2, face.n);
@@ -104,11 +102,11 @@ namespace charm {
                 rwInt[c1] += flxW;
                 reInt[c1] += flxE;
                 if (!isBnd) {
-                    roInt[c2] += flxR;
-                    ruInt[c2] += flxU;
-                    rvInt[c2] += flxV;
-                    rwInt[c2] += flxW;
-                    reInt[c2] += flxE;
+                    roInt[c2] -= flxR;
+                    ruInt[c2] -= flxU;
+                    rvInt[c2] -= flxV;
+                    rwInt[c2] -= flxW;
+                    reInt[c2] -= flxE;
                 }
             }
 
@@ -117,10 +115,10 @@ namespace charm {
                 Real cfl = dt / mesh.getCell(ic).volume;
 
                 ro[ic] -= cfl*roInt[ic];
-                ru[ic] -= cfl*roInt[ic];
-                rv[ic] -= cfl*roInt[ic];
-                rw[ic] -= cfl*roInt[ic];
-                re[ic] -= cfl*roInt[ic];
+                ru[ic] -= cfl*ruInt[ic];
+                rv[ic] -= cfl*rvInt[ic];
+                rw[ic] -= cfl*rwInt[ic];
+                re[ic] -= cfl*reInt[ic];
              }
 
             Parallel::exchange(ro);
@@ -149,7 +147,7 @@ namespace charm {
 
     }
 
-    void MethodFvm::seroIntegrals() {
+    void MethodFvm::zeroIntegrals() {
         Mesh& mesh = Config::getMesh();
         for (Index i = 0; i < mesh.getCellsCount(); i++) {
             roInt[i] = 0.;
@@ -185,7 +183,7 @@ namespace charm {
 
 
     Index MethodFvm::getScalarFieldsCount() {
-        return 5 + Config::getCompCount();
+        return 5;
     }
 
     String MethodFvm::getScalarFieldName(Index iFld) {
@@ -207,17 +205,12 @@ namespace charm {
         else if (iFld == 5) {
             return "Mach_num";
         }
-        for (Index i = 0; i < Config::getCompCount(); i++) {
-            if (iFld == 5+i) {
-                return "C_"+Config::getComponent(i)->name;
-            }
-        }
 
         throw Exception("Wrong field number");
     }
 
-    Real MethodFvm::getScalarFieldValue(Index iFld) {
-        Prim p = getPrim(iFld);
+    Real MethodFvm::getScalarFieldValue(Index i, Index iFld) {
+        Prim p = getPrim(i);
         if (iFld == 0) {
             return p.r;
         }
@@ -236,11 +229,6 @@ namespace charm {
         else if (iFld == 5) {
             return p.v.length()/p.cz;
         }
-        for (Index i = 0; i < Config::getCompCount(); i++) {
-            if (iFld == 5+i) {
-                return p.c[i];
-            }
-        }
 
         throw Exception("Wrong field number");
     }
@@ -253,8 +241,8 @@ namespace charm {
         return "Velosity";
     }
 
-    Vector MethodFvm::getVectorFieldValue(Index  iFld) {
-        Prim p = getPrim(iFld);
+    Vector MethodFvm::getVectorFieldValue(Index i, Index  iFld) {
+        Prim p = getPrim(i);
         return p.v;
     }
 

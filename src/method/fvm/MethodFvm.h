@@ -38,17 +38,17 @@ namespace charm {
 
         FluxFvm *flux;
 
-        void seroIntegrals();
+        void zeroIntegrals();
 
         Prim getPrim(Index) override;
         void setCons(Index i, Prim &p);
 
         Index getScalarFieldsCount() override;
         String getScalarFieldName(Index) override;
-        Real getScalarFieldValue(Index) override;
+        Real getScalarFieldValue(Index, Index) override;
         Index getVectorFieldsCount() override;
         String getVectorFieldName(Index) override;
-        Vector getVectorFieldValue(Index) override;
+        Vector getVectorFieldValue(Index, Index) override;
     };
 
 }

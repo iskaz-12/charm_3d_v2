@@ -79,7 +79,6 @@ add_executable( charm_3d_v2
         src/method/Region.h
         src/method/Component.cpp
         src/method/Component.h
-        src/method/Method.cpp
         src/method/Method.h
         src/method/Reaction.cpp
         src/method/Reaction.h

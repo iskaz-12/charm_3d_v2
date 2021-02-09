@@ -17,10 +17,6 @@ namespace charm {
         virtual void read();
 
         virtual Method* createMethod();
-
-        Int     useVisc;
-        Int     useDiff;
-        Real    tRef;
     };
 
 }

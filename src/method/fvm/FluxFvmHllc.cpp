@@ -196,6 +196,8 @@ namespace charm {
         ru = ru_flx*nt[0][0] + rv_flx*nt[1][0] + rw_flx*nt[2][0];
         rv = ru_flx*nt[0][1] + rv_flx*nt[1][1] + rw_flx*nt[2][1];
         rw = ru_flx*nt[0][2] + rv_flx*nt[1][2] + rw_flx*nt[2][2];
+        ro = ro_flx;
+        re = re_flx;
     }
 
 }

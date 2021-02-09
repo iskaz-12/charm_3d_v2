@@ -25,10 +25,10 @@ namespace charm {
 
         virtual Index getScalarFieldsCount() = 0;
         virtual String getScalarFieldName(Index) = 0;
-        virtual Real getScalarFieldValue(Index) = 0;
+        virtual Real getScalarFieldValue(Index, Index) = 0;
         virtual Index getVectorFieldsCount() = 0;
         virtual String getVectorFieldName(Index) = 0;
-        virtual Vector getVectorFieldValue(Index) = 0;
+        virtual Vector getVectorFieldValue(Index, Index) = 0;
     };
 
 
