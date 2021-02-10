@@ -7,19 +7,18 @@
  *
  */
 
+#include <Parallel.h>
 #include "MethodFvmLMCh.h"
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcAdv() {
+        Mesh &mesh = Config::getMesh();
+        Index cN = mesh.getCellsCount();
+        Index compCount = Config::getCompCount();
 
-
-
-        for (auto &i : integrals) {
-            i = 0.;
-        }
+        zeroIntegrals();
 
         calcDiff();
         calcVisc();
@@ -29,14 +28,22 @@ namespace charm {
 
         Real dt = calcDt();
 
-        for (Index ic = 0; ic < mesh->getCellsCount(); ic++) {
-            integrals[ic].normalize();
-            Real cfl = dt / mesh->getCell(ic).volume;
-            integrals[ic] *= cfl;
-            data[ic].c -= integrals[ic];
+        for (Index ic = 0; ic < cN; ic++) {
+            Real cfl = dt / mesh.getCell(ic).volume;
+            ru[ic] -= ruInt[ic] * cfl;
+            rv[ic] -= rvInt[ic] * cfl;
+            rw[ic] -= rwInt[ic] * cfl;
+            rh[ic] -= rhInt[ic] * cfl;
+            for (Index j = 0; j < compCount; j++) {
+                rc[ic][j] -= rcInt[ic][j] * cfl;
+            }
         }
 
-        exchange();
+        Parallel::exchange(ru);
+        Parallel::exchange(rv);
+        Parallel::exchange(rw);
+        Parallel::exchange(rh);
+//        Parallel::exchange(rc); // TODO
 
     }
 

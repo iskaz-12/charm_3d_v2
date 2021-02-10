@@ -91,7 +91,6 @@ add_executable( charm_3d_v2
         src/method/EosException.h
         src/method/VtkWriter.cpp
         src/method/VtkWriter.h
-#        src/method/Data.h
         src/method/Prim.h
         src/method/Prim.cpp
 
@@ -106,24 +105,22 @@ add_executable( charm_3d_v2
         src/method/fvm/MethodFvmException.cpp
         src/method/fvm/MethodFvmException.h
 
-#        src/method/lmchem/DataFvmLMCh.h
-#        src/method/lmchem/DataFvmLMCh.cpp
-#        src/method/lmchem/MethodFvmLMCh.h
-#        src/method/lmchem/MethodFvmLMCh.cpp
-#        src/method/lmchem/MethodFvmLMChException.h
-#        src/method/lmchem/ConfigFvmLMCh.cpp
-#        src/method/lmchem/ConfigFvmLMCh.h
-#        src/method/lmchem/FluxFvmLMCh.h
-#        src/method/lmchem/FluxFvmLMChLF.cpp
-#        src/method/lmchem/FluxFvmLMChLF.h
-#        src/method/lmchem/MethodFvmLMCh_chem.cpp
-#        src/method/lmchem/MethodFvmLMCh_adv.cpp
-#        src/method/lmchem/MethodFvmLMCh_visc.cpp
-#        src/method/lmchem/MethodFvmLMCh_diff.cpp
-#        src/method/lmchem/MethodFvmLMCh_press.cpp
-#        src/method/lmchem/MethodFvmLMCh_grad.cpp
-#        src/method/lmchem/MethodFvmLMCh_heat.cpp
-#        src/method/lmchem/MethodFvmLMCh_conv.cpp
+        src/method/lmchem/MethodFvmLMCh.h
+        src/method/lmchem/MethodFvmLMCh.cpp
+        src/method/lmchem/MethodFvmLMChException.h
+        src/method/lmchem/ConfigFvmLMCh.cpp
+        src/method/lmchem/ConfigFvmLMCh.h
+        src/method/lmchem/FluxFvmLMCh.h
+        src/method/lmchem/FluxFvmLMChLF.cpp
+        src/method/lmchem/FluxFvmLMChLF.h
+        src/method/lmchem/MethodFvmLMCh_chem.cpp
+        src/method/lmchem/MethodFvmLMCh_adv.cpp
+        src/method/lmchem/MethodFvmLMCh_visc.cpp
+        src/method/lmchem/MethodFvmLMCh_diff.cpp
+        src/method/lmchem/MethodFvmLMCh_press.cpp
+        src/method/lmchem/MethodFvmLMCh_grad.cpp
+        src/method/lmchem/MethodFvmLMCh_heat.cpp
+        src/method/lmchem/MethodFvmLMCh_conv.cpp
 
 
 )

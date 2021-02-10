@@ -267,7 +267,7 @@ namespace charm {
         return p;
     }
 
-    void MethodFvm::setCons(Index i, Prim &p) {
+    void MethodFvm::setCons(Index i, const Prim &p) {
         Index count = p.c.size();
         matId[i] = p.matId;
         ro[i] = p.r;

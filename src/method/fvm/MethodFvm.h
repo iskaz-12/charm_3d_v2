@@ -41,7 +41,7 @@ namespace charm {
         void zeroIntegrals();
 
         Prim getPrim(Index) override;
-        void setCons(Index i, Prim &p);
+        void setCons(Index i, const Prim &p) override;
 
         Index getScalarFieldsCount() override;
         String getScalarFieldName(Index) override;

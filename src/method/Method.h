@@ -22,6 +22,7 @@ namespace charm {
         virtual void run() = 0;
         virtual void done() = 0;
         virtual Prim getPrim(Index) = 0;
+        virtual void setCons(Index, const Prim&) = 0;
 
         virtual Index getScalarFieldsCount() = 0;
         virtual String getScalarFieldName(Index) = 0;

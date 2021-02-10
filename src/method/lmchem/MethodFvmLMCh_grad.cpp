@@ -12,12 +12,15 @@
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcGrad() {
+        Mesh& mesh = Config::getMesh();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
+        Index fN = mesh.getFacesCount();
         Index compCount = Config::getCompCount();
 
-        for (Index i = 0; i < mesh->getCellsCountWithGhost(); i++) {
+        for (Index i = 0; i < gN; i++) {
             gradT[i] = 0.;
             gradU[i] = 0.;
             gradV[i] = 0.;
@@ -26,16 +29,16 @@ namespace charm {
             gradH[i].resize(compCount, {0., 0., 0.});
         }
 
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
+        for (Index iFace = 0; iFace < fN; iFace++) {
+            Face &face = mesh.getFace(iFace);
             Vector n = face.n;
             bool isBnd = face.cells.size() == 1;
             Index c1 = face.cells[0];
             Index c2;
-            Prim p1 = data[c1].getPrim();
+            Prim p1 = getPrim(c1);
             Prim p2(compCount);
 
-            Real vol1 = mesh->getCell(c1).volume;
+            Real vol1 = mesh.getCell(c1).volume;
             Real vol2;
 
             if (isBnd) {
@@ -43,8 +46,8 @@ namespace charm {
                 vol2 = vol1;
             } else {
                 c2 = face.cells[1];
-                p2 = data[c2].getPrim();
-                vol2 = mesh->getCell(c2).volume;
+                p2 = getPrim(c2);
+                vol2 = mesh.getCell(c2).volume;
             }
 
             Real s = face.area / (vol1 + vol2);
@@ -87,8 +90,8 @@ namespace charm {
             }
         }
 
-        for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
-            Real vol = mesh->getCell(iCell).volume;
+        for (Index iCell = 0; iCell < lN; iCell++) {
+            Real vol = mesh.getCell(iCell).volume;
             gradT[iCell] /= vol;
             gradU[iCell] /= vol;
             gradV[iCell] /= vol;

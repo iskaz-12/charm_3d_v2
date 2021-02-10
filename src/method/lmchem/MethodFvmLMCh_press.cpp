@@ -14,25 +14,28 @@
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
 
     void MethodFvmLMCh::calcS() {
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Mesh& mesh = Config::getMesh();
+        Index fN = mesh.getFacesCount();
+
+
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
         ArrayReal tmp1(gN, 0);
 
         for (Index i = 0; i < gN; i++) {
             S[i] = 0.;
         }
 
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
+        for (Index iFace = 0; iFace < fN; iFace++) {
+            Face &face = mesh.getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
                 if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                     Index c1 = face.cells[0];
-                    Prim p1 = data[c1].getPrim();
+                    Prim p1 = getPrim(c1);
                     Vector _gradT = gradT[c1];
 
                     Vector qt = _gradT;
@@ -47,12 +50,12 @@ namespace charm {
             else {
                 Index c1 = face.cells[0];
                 Index c2 = face.cells[1];
-                Prim p1 = data[c1].getPrim();
-                Prim p2 = data[c2].getPrim();
+                Prim p1 = getPrim(c1);
+                Prim p2 = getPrim(c2);
                 Vector gradT1 = gradT[c1];
                 Vector gradT2 = gradT[c2];
-                Real vol1 = mesh->getCell(c1).volume;
-                Real vol2 = mesh->getCell(c2).volume;
+                Real vol1 = mesh.getCell(c1).volume;
+                Real vol2 = mesh.getCell(c2).volume;
 
                 gradT1 *= vol1*p1.kp; // @todo проверить вычисление KP
                 gradT2 *= vol2*p2.kp; // @todo проверить вычисление KP
@@ -73,16 +76,16 @@ namespace charm {
             for (Index i = 0; i < gN; i++) {
                 tmp1[i] = 0.;
             }
-            for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-                Face &face = mesh->getFace(iFace);
+            for (Index iFace = 0; iFace < fN; iFace++) {
+                Face &face = mesh.getFace(iFace);
                 Vector n = face.n;
                 if (face.cells.size() == 1) {
                     if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                         Index c1 = face.cells[0];
-                        Prim p1 = data[c1].getPrim();
+                        Prim p1 = getPrim(c1);
 
                         Vector qt = gradC[c1][m];
-                        qt *= data[c1].d[m];
+                        qt *= d[c1][m];
                         qt *= p1.r;
                         qt *= face.area;
                         Real qn = scalarProd(qt, n); // @todo проверить знаки
@@ -92,15 +95,15 @@ namespace charm {
                 } else {
                     Index c1 = face.cells[0];
                     Index c2 = face.cells[1];
-                    Prim p1 = data[c1].getPrim();
-                    Prim p2 = data[c2].getPrim();
+                    Prim p1 = getPrim(c1);
+                    Prim p2 = getPrim(c2);
                     Vector gradC1 = gradC[c1][m];
                     Vector gradC2 = gradC[c2][m];
-                    Real vol1 = mesh->getCell(c1).volume;
-                    Real vol2 = mesh->getCell(c2).volume;
+                    Real vol1 = mesh.getCell(c1).volume;
+                    Real vol2 = mesh.getCell(c2).volume;
 
-                    gradC1 *= vol1 * data[c1].d[m] * p1.r;
-                    gradC2 *= vol2 * data[c2].d[m] * p2.r;
+                    gradC1 *= vol1 * d[c1][m] * p1.r;
+                    gradC2 *= vol2 * d[c2][m] * p2.r;
 
                     Vector qt = gradC1;
                     qt += gradC2;
@@ -113,8 +116,8 @@ namespace charm {
                 }
             }
             for (Index i = 0; i < lN; i++) {
-                Prim prim = data[i].getPrim();
-                S[i] += data[i].d[m]*scalarProd(gradC[i][m], gradH[i][m]) / (prim.cp * prim.t);
+                Prim prim = getPrim(i);
+                S[i] += d[i][m]*scalarProd(gradC[i][m], gradH[i][m]) / (prim.cp * prim.t);
 
                 S[i] += tmp1[i];
             }
@@ -125,9 +128,10 @@ namespace charm {
 
 
     void MethodFvmLMCh::calcPress() {
+        Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
         ArrayReal rk(gN, 0);
         ArrayReal rk_1(gN, 0);
         ArrayReal r_tilde(gN, 0);
@@ -149,8 +153,8 @@ namespace charm {
         calcS();
 
 
-        for (Index i = 0; i < mesh->getCellsCount(); i++) {
-            Prim prim = data[i].getPrim();
+        for (Index i = 0; i < lN; i++) {
+            Prim prim = getPrim(i);
             rhsP[i]     = 0.;
             vecFld[i] = prim.v;
         }
@@ -167,7 +171,7 @@ namespace charm {
 
 
         Real rhsNorm2 = Operators::scProd(rhsP, rhsP);
-        Real eps2 = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressEps;
+        Real eps2 = dynamic_cast<ConfigFvmLMCh&>(Config::get()).pressEps;
         eps2 *= eps2;
 
         for (Index i = 0; i < lN; i++) {
@@ -182,7 +186,7 @@ namespace charm {
         Operators::copy(r_tilde, rk);
         rok = alphak = omegak = 1.;
 
-        Index iterK = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressMaxIter;
+        Index iterK = dynamic_cast<ConfigFvmLMCh&>(Config::get()).pressMaxIter;
         while (iterK--) {
             Operators::copy(xk_1, xk);
             Operators::copy(rk_1, rk);
@@ -233,7 +237,7 @@ namespace charm {
         }
 
         for (Index i = 0; i < gN; i++) {
-            data[i].p = xk[i];
+            p[i] = xk[i];
         }
 
         correctVelosities();
@@ -241,17 +245,20 @@ namespace charm {
 
 
     void MethodFvmLMCh::opLaplace(ArrayReal &out, ArrayReal &in) {
+        Mesh& mesh = Config::getMesh();
+        Index gN = mesh.getCellsCountWithGhost();
+
         assert(
                 in.size() == out.size() &&
-                in.size() == mesh->getCellsCountWithGhost() &&
+                in.size() == mesh.getCellsCountWithGhost() &&
                 "Size of arrays must be equal to cells count"
         );
 
         Operators::grad(vecFld, in);
 
 
-        for (Index iCell = 0; iCell < mesh->getCellsCountWithGhost(); iCell++) {
-            Prim prim = data[iCell].getPrim();
+        for (Index iCell = 0; iCell < gN; iCell++) {
+            Prim prim = getPrim(iCell);
             vecFld[iCell] /= prim.r;
         }
 
@@ -261,13 +268,14 @@ namespace charm {
 
 
     void MethodFvmLMCh::correctVelosities() {
+        Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
 //        ArrayVector gradIn(mesh->getCellsCountWithGhost(), {0., 0., 0.});
 
         for (Index i = 0; i < lN; i++) {
-            fld[i] = data[i].p;
+            fld[i] = p[i];
         }
         Parallel::exchange(fld);
 

@@ -11,7 +11,6 @@
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcChem() {
 
