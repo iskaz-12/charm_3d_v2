@@ -15,12 +15,11 @@
 #ifndef CHARM_3D_V2_FLUXFVMLMCH_H
 #define CHARM_3D_V2_FLUXFVMLMCH_H
 
-#include "DataFvmLMCh.h"
 
 namespace charm {
     class FluxFvmLMCh {
     public:
-        virtual void calc(const Prim &prim1, const Prim &prim2, DataFvmLMCh::Cons &flux, const Vector &n) = 0;
+        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ru, Real &rv, Real &rw, Real &rh, ArrayReal &rc, const Vector &n) = 0;
     };
 }
 

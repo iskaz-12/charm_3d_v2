@@ -16,15 +16,29 @@
 #define CHARM_3D_V2_METHODFVMLMCH_H
 
 #include <Method.h>
-#include "DataFvmLMCh.h"
 #include "FluxFvmLMCh.h"
 
 namespace charm {
 
     class MethodFvmLMCh : public Method {
     public:
-        Array<DataFvmLMCh>          data;
-        Array<DataFvmLMCh::Cons>    integrals;
+        ArrayReal           ru;
+        ArrayReal           rv;
+        ArrayReal           rw;
+        ArrayReal           rh;
+        Array<ArrayReal>    rc;
+
+        Real                p0;
+        ArrayReal           p;
+        Array<ArrayReal>    d;
+        ArrayIndex          matId;
+
+        ArrayReal           ruInt;
+        ArrayReal           rvInt;
+        ArrayReal           rwInt;
+        ArrayReal           rhInt;
+        Array<ArrayReal>    rcInt;
+
         FluxFvmLMCh*                flux;
 
 
@@ -50,7 +64,6 @@ namespace charm {
 
         void done() override;
 
-        Data* getData(Index iCell) override;
 
         void calcChem();
         void calcAdv();
@@ -64,25 +77,24 @@ namespace charm {
         void correctVelosities();
         void caldDiffCoeff();
 
-        using Method::exchange;
 
         void save();
 
         Real calcDt();
 
+        Prim getPrim(Index) override;
+        void setCons(Index iCell, const Prim &p) override;
+
+        Index getScalarFieldsCount() override;
+        String getScalarFieldName(Index) override;
+        Real getScalarFieldValue(Index, Index) override;
+        Index getVectorFieldsCount() override;
+        String getVectorFieldName(Index) override;
+        Vector getVectorFieldValue(Index, Index) override;
     protected:
         void opLaplace(ArrayReal &out, ArrayReal &in);
-        Real opScProd(ArrayReal &a, ArrayReal &b);
 
-        void opCopy(ArrayReal &dest, ArrayReal &src);
-        void opSub(ArrayReal &a, ArrayReal &b); //< a -= b;
-        void opAdd(ArrayReal &a, ArrayReal &b); //< a += b;
-
-        void opMult(ArrayReal &a, Real b);
-        Real opNorm(ArrayReal &a);
-
-        void opGrad(ArrayVector &out, ArrayReal &in);
-        void opDiv(ArrayReal &out, ArrayVector &in);
+        void zeroIntegrals();
     };
 
 }

@@ -7,6 +7,7 @@
 #include <MeshReader.h>
 #include <ConfigFvmLMCh.h>
 #include <lmchem/ConfigFvmLMCh.h>
+#include <Log.h>
 #include "Config.h"
 #include "ConfigFvm.h"
 #include "Material.h"
@@ -72,9 +73,9 @@ namespace charm {
         if (model == "EULER_FVM") {
             config = new ConfigFvm(fileName);
         }
-        else if (model == "LOW_MACH_CHEM_FVM") {
-            config = new ConfigFvmLMCh(fileName);
-        }
+//        else if (model == "LOW_MACH_CHEM_FVM") {
+//            config = new ConfigFvmLMCh(fileName);
+//        }
         else {
             throw ConfigException("Wrong model name.");
         }
@@ -512,11 +513,11 @@ namespace charm {
         return nullptr;
     }
 
-    Config* Config::get() {
+    Config& Config::get() {
         if (config == nullptr) {
             config = Config::create();
         }
-        return config;
+        return *config;
     }
 
 }

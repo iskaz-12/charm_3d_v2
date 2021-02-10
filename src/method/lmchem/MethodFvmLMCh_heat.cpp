@@ -10,39 +10,41 @@
 #include "MethodFvmLMCh.h"
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcHeat() {
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
+        Mesh& mesh = Config::getMesh();
+        Index fN = mesh.getFacesCount();
+
+        for (Index iFace = 0; iFace < fN; iFace++) {
+            Face &face = mesh.getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
 //                if (instanceof<BoundaryConditionWallNoSlip>(face.bnd.get())) {
                 if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                     Index c1 = face.cells[0];
-                    Prim p1 = data[c1].getPrim();
+                    Prim p1 = getPrim(c1);
                     Vector _gradT = gradT[c1];
 
                     Vector l = face.center;
-                    l -= mesh->getCell(c1).center;
+                    l -= mesh.getCell(c1).center;
                     Real ll = l.length();
 
                     Vector qt = _gradT;
                     qt *= -p1.kp;
                     Real qn = scalarProd(qt, n); // @todo проверить знаки
 
-                    integrals[c1].rh += qn;
+                    rh[c1] += qn;
                 }
             }
             else {
                 Index c1 = face.cells[0];
                 Index c2 = face.cells[1];
-                Prim p1 = data[c1].getPrim();
-                Prim p2 = data[c2].getPrim();
+                Prim p1 = getPrim(c1);
+                Prim p2 = getPrim(c2);
                 Vector gradT1 = gradT[c1];
                 Vector gradT2 = gradT[c2];
-                Real vol1 = mesh->getCell(c1).volume;
-                Real vol2 = mesh->getCell(c2).volume;
+                Real vol1 = mesh.getCell(c1).volume;
+                Real vol2 = mesh.getCell(c2).volume;
 
                 gradT1 *= vol1*p1.kp; // @todo проверить вычисление KP
                 gradT2 *= vol2*p2.kp; // @todo проверить вычисление KP
@@ -54,8 +56,8 @@ namespace charm {
 
                 Real qn = scalarProd(qt, n);
 
-                integrals[c1].rh += qn;
-                integrals[c2].rh -= qn;
+                rh[c1] += qn;
+                rh[c2] -= qn;
             }
         }
     }

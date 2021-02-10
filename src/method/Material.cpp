@@ -15,7 +15,7 @@ namespace charm {
 
 
     void Material::calcT(Prim &p) {
-        Config* conf = Config::get();
+        Config& conf = Config::get();
         Real tt = 1.0;        // начальное приближение для температуры
         Real h = p.h;        // энтальпия
         Real cp, cp_dt, tt1;

@@ -10,9 +10,8 @@ namespace charm {
 #define F_HLLC_V(UK, FK, SK, SS, PK, RK, VK) (((SS)*((SK)*(UK)-(FK))) / ((SK)-(SS)))
 #define F_HLLC_E(UK, FK, SK, SS, PK, RK, VK) (((SS)*((SK)*(UK)-(FK)) + (SK)*( (PK)+(RK)*((SK)-(VK))*((SS)-(VK)) )*(SS)) / ((SK)-(SS)))
 
-    using Cons = DataFvm::Cons;
 
-    void FluxFvmHllc::x_1(const Prim &prim1, const Prim &prim2, Cons &flux) {
+    void FluxFvmHllc::x_1(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re) {
         Index         cCount = Config::getCompCount();
         Real          sl, sr, p_star, s_star, p_pvrs, ql, qr, tmp;
 
@@ -45,86 +44,80 @@ namespace charm {
         }
 
         if (sl >= 0.) {
-            flux.ru = prim1.r*prim1.v.x*prim1.v.x+prim1.p;
-            flux.rv = prim1.r*prim1.v.y*prim1.v.x;
-            flux.rw = prim1.r*prim1.v.z*prim1.v.x;
-            flux.re = (prim1.r*prim1.eTot+prim1.p)*prim1.v.x;
-            for (Index i = 0; i < cCount; i++) {
-                flux.rc[i] = prim1.r*prim1.v.x*prim1.c[i];
-            }
+            ro = prim1.r*prim1.v.x;
+            ru = prim1.r*prim1.v.x*prim1.v.x+prim1.p;
+            rv = prim1.r*prim1.v.y*prim1.v.x;
+            rw = prim1.r*prim1.v.z*prim1.v.x;
+            re = (prim1.r*prim1.eTot+prim1.p)*prim1.v.x;
         }
         else if (sr <= 0.) {
-            flux.ru = prim2.r*prim2.v.x*prim2.v.x+prim2.p;
-            flux.rv = prim2.r*prim2.v.y*prim2.v.x;
-            flux.rw = prim2.r*prim2.v.z*prim2.v.x;
-            flux.re = (prim2.r*prim2.eTot+prim2.p)*prim2.v.x;
-            for (Index i = 0; i < cCount; i++) {
-                flux.rc[i] = prim2.r*prim2.v.x*prim2.c[i];
-            }
+            ro = prim2.r*prim2.v.x;
+            ru = prim2.r*prim2.v.x*prim2.v.x+prim2.p;
+            rv = prim2.r*prim2.v.y*prim2.v.x;
+            rw = prim2.r*prim2.v.z*prim2.v.x;
+            re = (prim2.r*prim2.eTot+prim2.p)*prim2.v.x;
         }
         else {
             if (s_star >= 0) {
-                flux.ru = F_HLLC_U( /*  UK, FK, SK, SS, PK, RK, VK */
+                ro = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                        prim1.r,
+                        prim1.r * prim1.v.x,
+                        sl, s_star, prim1.p, prim1.r, prim1.v.x
+                );
+                ru = F_HLLC_U( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim1.r * prim1.v.x,
                         prim1.r * prim1.v.x * prim1.v.x + prim1.p,
                         sl, s_star, prim1.p, prim1.r, prim1.v.x
                 );
-                flux.rv = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                rv = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim1.r * prim1.v.y,
                         prim1.r * prim1.v.x * prim1.v.y,
                         sl, s_star, prim1.p, prim1.r, prim1.v.x
                 );
-                flux.rw = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                rw = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim1.r * prim1.v.z,
                         prim1.r * prim1.v.x * prim1.v.z,
                         sl, s_star, prim1.p, prim1.r, prim1.v.x
                 );
-                flux.re = F_HLLC_E( /*  UK, FK, SK, SS, PK, RK, VK */
+                re = F_HLLC_E( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim1.r * prim1.eTot,
                         (prim1.r * prim1.eTot + prim1.p)*prim1.v.x,
                         sl, s_star, prim1.p, prim1.r, prim1.v.x
                 );
                 for (Index i = 0; i < cCount; i++) {
-                    flux.rc[i] = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
-                            prim1.r * prim1.c[i],
-                            prim1.r * prim1.c[i] * prim1.v.x,
-                            sl, s_star, prim1.p, prim1.r, prim1.v.x
-                    );
                 }
             }
             else {
-                flux.ru = F_HLLC_U( /*  UK, FK, SK, SS, PK, RK, VK */
+                ro = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                        prim2.r,
+                        prim2.r * prim2.v.x,
+                        sr, s_star, prim2.p, prim2.r, prim2.v.x
+                );
+                ru = F_HLLC_U( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim2.r * prim2.v.x,
                         prim2.r * prim2.v.x * prim2.v.x + prim2.p,
                         sr, s_star, prim2.p, prim2.r, prim2.v.x
                 );
-                flux.rv = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                rv = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim2.r * prim2.v.y,
                         prim2.r * prim2.v.x * prim2.v.y,
                         sr, s_star, prim2.p, prim2.r, prim2.v.x
                 );
-                flux.rw = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
+                rw = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim2.r * prim2.v.z,
                         prim2.r * prim2.v.x * prim2.v.z,
                         sr, s_star, prim2.p, prim2.r, prim2.v.x
                 );
-                flux.re = F_HLLC_E( /*  UK, FK, SK, SS, PK, RK, VK */
+                re = F_HLLC_E( /*  UK, FK, SK, SS, PK, RK, VK */
                         prim2.r * prim2.eTot,
                         (prim2.r * prim2.eTot + prim2.p)*prim2.v.x,
                         sr, s_star, prim2.p, prim2.r, prim2.v.x
                 );
-                for (Index i = 0; i < cCount; i++) {
-                    flux.rc[i] = F_HLLC_V( /*  UK, FK, SK, SS, PK, RK, VK */
-                            prim2.r * prim2.c[i],
-                            prim2.r * prim2.c[i] * prim2.v.x,
-                            sr, s_star, prim2.p, prim2.r, prim2.v.x
-                    );
-                }
             }
         }
     }
 
-    void FluxFvmHllc::calc(const Prim &prim1, const Prim &prim2, Cons &flux, const Vector &n) {
+    void FluxFvmHllc::calc(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re, const Vector &n) {
         Index cCount = Config::getCompCount();
         Real ri;
         Vector nt[3], vv[2], vn[2];
@@ -193,13 +186,18 @@ namespace charm {
         prim_2 = prim2;
         prim_2.v = vn[1];
 
-        Cons _flx(Config::getCompCount());
+        Real ro_flx;
+        Real ru_flx;
+        Real rv_flx;
+        Real rw_flx;
+        Real re_flx;
 
-        x_1( prim_1, prim_2, _flx );
-        flux = _flx;
-        flux.ru = _flx.ru*nt[0][0] + _flx.rv*nt[1][0] + _flx.rw*nt[2][0];
-        flux.rv = _flx.ru*nt[0][1] + _flx.rv*nt[1][1] + _flx.rw*nt[2][1];
-        flux.rw = _flx.ru*nt[0][2] + _flx.rv*nt[1][2] + _flx.rw*nt[2][2];
+        x_1( prim_1, prim_2, ro_flx, ru_flx, rv_flx, rw_flx, re_flx );
+        ru = ru_flx*nt[0][0] + rv_flx*nt[1][0] + rw_flx*nt[2][0];
+        rv = ru_flx*nt[0][1] + rv_flx*nt[1][1] + rw_flx*nt[2][1];
+        rw = ru_flx*nt[0][2] + rv_flx*nt[1][2] + rw_flx*nt[2][2];
+        ro = ro_flx;
+        re = re_flx;
     }
 
 }

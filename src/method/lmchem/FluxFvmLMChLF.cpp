@@ -17,9 +17,7 @@
 
 namespace charm {
 
-    using Cons = DataFvmLMCh::Cons;
-
-    void FluxFvmLMChLF::calc(const Prim &_prim1, const Prim &_prim2, Cons &flux, const Vector &n) {
+    void FluxFvmLMChLF::calc(const Prim &_prim1, const Prim &_prim2, Real &ru, Real &rv, Real &rw, Real &rh, ArrayReal &rc, const Vector &n) {
 
         Index cCount = Config::getCompCount();
         Index fCount = 4 + cCount;
@@ -33,12 +31,12 @@ namespace charm {
         prim.push_back(std::make_shared<Prim>(_prim2));
 
 
-        q[0] = &flux.ru;
-        q[1] = &flux.rv;
-        q[2] = &flux.rw;
-        q[3] = &flux.rh;
+        q[0] = &ru;
+        q[1] = &rv;
+        q[2] = &rw;
+        q[3] = &rh;
         for (Index i = 4; i < fCount; i++) {
-            q[i] = &(flux.rc[i - 4]);
+            q[i] = &(rc[i - 4]);
         }
 
 

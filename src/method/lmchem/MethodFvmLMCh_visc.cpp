@@ -11,17 +11,17 @@
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::calcVisc() {
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
+        Mesh& mesh = Config::getMesh();
+        for (Index iFace = 0; iFace < mesh.getFacesCount(); iFace++) {
+            Face &face = mesh.getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
 //                if (instanceof<std::shared_ptr<BoundaryConditionWallNoSlip>>(face.bnd.get())) {
                 if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                     Index c1 = face.cells[0];
-                    Prim p1 = data[c1].getPrim();
+                    Prim p1 = getPrim(c1);
 
                     Real un = scalarProd(p1.v, n);
                     Vector vn = n;
@@ -30,23 +30,23 @@ namespace charm {
                     vt -= vn;
 
                     Vector l = face.center;
-                    l -= mesh->getCell(c1).center;
+                    l -= mesh.getCell(c1).center;
                     Real ll = l.length();
 
                     Real qu = -p1.ml*vt[0]/ll;
                     Real qv = -p1.ml*vt[1]/ll;
                     Real qw = -p1.ml*vt[2]/ll;
 
-                    integrals[c1].ru -= qu;
-                    integrals[c1].rv -= qv;
-                    integrals[c1].rw -= qw;
+                    ruInt[c1] -= qu;
+                    rvInt[c1] -= qv;
+                    rwInt[c1] -= qw;
                 }
             }
             else {
                 Index c1 = face.cells[0];
                 Index c2 = face.cells[1];
-                Prim p1 = data[c1].getPrim();
-                Prim p2 = data[c2].getPrim();
+                Prim p1 = getPrim(c1);
+                Prim p2 = getPrim(c2);
 
                 Real tt1 = (-2. / 3.) * p1.ml * (gradU[c1].x + gradV[c1].y + gradW[c1].z);
                 Real txx1 = tt1 + 2. * p1.ml * gradU[c1].x;
@@ -72,20 +72,20 @@ namespace charm {
                 Real tv2 = txy2 * n.x + tyy2 * n.y + tyz2 * n.z;
                 Real tw2 = txz2 * n.x + tyz2 * n.y + tzz2 * n.z;
 
-                Real vol1 = mesh->getCell(c1).volume;
-                Real vol2 = mesh->getCell(c2).volume;
+                Real vol1 = mesh.getCell(c1).volume;
+                Real vol2 = mesh.getCell(c2).volume;
                 Real vols = vol1 + vol2;
                 Real tu = (vol1 * tu1 + vol2 * tu2) / vols;
                 Real tv = (vol1 * tv1 + vol2 * tv2) / vols;
                 Real tw = (vol1 * tw1 + vol2 * tw2) / vols;
 
-                integrals[c1].ru -= tu;
-                integrals[c1].rv -= tv;
-                integrals[c1].rw -= tw;
+                ruInt[c1] -= tu;
+                rvInt[c1] -= tv;
+                rwInt[c1] -= tw;
 
-                integrals[c2].ru += tu;
-                integrals[c2].rv += tv;
-                integrals[c2].rw += tw;
+                ruInt[c2] += tu;
+                rvInt[c2] += tv;
+                rwInt[c2] += tw;
             }
         }
     }

@@ -11,13 +11,15 @@
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
     void MethodFvmLMCh::caldDiffCoeff() {
+        Mesh& mesh = Config::getMesh();
         Index cC = Config::getCompCount();
+        Index cN = mesh.getCellsCount();
+
         ArrayReal x(cC, 0.);
-        for (Index iCell = 0; iCell < mesh->getCellsCount(); iCell++) {
-            Prim prim = data[iCell].getPrim();
+        for (Index iCell = 0; iCell < cN; iCell++) {
+            Prim prim = getPrim(iCell);
             Real pabs = prim.p/101325.0;
             Real s = 0.;
             for (Index i = 0; i < cC; i++) {
@@ -30,7 +32,7 @@ namespace charm {
             }
             for (Index i = 0; i < cC; i++) {
                 if (fabs(prim.c[i] - 1.) <= EPS) {
-                    data[iCell].d[i] = 0.;
+                    d[iCell][i] = 0.;
                 } else {
                     Component* ci = Config::getComponent(i);
                     Real s_xd = 0.;
@@ -44,7 +46,7 @@ namespace charm {
                               (pabs * pow((0.5 * (ci->sig + cj->sig)), 2.0) * wd);
                         s_xd += i == j ? 0. : x[j] / dij;
                     }
-                    data[iCell].d[i] = (1. - x[i]) / s_xd;
+                    d[iCell][i] = (1. - x[i]) / s_xd;
                 }
             }
         }

@@ -10,9 +10,6 @@ namespace charm {
     void ConfigFvm::read() {
         Config::read();
         YAML::Node model = confYaml["control"]["MODEL"];
-        useVisc = model["use_visc"].as<Int>();
-        useDiff = model["use_diffusion"].as<Int>();
-        tRef    = model["t_ref"].as<Real>();
     }
 
     Method* ConfigFvm::createMethod() {

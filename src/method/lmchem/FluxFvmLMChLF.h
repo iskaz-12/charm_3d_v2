@@ -20,7 +20,7 @@
 namespace charm {
     class FluxFvmLMChLF : public FluxFvmLMCh {
     public:
-        virtual void calc(const Prim &prim1, const Prim &prim2, DataFvmLMCh::Cons &flux, const Vector &n);
+        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ru, Real &rv, Real &rw, Real &rh, ArrayReal &rc, const Vector &n);
 
     };
 }

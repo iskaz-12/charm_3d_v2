@@ -7,30 +7,35 @@
  *
  */
 
+#include <Parallel.h>
+#include <Operators.h>
 #include "MethodFvmLMCh.h"
 #include "ConfigFvmLMCh.h"
 
 
 namespace charm {
-    using Cons = DataFvmLMCh::Cons;
 
 
     void MethodFvmLMCh::calcS() {
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Mesh& mesh = Config::getMesh();
+        Index fN = mesh.getFacesCount();
+
+
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
         ArrayReal tmp1(gN, 0);
 
         for (Index i = 0; i < gN; i++) {
             S[i] = 0.;
         }
 
-        for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-            Face &face = mesh->getFace(iFace);
+        for (Index iFace = 0; iFace < fN; iFace++) {
+            Face &face = mesh.getFace(iFace);
             Vector n = face.n;
             if (face.cells.size() == 1) {
                 if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                     Index c1 = face.cells[0];
-                    Prim p1 = data[c1].getPrim();
+                    Prim p1 = getPrim(c1);
                     Vector _gradT = gradT[c1];
 
                     Vector qt = _gradT;
@@ -45,12 +50,12 @@ namespace charm {
             else {
                 Index c1 = face.cells[0];
                 Index c2 = face.cells[1];
-                Prim p1 = data[c1].getPrim();
-                Prim p2 = data[c2].getPrim();
+                Prim p1 = getPrim(c1);
+                Prim p2 = getPrim(c2);
                 Vector gradT1 = gradT[c1];
                 Vector gradT2 = gradT[c2];
-                Real vol1 = mesh->getCell(c1).volume;
-                Real vol2 = mesh->getCell(c2).volume;
+                Real vol1 = mesh.getCell(c1).volume;
+                Real vol2 = mesh.getCell(c2).volume;
 
                 gradT1 *= vol1*p1.kp; // @todo проверить вычисление KP
                 gradT2 *= vol2*p2.kp; // @todo проверить вычисление KP
@@ -71,16 +76,16 @@ namespace charm {
             for (Index i = 0; i < gN; i++) {
                 tmp1[i] = 0.;
             }
-            for (Index iFace = 0; iFace < mesh->getFacesCount(); iFace++) {
-                Face &face = mesh->getFace(iFace);
+            for (Index iFace = 0; iFace < fN; iFace++) {
+                Face &face = mesh.getFace(iFace);
                 Vector n = face.n;
                 if (face.cells.size() == 1) {
                     if (face.bnd->type == BoundaryCondition::WALL_NO_SLIP) {
                         Index c1 = face.cells[0];
-                        Prim p1 = data[c1].getPrim();
+                        Prim p1 = getPrim(c1);
 
                         Vector qt = gradC[c1][m];
-                        qt *= data[c1].d[m];
+                        qt *= d[c1][m];
                         qt *= p1.r;
                         qt *= face.area;
                         Real qn = scalarProd(qt, n); // @todo проверить знаки
@@ -90,15 +95,15 @@ namespace charm {
                 } else {
                     Index c1 = face.cells[0];
                     Index c2 = face.cells[1];
-                    Prim p1 = data[c1].getPrim();
-                    Prim p2 = data[c2].getPrim();
+                    Prim p1 = getPrim(c1);
+                    Prim p2 = getPrim(c2);
                     Vector gradC1 = gradC[c1][m];
                     Vector gradC2 = gradC[c2][m];
-                    Real vol1 = mesh->getCell(c1).volume;
-                    Real vol2 = mesh->getCell(c2).volume;
+                    Real vol1 = mesh.getCell(c1).volume;
+                    Real vol2 = mesh.getCell(c2).volume;
 
-                    gradC1 *= vol1 * data[c1].d[m] * p1.r;
-                    gradC2 *= vol2 * data[c2].d[m] * p2.r;
+                    gradC1 *= vol1 * d[c1][m] * p1.r;
+                    gradC2 *= vol2 * d[c2][m] * p2.r;
 
                     Vector qt = gradC1;
                     qt += gradC2;
@@ -111,8 +116,8 @@ namespace charm {
                 }
             }
             for (Index i = 0; i < lN; i++) {
-                Prim prim = data[i].getPrim();
-                S[i] += data[i].d[m]*scalarProd(gradC[i][m], gradH[i][m]) / (prim.cp * prim.t);
+                Prim prim = getPrim(i);
+                S[i] += d[i][m]*scalarProd(gradC[i][m], gradH[i][m]) / (prim.cp * prim.t);
 
                 S[i] += tmp1[i];
             }
@@ -123,9 +128,10 @@ namespace charm {
 
 
     void MethodFvmLMCh::calcPress() {
+        Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
         ArrayReal rk(gN, 0);
         ArrayReal rk_1(gN, 0);
         ArrayReal r_tilde(gN, 0);
@@ -147,15 +153,15 @@ namespace charm {
         calcS();
 
 
-        for (Index i = 0; i < mesh->getCellsCount(); i++) {
-            Prim prim = data[i].getPrim();
+        for (Index i = 0; i < lN; i++) {
+            Prim prim = getPrim(i);
             rhsP[i]     = 0.;
             vecFld[i] = prim.v;
         }
 
-        exchange(vecFld);
+        Parallel::exchange(vecFld);
 
-        opDiv(rhsP, vecFld);
+        Operators::div(rhsP, vecFld);
 
         for (Index i = 0; i < lN; i++) {
             rhsP[i] -= S[i];
@@ -164,92 +170,116 @@ namespace charm {
 
 
 
-        Real rhsNorm2 = opScProd(rhsP, rhsP);
-        Real eps2 = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressEps;
+        Real rhsNorm2 = Operators::scProd(rhsP, rhsP);
+        Real eps2 = dynamic_cast<ConfigFvmLMCh&>(Config::get()).pressEps;
         eps2 *= eps2;
 
         for (Index i = 0; i < lN; i++) {
             xk[i] = 0.;//data[i].p;
         }
-        exchange(xk);
+        Parallel::exchange(xk);
 
-        opCopy(rk, rhsP);
+        Operators::copy(rk, rhsP);
         opLaplace(tmp1, xk);
-        opSub(rk, tmp1);
+        Operators::sub(rk, tmp1);
 
-        opCopy(r_tilde, rk);
+        Operators::copy(r_tilde, rk);
         rok = alphak = omegak = 1.;
 
-        Index iterK = dynamic_cast<ConfigFvmLMCh*>(Config::get())->pressMaxIter;
+        Index iterK = dynamic_cast<ConfigFvmLMCh&>(Config::get()).pressMaxIter;
         while (iterK--) {
-            opCopy(xk_1, xk);
-            opCopy(rk_1, rk);
-            opCopy(pk_1, pk);
-            opCopy(vk_1, vk);
+            Operators::copy(xk_1, xk);
+            Operators::copy(rk_1, rk);
+            Operators::copy(pk_1, pk);
+            Operators::copy(vk_1, vk);
 
             rok_1 = rok;
             alphak_1 = alphak;
             omegak_1 = omegak;
 
-            rok = opScProd(r_tilde, rk_1);
+            rok = Operators::scProd(r_tilde, rk_1);
             betak = (rok/rok_1)*(alphak_1/omegak_1);
 
-            opCopy(tmp1, vk_1);
-            opMult(tmp1, omegak_1);
-            opCopy(pk, pk_1);
-            opSub(pk, tmp1);
-            opMult(pk, betak);
-            opAdd(pk, rk_1);
+            Operators::copy(tmp1, vk_1);
+            Operators::mult(tmp1, omegak_1);
+            Operators::copy(pk, pk_1);
+            Operators::sub(pk, tmp1);
+            Operators::mult(pk, betak);
+            Operators::add(pk, rk_1);
 
             opLaplace(vk, pk);
 
-            alphak = rok/opScProd(r_tilde, vk);
+            alphak = rok/Operators::scProd(r_tilde, vk);
 
-            opCopy(sk, vk);
-            opMult(sk, -alphak);
-            opAdd(sk, rk_1);
+            Operators::copy(sk, vk);
+            Operators::mult(sk, -alphak);
+            Operators::add(sk, rk_1);
 
             opLaplace(tk, sk);
 
-            omegak = opScProd(tk, sk)/opScProd(tk, tk);
+            omegak = Operators::scProd(tk, sk) / Operators::scProd(tk, tk);
 
-            opCopy(tmp1, sk);
-            opMult(tmp1, omegak);
-            opAdd(xk, tmp1);
-            opCopy(tmp1, pk);
-            opMult(tmp1, alphak);
-            opAdd(xk, tmp1);
+            Operators::copy(tmp1, sk);
+            Operators::mult(tmp1, omegak);
+            Operators::add(xk, tmp1);
+            Operators::copy(tmp1, pk);
+            Operators::mult(tmp1, alphak);
+            Operators::add(xk, tmp1);
 
-            opCopy(rk, tk);
-            opMult(rk, -omegak);
-            opAdd(rk, sk);
+            Operators::copy(rk, tk);
+            Operators::mult(rk, -omegak);
+            Operators::add(rk, sk);
 
-            Real err2 = opScProd(rk, rk)/rhsNorm2;
+            Real err2 = Operators::scProd(rk, rk)/rhsNorm2;
             if (err2 < eps2) {
                 break;
             }
         }
 
         for (Index i = 0; i < gN; i++) {
-            data[i].p = xk[i];
+            p[i] = xk[i];
         }
 
         correctVelosities();
     }
 
 
+    void MethodFvmLMCh::opLaplace(ArrayReal &out, ArrayReal &in) {
+        Mesh& mesh = Config::getMesh();
+        Index gN = mesh.getCellsCountWithGhost();
+
+        assert(
+                in.size() == out.size() &&
+                in.size() == mesh.getCellsCountWithGhost() &&
+                "Size of arrays must be equal to cells count"
+        );
+
+        Operators::grad(vecFld, in);
+
+
+        for (Index iCell = 0; iCell < gN; iCell++) {
+            Prim prim = getPrim(iCell);
+            vecFld[iCell] /= prim.r;
+        }
+
+        Operators::div(out, vecFld);
+
+    }
+
+
     void MethodFvmLMCh::correctVelosities() {
+        Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
-        Index lN = mesh->getCellsCount();
-        Index gN = mesh->getCellsCountWithGhost();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
 //        ArrayVector gradIn(mesh->getCellsCountWithGhost(), {0., 0., 0.});
 
         for (Index i = 0; i < lN; i++) {
-            fld[i] = data[i].p;
+            fld[i] = p[i];
         }
-        exchange(fld);
+        Parallel::exchange(fld);
 
-        opGrad(vecFld, fld);
+        Operators::grad(vecFld, fld);
 
 
     }
