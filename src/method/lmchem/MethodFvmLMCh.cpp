@@ -62,6 +62,7 @@ namespace charm {
             prim.c.assign(reg->c.begin(), reg->c.end());
             prim.eos(Material::EOS_LOW_MACH_T_P_TO_R_CZ_E);
             prim.eTot = prim.e + 0.5 * prim.v.sqr();
+
             setCons(ic, prim);
         }
 

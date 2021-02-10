@@ -38,16 +38,16 @@ namespace charm {
             Prim p1 = getPrim(c1);
             Prim p2(compCount);
 
-            Real vol1 = mesh.getCell(c1).volume;
+            Real vol1 = 1.;//mesh.getCell(c1).volume;
             Real vol2;
 
             if (isBnd) {
                 face.bnd->calc(p1, p2, face.n);
-                vol2 = vol1;
+                vol2 = 1.;//vol1;
             } else {
                 c2 = face.cells[1];
                 p2 = getPrim(c2);
-                vol2 = mesh.getCell(c2).volume;
+                vol2 = 1.;//mesh.getCell(c2).volume;
             }
 
             Real s = face.area / (vol1 + vol2);
@@ -87,6 +87,9 @@ namespace charm {
                     gradC[c2][i] -= vC[i];
                     gradH[c2][i] -= vH[i];
                 }
+            }
+            if (gradC[0][0].length() != 0) {
+                int zhrv = 0;
             }
         }
 

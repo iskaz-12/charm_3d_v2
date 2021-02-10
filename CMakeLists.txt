@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.4)
 project(charm_3d_v2)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+    message(STATUS "Build type not specified: Use Release by default")
+endif(NOT CMAKE_BUILD_TYPE)
+
+
+
 
 set(CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib")
 
@@ -30,6 +37,10 @@ add_subdirectory(${CONTRIB_DIR}/metis-5.1.0)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_COMPILER mpicc)
 set(CMAKE_CXX_COMPILER mpicxx)
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -DNDEBUG") # for production
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -DCHARM_DEBUG") # for developing
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG") # for production
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -DCHARM_DEBUG") # for developing
 
 set(METIS_INCLUDE "${CONTRIB_DIR}/metis-5.1.0/include")
 set(CHARM_INCLUDE

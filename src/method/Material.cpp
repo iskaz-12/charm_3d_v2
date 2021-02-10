@@ -110,6 +110,7 @@ namespace charm {
                 }
                 p.e = p.p / (p.r * (p.gam - 1));
                 p.t = p.e / p.cv;
+                p.cz = ::sqrt(p.gam * p.p / p.r);
                 break;
 
             case EOS_T_P_TO_R_CZ:        // r=r(T,p)
@@ -146,12 +147,14 @@ namespace charm {
                 p.r = p.p0 * p.m / (p.t * gR);
                 p.cz = sqrt(p.gam * p.p0 / p.r);
                 p.e = p.p0 / (p.r * (p.gam - 1));
+                p.h = p.e+p.p0/p.r; // TODO
                 break;
 
             case EOS_LOW_MACH_R_TO_T_E:
                 p.e = p.p0 / (p.r * (p.gam - 1));
                 p.t = p.e / p.cv;
                 p.cz = ::sqrt(p.gam * p.p0 / p.r);
+                p.h = p.e+p.p0/p.r; // TODO
                 break;
 
             default:

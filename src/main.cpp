@@ -19,8 +19,9 @@ using namespace charm;
 
 
 int main(Int argc, char** argv) {
+#ifndef NDEBUG
     feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-
+#endif
 
     Parallel::init(&argc, &argv);
     try {

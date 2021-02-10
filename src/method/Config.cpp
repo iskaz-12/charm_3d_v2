@@ -73,9 +73,9 @@ namespace charm {
         if (model == "EULER_FVM") {
             config = new ConfigFvm(fileName);
         }
-//        else if (model == "LOW_MACH_CHEM_FVM") {
-//            config = new ConfigFvmLMCh(fileName);
-//        }
+        else if (model == "LOW_MACH_CHEM_FVM") {
+            config = new ConfigFvmLMCh(fileName);
+        }
         else {
             throw ConfigException("Wrong model name.");
         }

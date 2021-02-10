@@ -36,12 +36,21 @@ namespace charm {
         ArrayReal           rwInt;
         ArrayReal           reInt;
 
+        ArrayVector         gradR;
+        ArrayVector         gradP;
+        ArrayVector         gradU;
+        ArrayVector         gradV;
+        ArrayVector         gradW;
+
         FluxFvm *flux;
 
         void zeroIntegrals();
 
         Prim getPrim(Index) override;
         void setCons(Index i, const Prim &p) override;
+
+        Prim reconstruct(Index iCell, Point pt);
+        void calcGrad();
 
         Index getScalarFieldsCount() override;
         String getScalarFieldName(Index) override;

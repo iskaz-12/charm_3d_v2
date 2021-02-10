@@ -41,6 +41,12 @@ namespace charm {
         rwInt.shrink_to_fit();
         reInt.shrink_to_fit();
 
+        gradR.resize(cN);
+        gradP.resize(cN);
+        gradU.resize(cN);
+        gradV.resize(cN);
+        gradW.resize(cN);
+
         for (Index ic = 0; ic < cN; ic++) {
             Cell &cell = mesh.getCell(ic);
             auto reg = Config::getRegion(cell.tag);
@@ -72,20 +78,22 @@ namespace charm {
     void MethodFvm::run() {
         Mesh& mesh = Config::getMesh();
         while (true) {
+            calcGrad();
             zeroIntegrals();
             for (Index iFace = 0; iFace < mesh.getFacesCount(); iFace++) {
                 Face &face = mesh.getFace(iFace);
+                Point fc = face.center;
                 bool isBnd = face.cells.size() == 1;
                 Index c1 = face.cells[0];
                 Index c2;
-                Prim p1 = getPrim(c1);
+                Prim p1 = reconstruct(c1, fc);
                 Prim p2(1);
 
                 if (isBnd) {
                     face.bnd->calc(p1, p2, face.n);
                 } else {
                     c2 = face.cells[1];
-                    p2 = getPrim(c2);
+                    p2 = reconstruct(c2, fc);
                 }
 
                 Real flxR, flxU, flxV, flxW, flxE;
@@ -267,6 +275,7 @@ namespace charm {
         return p;
     }
 
+
     void MethodFvm::setCons(Index i, const Prim &p) {
         Index count = p.c.size();
         matId[i] = p.matId;
@@ -275,6 +284,104 @@ namespace charm {
         rv[i] = p.r * p.v.y;
         rw[i] = p.r * p.v.z;
         re[i] = p.r * (p.e + 0.5 * p.v2());
+    }
+
+
+    void MethodFvm::calcGrad() {
+        Mesh& mesh = Config::getMesh();
+        Index lN = mesh.getCellsCount();
+        Index gN = mesh.getCellsCountWithGhost();
+        Index fN = mesh.getFacesCount();
+        Index compCount = Config::getCompCount();
+
+        for (Index i = 0; i < gN; i++) {
+            gradP[i] = 0.;
+            gradU[i] = 0.;
+            gradV[i] = 0.;
+            gradW[i] = 0.;
+            gradR[i] = 0.;
+        }
+
+        for (Index iFace = 0; iFace < fN; iFace++) {
+            Face &face = mesh.getFace(iFace);
+            Vector n = face.n;
+            bool isBnd = face.cells.size() == 1;
+            Index c1 = face.cells[0];
+            Index c2;
+            Prim p1 = getPrim(c1);
+            Prim p2(compCount);
+
+            Real vol1 = 1.;//mesh.getCell(c1).volume;
+            Real vol2;
+
+            if (isBnd) {
+                face.bnd->calc(p1, p2, face.n);
+                vol2 = 1.;//vol1;
+            } else {
+                c2 = face.cells[1];
+                p2 = getPrim(c2);
+                vol2 = 1.;//mesh.getCell(c2).volume;
+            }
+
+            Real s = face.area / (vol1 + vol2);
+            vol1 *= s;
+            vol2 *= s;
+
+            Vector vR(n), vP(n), vU(n), vV(n), vW(n);
+            Array<Vector> vC(compCount, n);
+            Array<Vector> vH(compCount, n);
+
+
+            vR *= vol1 * p1.r   + vol2 * p2.r;
+            vP *= vol1 * p1.p   + vol2 * p2.p;
+            vU *= vol1 * p1.v.x + vol2 * p2.v.x;
+            vV *= vol1 * p1.v.y + vol2 * p2.v.y;
+            vW *= vol1 * p1.v.z + vol2 * p2.v.z;
+
+
+            gradR[c1] += vR;
+            gradP[c1] += vP;
+            gradU[c1] += vU;
+            gradV[c1] += vV;
+            gradW[c1] += vW;
+            if (!isBnd) {
+                gradR[c2] -= vR;
+                gradP[c2] -= vP;
+                gradU[c2] -= vU;
+                gradV[c2] -= vV;
+                gradW[c2] -= vW;
+            }
+        }
+
+        for (Index iCell = 0; iCell < lN; iCell++) {
+            Real vol = mesh.getCell(iCell).volume;
+            gradR[iCell] /= vol;
+            gradP[iCell] /= vol;
+            gradU[iCell] /= vol;
+            gradV[iCell] /= vol;
+            gradW[iCell] /= vol;
+        }
+
+        Parallel::exchange(gradR);
+        Parallel::exchange(gradP);
+        Parallel::exchange(gradU);
+        Parallel::exchange(gradV);
+        Parallel::exchange(gradW);
+    }
+
+    Prim MethodFvm::reconstruct(Index iCell, Point pt) {
+        Prim prim = getPrim(iCell);
+        Point c = pt;
+        c -= Config::getMesh().getCell(iCell).center;
+
+        prim.r   += scalarProd(gradR[iCell], c);
+        prim.p   += scalarProd(gradP[iCell], c);
+        prim.v.x += scalarProd(gradU[iCell], c);
+        prim.v.y += scalarProd(gradV[iCell], c);
+        prim.v.z += scalarProd(gradW[iCell], c);
+        prim.eos(Material::EOS_R_P_TO_E_T);
+        prim.eTot = prim.e+0.5*prim.v2();
+        return prim;
     }
 
 }
