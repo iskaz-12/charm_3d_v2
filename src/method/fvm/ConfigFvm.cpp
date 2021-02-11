@@ -10,6 +10,7 @@ namespace charm {
     void ConfigFvm::read() {
         Config::read();
         YAML::Node model = confYaml["control"]["MODEL"];
+        useReconstruct = model["use_reconstruct"].as<bool>();
     }
 
     Method* ConfigFvm::createMethod() {

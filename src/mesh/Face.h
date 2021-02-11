@@ -44,6 +44,40 @@ namespace charm {
         BoundaryCondition*      bnd = nullptr;
 
         friend class Mesh;
+
+    public:
+        /**
+         *  Triangle:
+         *
+         *   v
+         *   ^
+         *   |
+         *   2
+         *   |`\
+         *   |  `\
+         *   |    `\
+         *   |      `\
+         *   |        `\
+         *   0----------1 --> u
+         */
+        static const Uint FACE_TYPE_TRIANGLE   = 2;
+
+        /**
+         *
+         *  Quadrangle:
+         *
+         *       v
+         *       ^
+         *       |
+         *   3-----------2
+         *   |     |     |
+         *   |     |     |
+         *   |     +---- | --> u
+         *   |           |
+         *   |           |
+         *   0-----------1
+         */
+        static const Uint FACE_TYPE_QUADRANGLE = 3;
     };
 
 }

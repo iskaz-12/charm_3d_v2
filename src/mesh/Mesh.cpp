@@ -8,7 +8,7 @@
 
 namespace charm{
 
-    const Index Mesh::ftv[6][4] =
+    const Index Mesh::FTV_QUAD[6][4] =
             {{ 0, 2, 4, 6 },
              { 1, 3, 5, 7 },
              { 0, 1, 4, 5 },
@@ -16,11 +16,33 @@ namespace charm{
              { 0, 1, 2, 3 },
              { 4, 5, 6, 7 }};
 
+    const Index Mesh::FTV_TET[4][3] =
+            {{ 0, 1, 2 },
+             { 1, 2, 3 },
+             { 0, 1, 3 },
+             { 0, 2, 3 }};
+
+    const Index Mesh::FTV_PRISM[5][4] =
+            {{ 0, 1, 2, 100 },
+             { 3, 4, 5, 100 },
+             { 0, 1, 3, 4   },
+             { 1, 2, 4, 5   },
+             { 0, 2, 3, 5   }};
+
+    const Index Mesh::FTV_PIR[5][4] =
+            {{ 0, 1, 3, 2   },
+             { 0, 1, 4, 100 },
+             { 0, 3, 4, 100 },
+             { 1, 2, 4, 100 },
+             { 2, 3, 4, 100 }};
+
+
     Mesh::Mesh() {
         nCount = nCountGhost = 0;
         fCount = fCountGhost = 0;
         cCount = cCountGhost = 0;
     }
+
 
     Point Mesh::unitCubeToReal(Points vertices, Real x, Real y, Real z) {
         Point res = {0, 0, 0};
@@ -63,27 +85,245 @@ namespace charm{
 
         for (auto &c : cells) {
             Points vertices = cellGetVertices(c);
-            c.center = unitCubeToReal(vertices, 0.5, 0.5, 0.5);
+            
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
 
-            Real sqrt3 = 1./sqrt(3.);
-            Point t[8] = {
-                    {-sqrt3, -sqrt3, -sqrt3},
-                    { sqrt3, -sqrt3, -sqrt3},
-                    {-sqrt3,  sqrt3, -sqrt3},
-                    { sqrt3,  sqrt3, -sqrt3},
-                    {-sqrt3, -sqrt3,  sqrt3},
-                    { sqrt3, -sqrt3,  sqrt3},
-                    {-sqrt3,  sqrt3,  sqrt3},
-                    { sqrt3,  sqrt3,  sqrt3}
-            };
+                c.center = unitCubeToReal(vertices, 0.5, 0.5, 0.5);
 
-            for (auto & i : t) {
-                Point gp;
-                Real gw;
-                cellCalcGpAtPoint(vertices, i, gp, gw);
-                c.gp.push_back(gp);
-                c.gw.push_back(gw);
+                Real sqrt3 = 1. / sqrt(3.);
+                Point t[8] = {
+                        {-sqrt3, -sqrt3, -sqrt3},
+                        {sqrt3,  -sqrt3, -sqrt3},
+                        {-sqrt3, sqrt3,  -sqrt3},
+                        {sqrt3,  sqrt3,  -sqrt3},
+                        {-sqrt3, -sqrt3, sqrt3},
+                        {sqrt3,  -sqrt3, sqrt3},
+                        {-sqrt3, sqrt3,  sqrt3},
+                        {sqrt3,  sqrt3,  sqrt3}
+                };
+
+                for (auto &i : t) {
+                    Point gp;
+                    Real gw;
+                    cellCalcGpAtPoint(vertices, i, gp, gw);
+                    c.gp.push_back(gp);
+                    c.gw.push_back(gw);
+                }
+
+                for (Index fi = 0; fi < 6; fi++) {
+                    Index iFace = c.facesInd[fi];
+                    if (doneFaces.find(iFace) == doneFaces.end()) {
+                        doneFaces.insert(iFace);
+                        Face &face = faces[iFace];
+                        face.center = unitCubeToReal(vertices, fc[fi].x, fc[fi].y, fc[fi].z);
+
+                        Real nl;
+                        Point v[2];
+                        Points fv = cellGetFaceVertices(c, fi);
+
+                        v[0] = fv[1];
+                        v[0] -= fv[0];
+                        v[1] = fv[2];
+                        v[1] -= fv[0];
+
+
+                        face.n = vectorProd(v[0], v[1]);
+                        nl = face.n.length();
+                        face.n /= nl;
+
+                        Vector p0 = cells[face.cells[0]].center;
+                        p0 -= face.center;
+                        if (scalarProd(p0, face.n) > 0) {
+                            face.n *= -1.;
+                        }
+
+                        Point pt[3];
+                        Real a = 2.0 / 3.0;
+                        Real b = 1.0 / 6.0;
+
+
+                        for (Index i = 0; i < 6; i++) {
+                            face.gw.push_back(1. / 6.);
+                        }
+
+                        face.gp.resize(6); // @todo
+                        for (Index i = 0; i < 2; i++) {
+                            for (Index j = 0; j < 3; j++) {
+                                pt[j] = fv[i + j];
+                            }
+
+                            Real a1 = pt[0][0] - pt[2][0];
+                            Real a2 = pt[1][0] - pt[2][0];
+                            Real a3 = pt[2][0];
+                            Real b1 = pt[0][1] - pt[2][1];
+                            Real b2 = pt[1][1] - pt[2][1];
+                            Real b3 = pt[2][1];
+                            Real c1 = pt[0][2] - pt[2][2];
+                            Real c2 = pt[1][2] - pt[2][2];
+                            Real c3 = pt[2][2];
+
+                            Real E = a1 * a1 + b1 * b1 + c1 * c1;
+                            Real F = a2 * a2 + b2 * b2 + c2 * c2;
+                            Real G = a1 * a2 + b1 * b2 + c1 * c2;
+
+                            Real gj = sqrt(E * F - G * G);
+                            for (Index j = 0; j < 3; j++) {
+                                face.gw[3 * i + j] *= gj;
+                            }
+
+                            face.gp[3 * i + 0][0] = a * a1 + b * a2 + a3;
+                            face.gp[3 * i + 0][1] = a * b1 + b * b2 + b3;
+                            face.gp[3 * i + 0][2] = a * c1 + b * c2 + c3;
+
+                            face.gp[3 * i + 1][0] = b * a1 + a * a2 + a3;
+                            face.gp[3 * i + 1][1] = b * b1 + a * b2 + b3;
+                            face.gp[3 * i + 1][2] = b * c1 + a * c2 + c3;
+
+                            face.gp[3 * i + 2][0] = b * a1 + b * a2 + a3;
+                            face.gp[3 * i + 2][1] = b * b1 + b * b2 + b3;
+                            face.gp[3 * i + 2][2] = b * c1 + b * c2 + c3;
+                        }
+                        face.area = 0.;
+                        for (auto gw: face.gw) {
+                            face.area += gw;
+                        }
+                    }
+                }
             }
+            else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
+
+                c.center = {0, 0, 0};
+                for (auto &v : vertices) {
+                    c.center += v;
+                }
+                c.center /= 4.;
+
+
+                Real a = 0.585410196624969;
+                Real b = 0.138196601125011;
+                Real x, y, z;
+                Real a1 = vertices[0].x - vertices[3].x;	Real a2 = vertices[1].x - vertices[3].x;	Real a3 = vertices[2].x - vertices[3].x;	Real a4 = vertices[3].x;
+                Real b1 = vertices[0].y - vertices[3].y;	Real b2 = vertices[1].y - vertices[3].y;	Real b3 = vertices[2].y - vertices[3].y;	Real b4 = vertices[3].y;
+                Real c1 = vertices[0].z - vertices[3].z;	Real c2 = vertices[1].z - vertices[3].z;	Real c3 = vertices[2].z - vertices[3].z;	Real c4 = vertices[3].z;
+
+                Real fJ = ::fabs(a1 * (b2*c3 - b3*c2) - a2 * (b1 * c3 - b3*c1) + a3 * (b1 * c2 - b2 * c1));
+                fJ *= 0.25;
+                fJ /= 6.;
+                c.gw.resize(4, fJ);
+                c.gp.resize(4);
+
+                // 1 точка
+                x = a * a1 + b * a2 + b * a3 + a4;
+                y = a * b1 + b * b2 + b * b3 + b4;
+                z = a * c1 + b * c2 + b * c3 + c4;
+
+                c.gp[0] = {x, y, z};
+
+                // 2 точка
+                x = b * a1 + a * a2 + b * a3 + a4;
+                y = b * b1 + a * b2 + b * b3 + b4;
+                z = b * c1 + a * c2 + b * c3 + c4;
+
+                c.gp[1] = {x, y, z};
+
+                // 3 точка
+                x = b * a1 + b * a2 + a * a3 + a4;
+                y = b * b1 + b * b2 + a * b3 + b4;
+                z = b * c1 + b * c2 + a * c3 + c4;
+
+                c.gp[2] = {x, y, z};
+
+                // 4 точка
+                x = b * a1 + b * a2 + b * a3 + a4;
+                y = b * b1 + b * b2 + b * b3 + b4;
+                z = b * c1 + b * c2 + b * c3 + c4;
+
+                c.gp[3] = {x, y, z};
+
+                for (Index fi = 0; fi < 4; fi++) {
+                    Index iFace = c.facesInd[fi];
+                    if (doneFaces.find(iFace) == doneFaces.end()) {
+                        doneFaces.insert(iFace);
+                        Face &face = faces[iFace];
+
+
+                        Real nl;
+                        Point v[2];
+                        Points fv = cellGetFaceVertices(c, fi);
+
+                        face.center = {0, 0, 0};
+                        for (auto &pt : fv) {
+                            face.center += pt;
+                        }
+                        face.center /= 3.;
+
+
+                        v[0] = fv[1];
+                        v[0] -= fv[0];
+                        v[1] = fv[2];
+                        v[1] -= fv[0];
+
+
+                        face.n = vectorProd(v[0], v[1]);
+                        nl = face.n.length();
+                        face.n /= nl;
+
+                        Vector p0 = cells[face.cells[0]].center;
+                        p0 -= face.center;
+                        if (scalarProd(p0, face.n) > 0) {
+                            face.n *= -1.;
+                        }
+
+                        Points &pt = vertices;
+                        a = 2.0 / 3.0;
+                        b = 1.0 / 6.0;
+
+
+                        for (Index i = 0; i < 3; i++) {
+                            face.gw.push_back(1. / 6.);
+                        }
+
+                        face.gp.resize(3); // @todo
+
+                        a1 = pt[0][0] - pt[2][0];
+                        a2 = pt[1][0] - pt[2][0];
+                        a3 = pt[2][0];
+                        b1 = pt[0][1] - pt[2][1];
+                        b2 = pt[1][1] - pt[2][1];
+                        b3 = pt[2][1];
+                        c1 = pt[0][2] - pt[2][2];
+                        c2 = pt[1][2] - pt[2][2];
+                        c3 = pt[2][2];
+
+                        Real E = a1 * a1 + b1 * b1 + c1 * c1;
+                        Real F = a2 * a2 + b2 * b2 + c2 * c2;
+                        Real G = a1 * a2 + b1 * b2 + c1 * c2;
+
+                        Real gj = sqrt(E * F - G * G);
+                        for (Index j = 0; j < 3; j++) {
+                            face.gw[j] *= gj;
+                        }
+
+                        face.gp[0][0] = a * a1 + b * a2 + a3;
+                        face.gp[0][1] = a * b1 + b * b2 + b3;
+                        face.gp[0][2] = a * c1 + b * c2 + c3;
+
+                        face.gp[1][0] = b * a1 + a * a2 + a3;
+                        face.gp[1][1] = b * b1 + a * b2 + b3;
+                        face.gp[1][2] = b * c1 + a * c2 + c3;
+
+                        face.gp[2][0] = b * a1 + b * a2 + a3;
+                        face.gp[2][1] = b * b1 + b * b2 + b3;
+                        face.gp[2][2] = b * c1 + b * c2 + c3;
+
+                        face.area = 0.;
+                        for (auto gw: face.gw) {
+                            face.area += gw;
+                        }
+                    }
+                }
+            }
+
             c.volume = 0.;
             for (auto gw : c.gw) {
                 c.volume += gw;
@@ -105,82 +345,8 @@ namespace charm{
                 c.dh[j] = vmax[j] - vmin[j];
             }
 
-            for (Index fi = 0; fi < 6; fi++) {
-                Index iFace = c.facesInd[fi];
-                if (doneFaces.find(iFace) == doneFaces.end()) {
-                    doneFaces.insert(iFace);
-                    Face &face = faces[iFace];
-                    face.center = unitCubeToReal(vertices, fc[fi].x, fc[fi].y, fc[fi].z);
-
-                    Real nl;
-                    Point v[2];
-                    Points fv = cellGetFaceVertices(c, fi);
-
-                    v[0] = fv[1]; v[0] -= fv[0];
-                    v[1] = fv[2]; v[1] -= fv[0];
-
-
-                    face.n = vectorProd(v[0], v[1]);
-                    nl = face.n.length();
-                    face.n /= nl;
-
-                    Vector p0 = cells[face.cells[0]].center;
-                    p0 -= face.center;
-                    if (scalarProd(p0, face.n) > 0) {
-                        face.n *= -1.;
-                    }
-
-                    Point  pt[3];
-                    Real	a = 2.0/3.0;
-                    Real	b = 1.0/6.0;
-
-
-                    for (Index i = 0; i < 6; i++) {
-                        face.gw.push_back(1./6.);
-                    }
-
-                    face.gp.resize(6); // @todo
-                    for (Index  i = 0; i < 2; i++) {
-                        for (Index j = 0; j < 3; j++) {
-                            pt[j] = fv[i + j];
-                        }
-
-                        Real a1 = pt[0][0] - pt[2][0];	Real a2 = pt[1][0] - pt[2][0];	Real a3 = pt[2][0];
-                        Real b1 = pt[0][1] - pt[2][1];	Real b2 = pt[1][1] - pt[2][1];	Real b3 = pt[2][1];
-                        Real c1 = pt[0][2] - pt[2][2];	Real c2 = pt[1][2] - pt[2][2];	Real c3 = pt[2][2];
-
-                        Real E = a1*a1+b1*b1+c1*c1;
-                        Real F = a2*a2+b2*b2+c2*c2;
-                        Real G = a1*a2+b1*b2+c1*c2;
-
-                        Real gj = sqrt(E*F-G*G);
-                        for (Index j = 0; j < 3; j++) {
-                            face.gw[3 * i + j] *= gj;
-                        }
-
-                        face.gp[3*i+0][0] = a * a1 + b * a2 + a3;
-                        face.gp[3*i+0][1] = a * b1 + b * b2 + b3;
-                        face.gp[3*i+0][2] = a * c1 + b * c2 + c3;
-
-                        face.gp[3*i+1][0] = b * a1 + a * a2 + a3;
-                        face.gp[3*i+1][1] = b * b1 + a * b2 + b3;
-                        face.gp[3*i+1][2] = b * c1 + a * c2 + c3;
-
-                        face.gp[3*i+2][0] = b * a1 + b * a2 + a3;
-                        face.gp[3*i+2][1] = b * b1 + b * b2 + b3;
-                        face.gp[3*i+2][2] = b * c1 + b * c2 + c3;
-                    }
-                    face.area = 0.;
-                    for (auto gw: face.gw) {
-                        face.area += gw;
-                    }
-                }
-            }
-
         }
-        if (doneFaces.size() != faces.size()) {
-            throw Exception("Wrong faces number.");
-        }
+        assert (doneFaces.size() == faces.size() && "Wrong faces number.");
     }
 
     Points Mesh::cellGetVertices(Cell &c) {

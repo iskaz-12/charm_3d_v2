@@ -69,7 +69,7 @@ namespace charm {
                         Int node, type;
                         ss << line;
                         ss >> node >> type;
-                        if (type == 5) {
+                        if (type == Cell::CELL_TYPE_HEXAHEDRON) {
                             Cell cell;
                             Index tag1, tag2;
                             cell.type = type;
@@ -90,7 +90,48 @@ namespace charm {
                             cell.id = cid++;
                             mesh->cellPush(cell);
                         }
-                        else if (type == 3) {
+                        else if (type == Cell::CELL_TYPE_TETRAHEDRON) {
+                            Cell cell;
+                            Index tag1, tag2;
+                            cell.type = type;
+                            ss >> tag1 >> cell.tag >> tag2;
+                            cell.tag--;
+                            cell.nodesInd.resize(8);
+                            ss >> cell.nodesInd[0];
+                            ss >> cell.nodesInd[1];
+                            ss >> cell.nodesInd[2];
+                            ss >> cell.nodesInd[3];
+                            for (int j = 0; j < 4; j++) {
+                                --cell.nodesInd[j];
+                            }
+                            cell.id = cid++;
+                            mesh->cellPush(cell);
+                        }
+                        else if (type == Cell::CELL_TYPE_PRISM) {
+                            // TODO
+                        }
+                        else if (type == Cell::CELL_TYPE_PYRAMID) {
+                            // TODO
+                        }
+                        else if (type == Face::FACE_TYPE_TRIANGLE) {
+                            Face face;
+                            Index tag1, tag2;
+                            face.type = type;
+                            ss >> tag1 >> face.tag >> tag2;
+                            face.tag--;
+                            face.nodesInd.resize(3);
+                            ss >> face.nodesInd[0];
+                            ss >> face.nodesInd[1];
+                            ss >> face.nodesInd[2];
+                            std::set<Index> fNodes;
+                            for (int i = 0; i < 3; i++) {
+                                fNodes.insert(--face.nodesInd[i]);
+                            }
+                            face.id = fid++;
+                            face.bnd = bndPatchMap[patches[face.tag].name];
+                            faceMap[fNodes] = face;
+                        }
+                        else if (type == Face::FACE_TYPE_QUADRANGLE) {
                             Face face;
                             Index tag1, tag2;
                             face.type = type;
@@ -118,21 +159,45 @@ namespace charm {
 
         for (Index ic = 0; ic < mesh->getCellsSize(); ic++) {
             Cell &cell = mesh->getCell(ic);
-            if (cell.type == 5) {
+            if (cell.type == Cell::CELL_TYPE_HEXAHEDRON) {
                 for (Int i = 0; i < 6; i++) {
                     std::set<Index> fNodes;
 
                     for (Int j = 0; j < 4; j++) {
-                        fNodes.insert(cell.nodesInd[Mesh::ftv[i][j]]);
+                        fNodes.insert(cell.nodesInd[Mesh::FTV_QUAD[i][j]]);
                     }
                     auto it = faceMap.find(fNodes);
                     Face &f = faceMap[fNodes];
                     if (it == faceMap.end()) {
                         f.id = fid++;
+                        f.type = Face::FACE_TYPE_QUADRANGLE;
                     }
                     f.nodesInd.resize(4);
                     for (Int j = 0; j < 4; j++) {
-                        f.nodesInd[j] = cell.nodesInd[Mesh::ftv[i][j]];
+                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_QUAD[i][j]];
+                    }
+                    f.addCell(ic);
+                    //mesh->faces.push_back(f);
+                    cell.facesInd.push_back(f.id);
+                    //faceMap[fNodes] = f;
+                }
+            }
+            else if (cell.type == Cell::CELL_TYPE_TETRAHEDRON) {
+                for (Int i = 0; i < 4; i++) {
+                    std::set<Index> fNodes;
+
+                    for (Int j = 0; j < 3; j++) {
+                        fNodes.insert(cell.nodesInd[Mesh::FTV_TET[i][j]]);
+                    }
+                    auto it = faceMap.find(fNodes);
+                    Face &f = faceMap[fNodes];
+                    if (it == faceMap.end()) {
+                        f.id = fid++;
+                        f.type = Face::FACE_TYPE_TRIANGLE;
+                    }
+                    f.nodesInd.resize(3);
+                    for (Int j = 0; j < 3; j++) {
+                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_QUAD[i][j]];
                     }
                     f.addCell(ic);
                     //mesh->faces.push_back(f);
