@@ -40,9 +40,9 @@ namespace charm {
         ArrayIndex cellGetNeighIndexes(Index ci);
         void assign(const Mesh &msh);
 
-        static void cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);
+        static void cellHexCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);
         static void cellCalcGp(Cell &cell);
-        static Point unitCubeToReal(Array<Point> vertices, Real x, Real y, Real z);
+//        static Point unitCubeToReal(Array<Point> vertices, Real x, Real y, Real z);
 
         static FileType getfileTypeByStr(String str);
 
@@ -136,6 +136,8 @@ namespace charm {
         friend class MeshReader;
         friend class Method;
         friend class Parallel;
+
+        Points faceGetVertices(Face &f);
     };
 
 

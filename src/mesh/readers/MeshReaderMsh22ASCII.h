@@ -15,6 +15,10 @@ namespace charm {
     };
 
 
+    /**
+     * Reader for GMSH format of mesh file (ver.2.2).
+     * See gmsh.info
+     */
     class MeshReaderMsh22ASCII : public MeshReader {
     public:
         MeshReaderMsh22ASCII(Config* config);

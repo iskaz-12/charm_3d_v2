@@ -32,9 +32,9 @@ namespace charm {
             tag             = c.tag;
             volume          = c.volume;
             center          = c.center;
-            gp.assign(c.gp.begin(), c.gp.end());
-            gw.assign(c.gw.begin(), c.gw.end());
-            dh              = c.dh;
+//            gp.assign(c.gp.begin(), c.gp.end());
+//            gw.assign(c.gw.begin(), c.gw.end());
+//            dh              = c.dh;
             flag            = c.flag;
             return *this;
         }
@@ -48,9 +48,9 @@ namespace charm {
         Int                 tag;
         Real                volume;
         Point               center;
-        Points              gp;
-        ArrayReal           gw;
-        Point               dh;
+//        Points              gp;
+//        ArrayReal           gw;
+//        Point               dh;
         Uint                flag;
 
         friend class Mesh;

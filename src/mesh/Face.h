@@ -38,8 +38,8 @@ namespace charm {
         Point                   n;              // нормаль к грани
         Real                    area;           // длина грани
         Point                   center;         // центр грани
-        Points                  gp;
-        ArrayReal               gw;
+//        Points                  gp;
+//        ArrayReal               gw;
         Int                     type;           // тип грани (внутр., гранич.)
         BoundaryCondition*      bnd = nullptr;
 

@@ -3,6 +3,7 @@
 //
 
 #include "MeshReaderMsh22ASCII.h"
+#include "MeshReaderException.h"
 #include <sstream>
 #include <map>
 #include <set>
@@ -19,6 +20,10 @@ namespace charm {
         Index fid = 0;
         String line;
         std::fstream fin(fileName);
+        if (!fin) {
+            throw MeshReaderException("Unable to open mesh file '" + fileName + "'.");
+        }
+
         std::stringstream ss;
         Int numPatches, numVert, numCells;
 
@@ -96,7 +101,7 @@ namespace charm {
                             cell.type = type;
                             ss >> tag1 >> cell.tag >> tag2;
                             cell.tag--;
-                            cell.nodesInd.resize(8);
+                            cell.nodesInd.resize(4);
                             ss >> cell.nodesInd[0];
                             ss >> cell.nodesInd[1];
                             ss >> cell.nodesInd[2];
@@ -124,8 +129,8 @@ namespace charm {
                             ss >> face.nodesInd[1];
                             ss >> face.nodesInd[2];
                             std::set<Index> fNodes;
-                            for (int i = 0; i < 3; i++) {
-                                fNodes.insert(--face.nodesInd[i]);
+                            for (int ind = 0; ind < 3; ind++) {
+                                fNodes.insert(--face.nodesInd[ind]);
                             }
                             face.id = fid++;
                             face.bnd = bndPatchMap[patches[face.tag].name];
@@ -177,9 +182,7 @@ namespace charm {
                         f.nodesInd[j] = cell.nodesInd[Mesh::FTV_QUAD[i][j]];
                     }
                     f.addCell(ic);
-                    //mesh->faces.push_back(f);
                     cell.facesInd.push_back(f.id);
-                    //faceMap[fNodes] = f;
                 }
             }
             else if (cell.type == Cell::CELL_TYPE_TETRAHEDRON) {
@@ -197,12 +200,10 @@ namespace charm {
                     }
                     f.nodesInd.resize(3);
                     for (Int j = 0; j < 3; j++) {
-                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_QUAD[i][j]];
+                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_TET[i][j]];
                     }
                     f.addCell(ic);
-                    //mesh->faces.push_back(f);
                     cell.facesInd.push_back(f.id);
-                    //faceMap[fNodes] = f;
                 }
             }
         }
@@ -226,13 +227,12 @@ namespace charm {
     MeshReaderMsh22ASCII::MeshReaderMsh22ASCII(Config* config) {
 
         this->config      = config;
-        //this->mesh        = mesh;
         this->fileName    = config->msh.fileName;
     }
 
 
     String MeshReaderMsh22ASCII::getlineUpper(std::fstream &stream) {
-        char *line = new char[1024]/*CHARM_ALLOC (char, 1024)*/, *linep = line;
+        char *line = new char[1024], *linep = line;
         Index lenmax = 1024, len = lenmax;
         int c;
 

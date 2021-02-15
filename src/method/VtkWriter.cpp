@@ -102,8 +102,21 @@ namespace charm {
         fprintf(fp, "      <Cells>\n");
         fprintf(fp, "        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n");
         fprintf(fp, "          ");
-        for (int i = 0; i < mesh.getCellsCount(); i++) {
-            fprintf(fp, "%d ", (i + 1) * 8);
+
+        Int offset = 0;
+        for (Int i = 0; i < mesh.getCellsCount(); i++) {
+            Cell &c = mesh.getCell(i);
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
+                offset += 8;
+                fprintf(fp, "%d ", offset);
+            }
+            else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
+                offset += 4;
+                fprintf(fp, "%d ", offset);
+            }
+            else {
+                throw Exception("VTK writer: not realized cell type.");
+            }
         }
         fprintf(fp, "\n");
         fprintf(fp, "        </DataArray>\n");
@@ -111,15 +124,34 @@ namespace charm {
         fprintf(fp, "          ");
         for (int i = 0; i < mesh.getCellsCount(); i++) {
             Cell &c = mesh.getCell(i);
-            fprintf(fp, "%lu %lu %lu %lu %lu %lu %lu %lu ", c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3],
-                    c.nodesInd[4], c.nodesInd[5], c.nodesInd[6], c.nodesInd[7]);
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
+                fprintf(fp, "%lu %lu %lu %lu %lu %lu %lu %lu ",
+                        c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3],
+                        c.nodesInd[4], c.nodesInd[5], c.nodesInd[6], c.nodesInd[7]);
+            }
+            else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
+                fprintf(fp, "%lu %lu %lu %lu ", c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3]);
+            }
+            else {
+                throw Exception("VTK writer: not realized cell type.");
+            }
         }
         fprintf(fp, "\n");
         fprintf(fp, "        </DataArray>\n");
         fprintf(fp, "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n");
         fprintf(fp, "          ");
         for (int i = 0; i < mesh.getCellsCount(); i++) {
-            fprintf(fp, "%d ", 11);
+            Cell &c = mesh.getCell(i);
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
+                fprintf(fp, "%d ", 11);
+            }
+            else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
+                fprintf(fp, "%d ", 10);
+            }
+            else {
+                throw Exception("VTK writer: not realized cell type.");
+            }
+
         }
         fprintf(fp, "\n");
         fprintf(fp, "        </DataArray>\n");

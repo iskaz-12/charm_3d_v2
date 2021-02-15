@@ -142,6 +142,10 @@ namespace charm {
             return res;
         }
 
+        friend Real mixProd(const Vector &p1, const Vector &p2, const Vector &p3) {
+            return scalarProd(p1, vectorProd(p2, p3));
+        }
+
         static inline Index size() { return sizeof(Real)*3; }
 
 
