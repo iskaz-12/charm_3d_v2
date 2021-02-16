@@ -29,7 +29,7 @@ namespace charm{
              { 1, 2, 4, 5   },
              { 0, 2, 3, 5   }};
 
-    const Index Mesh::FTV_PIR[5][4] =
+    const Index Mesh::FTV_PYR[5][4] =
             {{ 0, 1, 3, 2   },
              { 0, 1, 4, 100 },
              { 0, 3, 4, 100 },
@@ -44,6 +44,15 @@ namespace charm{
              {1, 3, 6, 7},
              {1, 3, 2, 6},
              {0, 1, 2, 6}};
+
+    const Index PRISM_TO_TET[3][4] =
+            {{0, 1, 2, 4},
+             {0, 3, 2, 4},
+             {5, 3, 2, 4}};
+
+    const Index PYR_TO_TET[2][4] =
+            {{0, 1, 3, 4},
+             {1, 3, 2, 4}};
 
 
     Real calcTetVolume(Points &pt) {
@@ -105,12 +114,43 @@ namespace charm{
     void Mesh::calcGeom() {
         for (auto &c : cells) {
             Points vertices = cellGetVertices(c);
-            
-            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
 
-                c.center = {0., 0., 0.}; //unitCubeToReal(vertices, 0.5, 0.5, 0.5);
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
+                c.center = {0., 0., 0.};
                 c.volume = 0.;
                 for (auto &ti: HEX_TO_TET) {
+                    Points tet;
+                    for (auto &p : ti) {
+                        tet.push_back(vertices[p]);
+                    }
+                    Point tc = calcTetCenter(tet);
+                    Real vol = calcTetVolume(tet);
+                    tc *= vol;
+                    c.center += tc;
+                    c.volume += vol;
+                }
+                c.center /= c.volume;
+            }
+            else if (c.type == Cell::CELL_TYPE_PRISM) {
+                c.center = {0., 0., 0.};
+                c.volume = 0.;
+                for (auto &ti: PRISM_TO_TET) {
+                    Points tet;
+                    for (auto &p : ti) {
+                        tet.push_back(vertices[p]);
+                    }
+                    Point tc = calcTetCenter(tet);
+                    Real vol = calcTetVolume(tet);
+                    tc *= vol;
+                    c.center += tc;
+                    c.volume += vol;
+                }
+                c.center /= c.volume;
+            }
+            else if (c.type == Cell::CELL_TYPE_PYRAMID) {
+                c.center = {0., 0., 0.};
+                c.volume = 0.;
+                for (auto &ti: PYR_TO_TET) {
                     Points tet;
                     for (auto &p : ti) {
                         tet.push_back(vertices[p]);

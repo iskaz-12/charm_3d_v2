@@ -113,10 +113,41 @@ namespace charm {
                             mesh->cellPush(cell);
                         }
                         else if (type == Cell::CELL_TYPE_PRISM) {
-                            // TODO
+                            Cell cell;
+                            Index tag1, tag2;
+                            cell.type = type;
+                            ss >> tag1 >> cell.tag >> tag2;
+                            cell.tag--;
+                            cell.nodesInd.resize(6);
+                            ss >> cell.nodesInd[0];
+                            ss >> cell.nodesInd[1];
+                            ss >> cell.nodesInd[2];
+                            ss >> cell.nodesInd[3];
+                            ss >> cell.nodesInd[4];
+                            ss >> cell.nodesInd[5];
+                            for (int j = 0; j < 6; j++) {
+                                --cell.nodesInd[j];
+                            }
+                            cell.id = cid++;
+                            mesh->cellPush(cell);
                         }
                         else if (type == Cell::CELL_TYPE_PYRAMID) {
-                            // TODO
+                            Cell cell;
+                            Index tag1, tag2;
+                            cell.type = type;
+                            ss >> tag1 >> cell.tag >> tag2;
+                            cell.tag--;
+                            cell.nodesInd.resize(5);
+                            ss >> cell.nodesInd[0];
+                            ss >> cell.nodesInd[1];
+                            ss >> cell.nodesInd[2];
+                            ss >> cell.nodesInd[3];
+                            ss >> cell.nodesInd[4];
+                            for (int j = 0; j < 5; j++) {
+                                --cell.nodesInd[j];
+                            }
+                            cell.id = cid++;
+                            mesh->cellPush(cell);
                         }
                         else if (type == Face::FACE_TYPE_TRIANGLE) {
                             Face face;
@@ -165,11 +196,11 @@ namespace charm {
         for (Index ic = 0; ic < mesh->getCellsSize(); ic++) {
             Cell &cell = mesh->getCell(ic);
             if (cell.type == Cell::CELL_TYPE_HEXAHEDRON) {
-                for (Int i = 0; i < 6; i++) {
+                for (const auto & i : Mesh::FTV_QUAD) {
                     std::set<Index> fNodes;
 
-                    for (Int j = 0; j < 4; j++) {
-                        fNodes.insert(cell.nodesInd[Mesh::FTV_QUAD[i][j]]);
+                    for (Index j : i) {
+                        fNodes.insert(cell.nodesInd[j]);
                     }
                     auto it = faceMap.find(fNodes);
                     Face &f = faceMap[fNodes];
@@ -179,18 +210,18 @@ namespace charm {
                     }
                     f.nodesInd.resize(4);
                     for (Int j = 0; j < 4; j++) {
-                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_QUAD[i][j]];
+                        f.nodesInd[j] = cell.nodesInd[i[j]];
                     }
                     f.addCell(ic);
                     cell.facesInd.push_back(f.id);
                 }
             }
             else if (cell.type == Cell::CELL_TYPE_TETRAHEDRON) {
-                for (Int i = 0; i < 4; i++) {
+                for (const auto & ftv : Mesh::FTV_TET) {
                     std::set<Index> fNodes;
 
-                    for (Int j = 0; j < 3; j++) {
-                        fNodes.insert(cell.nodesInd[Mesh::FTV_TET[i][j]]);
+                    for (Index j : ftv) {
+                        fNodes.insert(cell.nodesInd[j]);
                     }
                     auto it = faceMap.find(fNodes);
                     Face &f = faceMap[fNodes];
@@ -200,7 +231,53 @@ namespace charm {
                     }
                     f.nodesInd.resize(3);
                     for (Int j = 0; j < 3; j++) {
-                        f.nodesInd[j] = cell.nodesInd[Mesh::FTV_TET[i][j]];
+                        f.nodesInd[j] = cell.nodesInd[ftv[j]];
+                    }
+                    f.addCell(ic);
+                    cell.facesInd.push_back(f.id);
+                }
+            }
+            else if (cell.type == Cell::CELL_TYPE_PRISM) {
+                for (const auto & ftv : Mesh::FTV_PRISM) {
+                    std::set<Index> fNodes;
+
+                    for (Index j : ftv) {
+                        if (j == 100) break;
+                        fNodes.insert(cell.nodesInd[j]);
+                    }
+                    auto it = faceMap.find(fNodes);
+                    Face &f = faceMap[fNodes];
+                    if (it == faceMap.end()) {
+                        f.id = fid++;
+                        f.type = fNodes.size() == 3 ? Face::FACE_TYPE_TRIANGLE : Face::FACE_TYPE_QUADRANGLE;
+                    }
+                    f.nodesInd.resize(fNodes.size());
+                    for (Int j = 0; j < 4; j++) {
+                        if (ftv[j] == 100) break;
+                        f.nodesInd[j] = cell.nodesInd[ftv[j]];
+                    }
+                    f.addCell(ic);
+                    cell.facesInd.push_back(f.id);
+                }
+            }
+            else if (cell.type == Cell::CELL_TYPE_PYRAMID) {
+                for (const auto & ftv : Mesh::FTV_PYR) {
+                    std::set<Index> fNodes;
+
+                    for (Index j : ftv) {
+                        if (j == 100) break;
+                        fNodes.insert(cell.nodesInd[j]);
+                    }
+                    auto it = faceMap.find(fNodes);
+                    Face &f = faceMap[fNodes];
+                    if (it == faceMap.end()) {
+                        f.id = fid++;
+                        f.type = fNodes.size() == 3 ? Face::FACE_TYPE_TRIANGLE : Face::FACE_TYPE_QUADRANGLE;
+                    }
+                    f.nodesInd.resize(fNodes.size());
+                    for (Int j = 0; j < 4; j++) {
+                        if (ftv[j] == 100) break;
+                        f.nodesInd[j] = cell.nodesInd[ftv[j]];
                     }
                     f.addCell(ic);
                     cell.facesInd.push_back(f.id);

@@ -116,7 +116,7 @@ namespace charm {
         static const Index FTV_QUAD[6][4];
         static const Index FTV_TET[4][3];
         static const Index FTV_PRISM[5][4];
-        static const Index FTV_PIR[5][4];
+        static const Index FTV_PYR[5][4];
 
     protected:
         Index               nCount;
