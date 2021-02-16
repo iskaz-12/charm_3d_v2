@@ -55,6 +55,8 @@ namespace charm {
     const Real EPS = 1.e-12;
     const Int DIM = 3;
 
+#define NORM_REAL(X) (fabs(X) < EPS ? 0. : (X))
+
     class Vector {
     public:
         union {
@@ -119,7 +121,7 @@ namespace charm {
         }
 
         inline Real sqr() const {
-            return x*x+y*y+z*z;
+            return x*x + y*y + z*z;
         }
 
         inline Real length() const {

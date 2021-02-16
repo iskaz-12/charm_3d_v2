@@ -40,7 +40,7 @@ namespace charm{
     const Index HEX_TO_TET[6][4] =
             {{0, 1, 4, 6},
              {1, 5, 4, 6},
-             {0, 1, 6, 7},
+             {1, 5, 6, 7},
              {1, 3, 6, 7},
              {1, 3, 2, 6},
              {0, 1, 2, 6}};
@@ -60,7 +60,7 @@ namespace charm{
     Point calcTetCenter(Points &pt) {
         assert(pt.size() == 4 && "Points count must be equal to 4.");
 
-        Vector v1;
+        Vector v1 = {0., 0., 0.};
         v1 += pt[0];
         v1 += pt[1];
         v1 += pt[2];
@@ -70,20 +70,10 @@ namespace charm{
     }
 
 
-    Point calcTriNormal(Points &pt) {
-        assert(pt.size() == 3 && "Points count must be equal to 3.");
-
-        Vector v1, v2, v3;
-        v1 = pt[1]; v1 -= pt[0];
-        v2 = pt[2]; v2 -= pt[0];
-        v3 = vectorProd(v1, v2);
-        return v3;
-    }
-
     Point calcTriCenter(Points &pt) {
         assert(pt.size() == 3 && "Points count must be equal to 3.");
 
-        Vector v1;
+        Vector v1 = {0., 0., 0.};
         v1 += pt[0];
         v1 += pt[1];
         v1 += pt[2];
@@ -92,18 +82,13 @@ namespace charm{
     }
 
 
-    Real calcTriArea(Points &pt) {
-        assert(pt.size() == 3 && "Points count must be equal to 4.");
-
-        Vector n = calcTriNormal(pt);
-        return fabs(n.length()) / 2.;
-    }
-
-
     Real calcTriArea(Points &pt, Vector &n) {
-        assert(pt.size() == 3 && "Points count must be equal to 4.");
+        assert(pt.size() == 3 && "Points count must be equal to 3.");
 
-        n = calcTriNormal(pt);
+        Vector v1, v2;
+        v1 = pt[1]; v1 -= pt[0];
+        v2 = pt[2]; v2 -= pt[0];
+        n = vectorProd(v1, v2);
         Real area = n.length();
         n /= area;
         return fabs(area) / 2.;
@@ -123,7 +108,7 @@ namespace charm{
             
             if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
 
-                c.center = {0., 0., 0.};//unitCubeToReal(vertices, 0.5, 0.5, 0.5);
+                c.center = {0., 0., 0.}; //unitCubeToReal(vertices, 0.5, 0.5, 0.5);
                 c.volume = 0.;
                 for (auto &ti: HEX_TO_TET) {
                     Points tet;

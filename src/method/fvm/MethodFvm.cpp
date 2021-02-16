@@ -123,11 +123,11 @@ namespace charm {
             for (Index ic = 0; ic < mesh.getCellsCount(); ic++) {
                 Real cfl = dt / mesh.getCell(ic).volume;
 
-                ro[ic] -= cfl*roInt[ic];
-                ru[ic] -= cfl*ruInt[ic];
-                rv[ic] -= cfl*rvInt[ic];
-                rw[ic] -= cfl*rwInt[ic];
-                re[ic] -= cfl*reInt[ic];
+                ro[ic] -= NORM_REAL(cfl*roInt[ic]);
+                ru[ic] -= NORM_REAL(cfl*ruInt[ic]);
+                rv[ic] -= NORM_REAL(cfl*rvInt[ic]);
+                rw[ic] -= NORM_REAL(cfl*rwInt[ic]);
+                re[ic] -= NORM_REAL(cfl*reInt[ic]);
              }
 
             Parallel::exchange(ro);
