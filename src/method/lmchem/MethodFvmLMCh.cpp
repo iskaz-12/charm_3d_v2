@@ -238,15 +238,20 @@ namespace charm {
         Prim prim = getPrim(i);
         if (iFld == 0) {
             return prim.r;
-        } else if (iFld == 1) {
+        }
+        else if (iFld == 1) {
             return prim.p + prim.p0;
-        } else if (iFld == 2) {
+        }
+        else if (iFld == 2) {
             return prim.e;
-        } else if (iFld == 3) {
+        }
+        else if (iFld == 3) {
             return prim.eTot;
-        } else if (iFld == 4) {
+        }
+        else if (iFld == 4) {
             return prim.t;
-        } else if (iFld == 5) {
+        }
+        else if (iFld == 5) {
             return prim.v.length() / prim.cz;
         }
         for (Index i = 0; i < Config::getCompCount(); i++) {

@@ -11,7 +11,7 @@
 namespace charm {
     class FluxFvm {
     public:
-        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re, const Vector &n) = 0;
+        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ru, Real &rv, Real &rw, Real &re, ArrayReal &rc, const Vector &n) = 0;
     };
 }
 

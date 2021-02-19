@@ -54,11 +54,12 @@ namespace charm {
 
         static void exchange(ArrayVector &field);
 
+        static void exchange(Array<ArrayReal> &field);
+
         static void exchange(Array <ArrayVector> &field);
 
         static Int procCount;
         static Int procId;
-        static Real *buf;
 
     };
 

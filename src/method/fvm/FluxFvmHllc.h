@@ -14,9 +14,9 @@ namespace charm {
 
     class FluxFvmHllc : public FluxFvm {
     public:
-        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re, const Vector &n);
+        virtual void calc(const Prim &prim1, const Prim &prim2, Real &ru, Real &rv, Real &rw, Real &re, ArrayReal &ro, const Vector &n);
     private:
-        void x_1(const Prim &prim1, const Prim &prim2, Real &ro, Real &ru, Real &rv, Real &rw, Real &re);
+        void x_1(const Prim &prim1, const Prim &prim2, Real &ru, Real &rv, Real &rw, Real &re, ArrayReal &ro);
     };
 }
 

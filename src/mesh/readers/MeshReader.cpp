@@ -73,23 +73,23 @@ namespace charm {
         ProcMesh pm;
         buildProcMesh(mesh, epart, pm);
 
-        for (int p = 0; p < Parallel::procCount; p++) {
-            if (p == Parallel::procId) {
-                printf("PROC %d: cCount: %4lu; cCountGhost: %4lu\n", p, pm.cCount, pm.cCountEx);fflush(stdout);
-                printf("-------------------------------\n");fflush(stdout);
-                for (int i = 0; i < Parallel::procCount; i++) {
-                    printf("\t%d>> SEND: %3zu    RECV: %3lu\n", i, pm.sendInd[i].size(), pm.recvCount[i]);fflush(stdout);
-                    printf("\t\tCELLS TO SEND:");fflush(stdout);
-                    for (auto j: pm.sendInd[i]) {
-                        printf(" %3lu", j);fflush(stdout);
-                    }
-                    printf("\n");fflush(stdout);
-                }
-
-                printf("===============================\n\n");fflush(stdout);
-            }
-            Parallel::barrier();
-        }
+//        for (int p = 0; p < Parallel::procCount; p++) {
+//            if (p == Parallel::procId) {
+//                printf("PROC %d: cCount: %4lu; cCountGhost: %4lu\n", p, pm.cCount, pm.cCountEx);fflush(stdout);
+//                printf("-------------------------------\n");fflush(stdout);
+//                for (int i = 0; i < Parallel::procCount; i++) {
+//                    printf("\t%d>> SEND: %3zu    RECV: %3lu\n", i, pm.sendInd[i].size(), pm.recvCount[i]);fflush(stdout);
+//                    printf("\t\tCELLS TO SEND:");fflush(stdout);
+//                    for (auto j: pm.sendInd[i]) {
+//                        printf(" %3lu", j);fflush(stdout);
+//                    }
+//                    printf("\n");fflush(stdout);
+//                }
+//
+//                printf("===============================\n\n");fflush(stdout);
+//            }
+//            Parallel::barrier();
+//        }
 
 
 
@@ -155,6 +155,9 @@ namespace charm {
             locMesh.sendInd[i].assign(pm.sendInd[i].begin(), pm.sendInd[i].end());
         }
         mesh->assign(locMesh);
+
+
+
 
     }
 

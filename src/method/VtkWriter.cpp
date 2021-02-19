@@ -8,6 +8,7 @@
 #include <Parallel.h>
 #include "VtkWriter.h"
 #include "Config.h"
+#include "MethodException.h"
 
 namespace charm {
 
@@ -61,6 +62,9 @@ namespace charm {
             String fileName = ss.str();
 
             fp = fopen(fileName.c_str(), "w");
+            if (!fp) {
+                throw MethodException("Could not open VTK file.");
+            }
             fprintf(fp, "<?xml version=\"1.0\"?>\n");
             fprintf(fp, "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n");
             fprintf(fp, "  <PUnstructuredGrid GhostLevel=\"0\">\n");

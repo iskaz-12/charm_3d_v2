@@ -1,3 +1,13 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 /**
  * Created by zhrv on 18.11.2020.
  * @author R.V.Zhalnin, zhalnin@gmail.com
@@ -23,19 +33,20 @@ namespace charm {
 
         void save();
 
-        ArrayReal           ro;
         ArrayReal           ru;
         ArrayReal           rv;
         ArrayReal           rw;
         ArrayReal           re;
+        Array<ArrayReal>    rc;
         ArrayReal           matId;
 
-        ArrayReal           roInt;
         ArrayReal           ruInt;
         ArrayReal           rvInt;
         ArrayReal           rwInt;
         ArrayReal           reInt;
+        Array<ArrayReal>    rcInt;
 
+        Array<ArrayVector>  gradC;
         ArrayVector         gradR;
         ArrayVector         gradP;
         ArrayVector         gradU;
@@ -47,7 +58,7 @@ namespace charm {
         void zeroIntegrals();
 
         Prim getPrim(Index) override;
-        void setCons(Index i, const Prim &p) override;
+        void setCons(Index iCell, const Prim &prim) override;
 
         Prim reconstruct(Index iCell, Point pt);
         void calcGrad();
@@ -58,6 +69,9 @@ namespace charm {
         Index getVectorFieldsCount() override;
         String getVectorFieldName(Index) override;
         Vector getVectorFieldValue(Index, Index) override;
+        void exchangeFields();
+        void exchangeGrads();
+
     };
 
 }
