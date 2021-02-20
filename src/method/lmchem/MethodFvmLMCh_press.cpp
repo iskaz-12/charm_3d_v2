@@ -117,7 +117,7 @@ namespace charm {
             }
             for (Index i = 0; i < lN; i++) {
                 Prim prim = getPrim(i);
-                //S[i] += d[i][m]*scalarProd(gradC[i][m], gradH[i][m]) / (prim.cp * prim.t);
+                //S[i] += d[i][m]*scalarProd(gradRC[i][m], gradH[i][m]) / (prim.cp * prim.t);
 
                 S[i] += tmp1[i];
             }

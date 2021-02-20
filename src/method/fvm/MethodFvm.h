@@ -46,8 +46,7 @@ namespace charm {
         ArrayReal           reInt;
         Array<ArrayReal>    rcInt;
 
-        Array<ArrayVector>  gradC;
-        ArrayVector         gradR;
+        Array<ArrayVector>  gradRC;
         ArrayVector         gradP;
         ArrayVector         gradU;
         ArrayVector         gradV;

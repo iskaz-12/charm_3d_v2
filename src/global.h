@@ -128,6 +128,12 @@ namespace charm {
             return ::sqrt(sqr());
         }
 
+        inline void normalize() {
+            x = NORM_REAL(x);
+            y = NORM_REAL(y);
+            z = NORM_REAL(z);
+        }
+
         friend Real scalarProd(const Vector &p1, const Vector &p2) {
             Real res = 0.;
             for (auto i: {0,1,2}) {

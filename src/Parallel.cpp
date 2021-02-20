@@ -133,21 +133,17 @@ namespace charm {
         for (int p = 0; p < Parallel::procCount; p++) {
             if (p < Parallel::procId) {
                 if (mesh.recvCount[p] > 0) {
-                    ArrayReal buf(mesh.recvCount[p]*3);
-                    Parallel::recv(p, 0, mesh.recvCount[p]*3, buf.data());
+                    ArrayVector buf(mesh.recvCount[p]);
+                    Parallel::recv(p, 0, mesh.recvCount[p], buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
-                        field[mesh.recvShift[p]+i][0] = buf[i*3+0];
-                        field[mesh.recvShift[p]+i][1] = buf[i*3+1];
-                        field[mesh.recvShift[p]+i][2] = buf[i*3+2];
+                        field[mesh.recvShift[p]+i] = buf[i];
                     }
                 }
                 int n = mesh.sendInd[p].size();
                 if (n > 0) {
-                    ArrayReal buf(n*3);
+                    ArrayVector buf(n);
                     for (int i = 0; i < n; i++) {
-                        buf[i*3+0] = field[mesh.sendInd[p][i]][0];
-                        buf[i*3+1] = field[mesh.sendInd[p][i]][1];
-                        buf[i*3+2] = field[mesh.sendInd[p][i]][2];
+                        buf[i] = field[mesh.sendInd[p][i]];
                     }
                     Parallel::send(p, 1, n, buf.data());
                 }
@@ -155,21 +151,17 @@ namespace charm {
             else if (p > Parallel::procId) {
                 int n = mesh.sendInd[p].size();
                 if (n > 0) {
-                    ArrayReal buf(n*3);
+                    ArrayVector buf(n);
                     for (int i = 0; i < n; i++) {
-                        buf[i*3+0] = field[mesh.sendInd[p][i]][0];
-                        buf[i*3+1] = field[mesh.sendInd[p][i]][1];
-                        buf[i*3+2] = field[mesh.sendInd[p][i]][2];
+                        buf[i] = field[mesh.sendInd[p][i]];
                     }
                     Parallel::send(p, 0, n, buf.data());
                 }
                 if (mesh.recvCount[p] > 0) {
-                    ArrayReal buf(mesh.recvCount[p]*3);
+                    ArrayVector buf(mesh.recvCount[p]);
                     Parallel::recv(p, 1, mesh.recvCount[p], buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
-                        field[mesh.recvShift[p]+i][0] = buf[i*3+0];
-                        field[mesh.recvShift[p]+i][1] = buf[i*3+1];
-                        field[mesh.recvShift[p]+i][2] = buf[i*3+2];
+                        field[mesh.recvShift[p]+i] = buf[i];
                     }
                 }
             }
@@ -233,7 +225,7 @@ namespace charm {
             if (p < Parallel::procId) {
                 if (mesh.recvCount[p] > 0) {
                     ArrayVector buf(mesh.recvCount[p] * compCount);
-                    Parallel::recv(p, 0, mesh.recvCount[p], buf.data());
+                    Parallel::recv(p, 0, mesh.recvCount[p] * compCount, buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
                         for (Index j = 0; j < compCount; j++) {
                             field[mesh.recvShift[p] + i][j] = buf[i*compCount+j];
@@ -248,7 +240,7 @@ namespace charm {
                             buf[i*compCount+j] = field[mesh.sendInd[p][i]][j];
                         }
                     }
-                    Parallel::send(p, 1, n, buf.data());
+                    Parallel::send(p, 1, n*compCount, buf.data());
                 }
             }
             else if (p > Parallel::procId) {
@@ -260,11 +252,11 @@ namespace charm {
                             buf[i*compCount+j] = field[mesh.sendInd[p][i]][j];
                         }
                     }
-                    Parallel::send(p, 0, n, buf.data());
+                    Parallel::send(p, 0, n*compCount, buf.data());
                 }
                 if (mesh.recvCount[p] > 0) {
-                    ArrayVector buf(mesh.recvCount[p]);
-                    Parallel::recv(p, 1, mesh.recvCount[p], buf.data());
+                    ArrayVector buf(mesh.recvCount[p]*compCount);
+                    Parallel::recv(p, 1, mesh.recvCount[p]*compCount, buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
                         for (Index j = 0; j < compCount; j++) {
                             field[mesh.recvShift[p] + i][j] = buf[i*compCount+j];
@@ -287,7 +279,7 @@ namespace charm {
             if (p < Parallel::procId) {
                 if (mesh.recvCount[p] > 0) {
                     ArrayReal buf(mesh.recvCount[p] * compCount);
-                    Parallel::recv(p, 0, mesh.recvCount[p], buf.data());
+                    Parallel::recv(p, 0, mesh.recvCount[p] * compCount, buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
                         for (Index j = 0; j < compCount; j++) {
                             field[mesh.recvShift[p] + i][j] = buf[i*compCount+j];
@@ -302,7 +294,7 @@ namespace charm {
                             buf[i*compCount+j] = field[mesh.sendInd[p][i]][j];
                         }
                     }
-                    Parallel::send(p, 1, n, buf.data());
+                    Parallel::send(p, 1, n * compCount, buf.data());
                 }
             }
             else if (p > Parallel::procId) {
@@ -314,11 +306,11 @@ namespace charm {
                             buf[i*compCount+j] = field[mesh.sendInd[p][i]][j];
                         }
                     }
-                    Parallel::send(p, 0, n, buf.data());
+                    Parallel::send(p, 0, n * compCount, buf.data());
                 }
                 if (mesh.recvCount[p] > 0) {
-                    ArrayReal buf(mesh.recvCount[p]);
-                    Parallel::recv(p, 1, mesh.recvCount[p], buf.data());
+                    ArrayReal buf(mesh.recvCount[p] * compCount);
+                    Parallel::recv(p, 1, mesh.recvCount[p] * compCount, buf.data());
                     for (Index i = 0; i < mesh.recvCount[p]; i++) {
                         for (Index j = 0; j < compCount; j++) {
                             field[mesh.recvShift[p] + i][j] = buf[i*compCount+j];

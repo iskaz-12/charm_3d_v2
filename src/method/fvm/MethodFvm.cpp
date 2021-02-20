@@ -1,3 +1,13 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 /**
  * Created by zhrv on 18.11.2020.
  * @author R.V.Zhalnin, zhalnin@gmail.com
@@ -8,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <Parallel.h>
+#include <Log.h>
 #include "MethodFvm.h"
 #include "VtkWriter.h"
 #include "MethodException.h"
@@ -25,11 +36,11 @@ namespace charm {
         rw.resize(cN);
         re.resize(cN);
         rc.resize(cN, ArrayReal(compCount));
-//        ru.shrink_to_fit();
-//        rv.shrink_to_fit();
-//        rw.shrink_to_fit();
-//        re.shrink_to_fit();
-//        rc.shrink_to_fit();
+        ru.shrink_to_fit();
+        rv.shrink_to_fit();
+        rw.shrink_to_fit();
+        re.shrink_to_fit();
+        rc.shrink_to_fit();
 
         ruInt.resize(cN);
         rvInt.resize(cN);
@@ -37,24 +48,23 @@ namespace charm {
         reInt.resize(cN);
         rcInt.resize(cN, ArrayReal(compCount));
 
-//        rcInt.shrink_to_fit();
-//        ruInt.shrink_to_fit();
-//        rvInt.shrink_to_fit();
-//        rwInt.shrink_to_fit();
-//        reInt.shrink_to_fit();
+        rcInt.shrink_to_fit();
+        ruInt.shrink_to_fit();
+        rvInt.shrink_to_fit();
+        rwInt.shrink_to_fit();
+        reInt.shrink_to_fit();
 
-        gradR.resize(cN);
         gradP.resize(cN);
         gradU.resize(cN);
         gradV.resize(cN);
         gradW.resize(cN);
-        gradC.resize(cN, ArrayVector(compCount));
+        gradRC.resize(cN, ArrayVector(compCount));
 
-//        gradP.shrink_to_fit();
-//        gradU.shrink_to_fit();
-//        gradV.shrink_to_fit();
-//        gradW.shrink_to_fit();
-//        gradC.shrink_to_fit();
+        gradP.shrink_to_fit();
+        gradU.shrink_to_fit();
+        gradV.shrink_to_fit();
+        gradW.shrink_to_fit();
+        gradRC.shrink_to_fit();
 
         for (Index ic = 0; ic < cN; ic++) {
             Cell &cell = mesh.getCell(ic);
@@ -84,7 +94,7 @@ namespace charm {
         Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
         while (true) {
-            //calcGrad();
+            calcGrad();
             zeroIntegrals();
             for (Index iFace = 0; iFace < mesh.getFacesCount(); iFace++) {
                 Face &face = mesh.getFace(iFace);
@@ -93,7 +103,7 @@ namespace charm {
                 Index c1 = face.cells[0];
                 Index c2;
                 Prim p1 = reconstruct(c1, fc);
-                Prim p2(1);
+                Prim p2(compCount);
 
                 if (isBnd) {
                     face.bnd->calc(p1, p2, face.n);
@@ -154,7 +164,9 @@ namespace charm {
             save();
 
             if (Config::get().timestep % Config::get().logPeriod == 0) {
-                std::cout << "STEP: " << Config::get().timestep << std::endl;
+                std::stringstream ss;
+                ss << "STEP: " << Config::get().timestep << std::endl;
+                Log::print(ss.str());
             }
 
             if (Config::get().t >= Config::get().time) {
@@ -336,9 +348,8 @@ namespace charm {
             gradU[i] = 0.;
             gradV[i] = 0.;
             gradW[i] = 0.;
-            gradR[i] = 0.;
             for (Index iComp = 0; iComp < compCount; iComp++) {
-                gradC[i][iComp] = 0.;
+                gradRC[i][iComp] = 0.;
             }
         }
 
@@ -348,8 +359,14 @@ namespace charm {
             bool isBnd = face.cells.size() == 1;
             Index c1 = face.cells[0];
             Index c2;
+
+            ArrayReal rc1(compCount), rc2(compCount);
             Prim p1 = getPrim(c1);
             Prim p2(compCount);
+
+            for (Index i = 0; i < compCount; i++) {
+                rc1[i] = rc[c1][i];
+            }
 
             Real vol1 = mesh.getCell(c1).volume;
             Real vol2;
@@ -357,62 +374,61 @@ namespace charm {
             if (isBnd) {
                 face.bnd->calc(p1, p2, face.n);
                 vol2 = vol1;
+                for (Index i = 0; i < compCount; i++) {
+                    rc2[i] = rc[c1][i];
+                }
             } else {
                 c2 = face.cells[1];
                 p2 = getPrim(c2);
                 vol2 = mesh.getCell(c2).volume;
+
+                for (Index i = 0; i < compCount; i++) {
+                    rc2[i] = rc[c2][i];
+                }
             }
 
             Real s = face.area / (vol1 + vol2);
             vol1 *= s;
             vol2 *= s;
 
-            Vector vR(n), vP(n), vU(n), vV(n), vW(n);
-
+            Vector vP(n), vU(n), vV(n), vW(n);
             Array<Vector> vC(compCount, n);
-            Array<Vector> vH(compCount, n);
 
-
-            vR *= vol1 * p1.r   + vol2 * p2.r;
             vP *= vol1 * p1.p   + vol2 * p2.p;
             vU *= vol1 * p1.v.x + vol2 * p2.v.x;
             vV *= vol1 * p1.v.y + vol2 * p2.v.y;
             vW *= vol1 * p1.v.z + vol2 * p2.v.z;
             for (Index iComp = 0; iComp < compCount; iComp++) {
-                vC[iComp] *= vol1 * p1.c[iComp] + vol2 * p2.c[iComp];
+                vC[iComp] *= vol1 * rc1[iComp] + vol2 * rc2[iComp];
             }
 
-
-            gradR[c1] += vR;
             gradP[c1] += vP;
             gradU[c1] += vU;
             gradV[c1] += vV;
             gradW[c1] += vW;
-            for (Index iComp = 0; iComp < compCount; iComp++) {
-                gradC[c1][iComp] += vC[iComp];
-            }
+//            for (Index iComp = 0; iComp < compCount; iComp++) {
+//                gradRC[c1][iComp] += vC[iComp];
+//            }
             if (!isBnd) {
-                gradR[c2] -= vR;
                 gradP[c2] -= vP;
                 gradU[c2] -= vU;
                 gradV[c2] -= vV;
                 gradW[c2] -= vW;
-                for (Index iComp = 0; iComp < compCount; iComp++) {
-                    gradC[c2][iComp] -= vC[iComp];
-                }
+//                for (Index iComp = 0; iComp < compCount; iComp++) {
+//                    gradRC[c2][iComp] -= vC[iComp];
+//                }
             }
         }
 
         for (Index iCell = 0; iCell < lN; iCell++) {
             Real vol = mesh.getCell(iCell).volume;
-            gradR[iCell] /= vol;
-            gradP[iCell] /= vol;
-            gradU[iCell] /= vol;
-            gradV[iCell] /= vol;
-            gradW[iCell] /= vol;
-            for (Index iComp = 0; iComp < compCount; iComp++) {
-                gradC[iCell][iComp] /= vol;
-            }
+            gradP[iCell] /= vol; gradP[iCell].normalize();
+            gradU[iCell] /= vol; gradU[iCell].normalize();
+            gradV[iCell] /= vol; gradV[iCell].normalize();
+            gradW[iCell] /= vol; gradW[iCell].normalize();
+//            for (Index iComp = 0; iComp < compCount; iComp++) {
+//                gradRC[iCell][iComp] /= vol; gradRC[iCell][iComp].normalize();
+//            }
         }
 
         exchangeGrads();
@@ -424,16 +440,29 @@ namespace charm {
             Index compCount = Config::getCompCount();
             Point c = pt;
             c -= Config::getMesh().getCell(iCell).center;
-            Real sc = 0.;
-            for (Index iComp = 0; iComp < compCount; iComp++) {
-                prim.c[iComp] += scalarProd(gradC[iCell][iComp], c);
-                sc += prim.c[iComp];
+
+            ArrayReal _rc(rc[iCell].begin(), rc[iCell].end());
+            prim.r = 0.;
+            for (Index i = 0; i < compCount; i++) {
+                _rc[i]   += scalarProd(gradRC[iCell][i], c);
+                prim.r += _rc[i];
             }
-            for (Index iComp = 0; iComp < compCount; iComp++) {
-                prim.c[iComp] /= sc;
+            for (Index i = 0; i < compCount; i++) {
+                prim.c[i] = _rc[i] / prim.r;
+                if (prim.c[i] < 0.) prim.c[i] = 0.; // @todo
+                if (prim.c[i] > 1.) prim.c[i] = 1.;
             }
 
-            prim.r   += scalarProd(gradR[iCell], c);
+//            Real sc = 0.;
+//            for (Index iComp = 0; iComp < compCount; iComp++) {
+//                prim.c[iComp] += scalarProd(gradRC[iCell][iComp], c);
+//                sc += prim.c[iComp];
+//            }
+//            for (Index iComp = 0; iComp < compCount; iComp++) {
+//                prim.c[iComp] /= sc;
+//            }
+//
+
             prim.p   += scalarProd(gradP[iCell], c);
             prim.v.x += scalarProd(gradU[iCell], c);
             prim.v.y += scalarProd(gradV[iCell], c);
@@ -443,6 +472,7 @@ namespace charm {
         }
         return prim;
     }
+
 
     void MethodFvm::exchangeFields() {
         Parallel::exchange(ru);
@@ -454,12 +484,11 @@ namespace charm {
     }
 
     void MethodFvm::exchangeGrads() {
-        Parallel::exchange(gradR);
         Parallel::exchange(gradP);
         Parallel::exchange(gradU);
         Parallel::exchange(gradV);
         Parallel::exchange(gradW);
-        Parallel::exchange(gradC);
+        Parallel::exchange(gradRC);
     }
 
 }

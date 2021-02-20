@@ -10,10 +10,11 @@
 #include "Parallel.h"
 
 namespace charm {
-    class Log {
+class Log {
     public:
         static void print(const String &str) { if (Parallel::isRoot()) std::cout << str; }
     };
+
 }
 
 #endif //CHARM_3D_V2_LOG_H

@@ -4,3 +4,7 @@
  */
 
 #include "Log.h"
+
+namespace charm {
+
+}
