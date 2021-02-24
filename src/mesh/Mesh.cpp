@@ -1,12 +1,14 @@
-
+#include "global.h"
 #include "Mesh.h"
+#include "MeshException.h"
 #include <cmath>
 #include <set>
+#include <cassert>
 
 
 namespace charm{
 
-    const Index Mesh::ftv[6][4] =
+    const Index Mesh::FTV_QUAD[6][4] =
             {{ 0, 2, 4, 6 },
              { 1, 3, 5, 7 },
              { 0, 1, 4, 5 },
@@ -14,165 +16,199 @@ namespace charm{
              { 0, 1, 2, 3 },
              { 4, 5, 6, 7 }};
 
+    const Index Mesh::FTV_TET[4][3] =
+            {{ 0, 1, 2 },
+             { 1, 2, 3 },
+             { 0, 1, 3 },
+             { 0, 2, 3 }};
 
-    Point Mesh::unitCubeToReal(Points vertices, Real x, Real y, Real z) {
-        Point res = {0, 0, 0};
-        Real wx[2], wy[2], wz[2];
-        wx[1] = x;
-        wx[0] = 1.-wx[1];
-        wy[1] = y;
-        wy[0] = 1.-wy[1];
-        wz[1] = z;
-        wz[0] = 1.-wz[1];
-        Index n = 0;
-        for (Index iz : {0, 1}) {
-            for (Index iy : {0, 1}) {
-                Real ay = wz[iz]*wy[iy];
-                for (Index ix : {0, 1}) {
-                    Real ax = ay*wx[ix];
-                    Point &node = vertices[n++];
-                    res.x += ax*node.x;
-                    res.y += ax*node.y;
-                    res.z += ax*node.z;
-                }
-            }
-        }
+    const Index Mesh::FTV_PRISM[5][4] =
+            {{ 0, 1, 2, 100 },
+             { 3, 4, 5, 100 },
+             { 0, 1, 3, 4   },
+             { 1, 2, 4, 5   },
+             { 0, 2, 3, 5   }};
 
-        return res;
+    const Index Mesh::FTV_PYR[5][4] =
+            {{ 0, 1, 3, 2   },
+             { 0, 1, 4, 100 },
+             { 0, 3, 4, 100 },
+             { 1, 2, 4, 100 },
+             { 2, 3, 4, 100 }};
+
+
+    const Index HEX_TO_TET[6][4] =
+            {{0, 1, 4, 6},
+             {1, 5, 4, 6},
+             {1, 5, 6, 7},
+             {1, 3, 6, 7},
+             {1, 3, 2, 6},
+             {0, 1, 2, 6}};
+
+    const Index PRISM_TO_TET[3][4] =
+            {{0, 1, 2, 4},
+             {0, 3, 2, 4},
+             {5, 3, 2, 4}};
+
+    const Index PYR_TO_TET[2][4] =
+            {{0, 1, 3, 4},
+             {1, 3, 2, 4}};
+
+
+    Real calcTetVolume(Points &pt) {
+        assert(pt.size() == 4 && "Points count must be equal to 4.");
+
+        Vector v1, v2, v3;
+        v1 = pt[1]; v1 -= pt[0];
+        v2 = pt[2]; v2 -= pt[0];
+        v3 = pt[3]; v3 -= pt[0];
+        return fabs(mixProd(v1, v2, v3)) / 6.;
+    }
+
+
+    Point calcTetCenter(Points &pt) {
+        assert(pt.size() == 4 && "Points count must be equal to 4.");
+
+        Vector v1 = {0., 0., 0.};
+        v1 += pt[0];
+        v1 += pt[1];
+        v1 += pt[2];
+        v1 += pt[3];
+        v1 /= 4.;
+        return v1;
+    }
+
+
+    Point calcTriCenter(Points &pt) {
+        assert(pt.size() == 3 && "Points count must be equal to 3.");
+
+        Vector v1 = {0., 0., 0.};
+        v1 += pt[0];
+        v1 += pt[1];
+        v1 += pt[2];
+        v1 /= 3.;
+        return v1;
+    }
+
+
+    Real calcTriArea(Points &pt, Vector &n) {
+        assert(pt.size() == 3 && "Points count must be equal to 3.");
+
+        Vector v1, v2;
+        v1 = pt[1]; v1 -= pt[0];
+        v2 = pt[2]; v2 -= pt[0];
+        n = vectorProd(v1, v2);
+        Real area = n.length();
+        n /= area;
+        return fabs(area) / 2.;
+    }
+
+
+    Mesh::Mesh() {
+        nCount = nCountGhost = 0;
+        fCount = fCountGhost = 0;
+        cCount = cCountGhost = 0;
     }
 
 
     void Mesh::calcGeom() {
-        std::set<Index> doneFaces;
-        Real l  = 1, l2 = l / 2.;;
-        const Point fc[6] = {
-                {0, l2, l2},
-                {l, l2, l2},
-                {l2, 0, l2},
-                {l2, l, l2},
-                {l2, l2, 0},
-                {l2, l2, l},
-        };
-
         for (auto &c : cells) {
             Points vertices = cellGetVertices(c);
-            c.center = unitCubeToReal(vertices, 0.5, 0.5, 0.5);
 
-            Real sqrt3 = 1./sqrt(3.);
-            Point t[8] = {
-                    {-sqrt3, -sqrt3, -sqrt3},
-                    { sqrt3, -sqrt3, -sqrt3},
-                    {-sqrt3,  sqrt3, -sqrt3},
-                    { sqrt3,  sqrt3, -sqrt3},
-                    {-sqrt3, -sqrt3,  sqrt3},
-                    { sqrt3, -sqrt3,  sqrt3},
-                    {-sqrt3,  sqrt3,  sqrt3},
-                    { sqrt3,  sqrt3,  sqrt3}
-            };
-
-            for (auto & i : t) {
-                Point gp;
-                Real gw;
-                cellCalcGpAtPoint(vertices, i, gp, gw);
-                c.gp.push_back(gp);
-                c.gw.push_back(gw);
-            }
-            c.volume = 0.;
-            for (auto gw : c.gw) {
-                c.volume += gw;
-            }
-
-
-            Point vmin, vmax;
-            for (Index j = 0; j < 3; j++) {
-                vmin[j] = vertices[0][j];
-                vmax[j] = vertices[0][j];
-            }
-            for (Index i = 1; i < 8; i++) {
-                for (Index j = 0; j < 3; j++) {
-                    if (vmin[j] > vertices[i][j]) vmin[j] = vertices[i][j];
-                    if (vmax[j] < vertices[i][j]) vmax[j] = vertices[i][j];
+            if (c.type == Cell::CELL_TYPE_HEXAHEDRON) {
+                c.center = {0., 0., 0.};
+                c.volume = 0.;
+                for (auto &ti: HEX_TO_TET) {
+                    Points tet;
+                    for (auto &p : ti) {
+                        tet.push_back(vertices[p]);
+                    }
+                    Point tc = calcTetCenter(tet);
+                    Real vol = calcTetVolume(tet);
+                    tc *= vol;
+                    c.center += tc;
+                    c.volume += vol;
                 }
+                c.center /= c.volume;
             }
-            for (Index j = 0; j < 3; j++) {
-                c.dh[j] = vmax[j] - vmin[j];
-            }
-
-            for (Index fi = 0; fi < 6; fi++) {
-                Index iFace = c.facesInd[fi];
-                if (doneFaces.find(iFace) == doneFaces.end()) {
-                    doneFaces.insert(iFace);
-                    Face &face = faces[iFace];
-                    face.center = unitCubeToReal(vertices, fc[fi].x, fc[fi].y, fc[fi].z);
-
-                    Real nl;
-                    Point v[2];
-                    Points fv = cellGetFaceVertices(c, fi);
-
-                    v[0] = fv[1]; v[0] -= fv[0];
-                    v[1] = fv[2]; v[1] -= fv[0];
-
-
-                    face.n = vectorProd(v[0], v[1]);
-                    nl = face.n.length();
-                    face.n /= nl;
-
-                    Vector p0 = cells[face.cells[0]].center;
-                    p0 -= face.center;
-                    if (scalarProd(p0, face.n) > 0) {
-                        face.n *= -1.;
+            else if (c.type == Cell::CELL_TYPE_PRISM) {
+                c.center = {0., 0., 0.};
+                c.volume = 0.;
+                for (auto &ti: PRISM_TO_TET) {
+                    Points tet;
+                    for (auto &p : ti) {
+                        tet.push_back(vertices[p]);
                     }
-
-                    Point  pt[3];
-                    Real	a = 2.0/3.0;
-                    Real	b = 1.0/6.0;
-
-
-                    for (Index i = 0; i < 6; i++) {
-                        face.gw.push_back(1./6.);
-                    }
-
-                    face.gp.resize(6); // @todo
-                    for (Index  i = 0; i < 2; i++) {
-                        for (Index j = 0; j < 3; j++) {
-                            pt[j] = fv[i + j];
-                        }
-
-                        Real a1 = pt[0][0] - pt[2][0];	Real a2 = pt[1][0] - pt[2][0];	Real a3 = pt[2][0];
-                        Real b1 = pt[0][1] - pt[2][1];	Real b2 = pt[1][1] - pt[2][1];	Real b3 = pt[2][1];
-                        Real c1 = pt[0][2] - pt[2][2];	Real c2 = pt[1][2] - pt[2][2];	Real c3 = pt[2][2];
-
-                        Real E = a1*a1+b1*b1+c1*c1;
-                        Real F = a2*a2+b2*b2+c2*c2;
-                        Real G = a1*a2+b1*b2+c1*c2;
-
-                        Real gj = sqrt(E*F-G*G);
-                        for (Index j = 0; j < 3; j++) {
-                            face.gw[3 * i + j] *= gj;
-                        }
-
-                        face.gp[3*i+0][0] = a * a1 + b * a2 + a3;
-                        face.gp[3*i+0][1] = a * b1 + b * b2 + b3;
-                        face.gp[3*i+0][2] = a * c1 + b * c2 + c3;
-
-                        face.gp[3*i+1][0] = b * a1 + a * a2 + a3;
-                        face.gp[3*i+1][1] = b * b1 + a * b2 + b3;
-                        face.gp[3*i+1][2] = b * c1 + a * c2 + c3;
-
-                        face.gp[3*i+2][0] = b * a1 + b * a2 + a3;
-                        face.gp[3*i+2][1] = b * b1 + b * b2 + b3;
-                        face.gp[3*i+2][2] = b * c1 + b * c2 + c3;
-                    }
-                    face.area = 0.;
-                    for (auto gw: face.gw) {
-                        face.area += gw;
-                    }
+                    Point tc = calcTetCenter(tet);
+                    Real vol = calcTetVolume(tet);
+                    tc *= vol;
+                    c.center += tc;
+                    c.volume += vol;
                 }
+                c.center /= c.volume;
             }
-
+            else if (c.type == Cell::CELL_TYPE_PYRAMID) {
+                c.center = {0., 0., 0.};
+                c.volume = 0.;
+                for (auto &ti: PYR_TO_TET) {
+                    Points tet;
+                    for (auto &p : ti) {
+                        tet.push_back(vertices[p]);
+                    }
+                    Point tc = calcTetCenter(tet);
+                    Real vol = calcTetVolume(tet);
+                    tc *= vol;
+                    c.center += tc;
+                    c.volume += vol;
+                }
+                c.center /= c.volume;
+            }
+            else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
+                c.center = calcTetCenter(vertices);
+                c.volume = calcTetVolume(vertices);
+            }
+            else {
+                throw MeshException("Mesh geometry: not realized cell type.");
+            }
         }
-        if (doneFaces.size() != faces.size()) {
-            throw Exception("Wrong faces number.");
+
+        for (auto &face : faces) {
+            Points fv = faceGetVertices(face);
+            if (face.type == Face::FACE_TYPE_QUADRANGLE) {
+                face.center = {0., 0., 0.};
+                Points pt(3);
+                face.area = 0.;
+                for (Int i = 0; i < 2; i++) {
+                    for (Int j = 0; j < 3; j++) {
+                        pt[j] = fv[i+j];
+                    }
+                    Real a = calcTriArea(pt, face.n);
+                    Point ct = calcTriCenter(pt);
+                    ct *= a;
+                    face.center += ct;
+                    face.area += a;
+                }
+                face.center /= face.area;
+
+                Vector p0 = cells[face.cells[0]].center;
+                p0 -= face.center;
+                if (scalarProd(p0, face.n) > 0) {
+                    face.n *= -1.;
+                }
+            }
+            else if (face.type == Face::FACE_TYPE_TRIANGLE) {
+                face.center = calcTriCenter(fv);
+                face.area = calcTriArea(fv, face.n);
+
+                Vector p0 = cells[face.cells[0]].center;
+                p0 -= face.center;
+                if (scalarProd(p0, face.n) > 0) {
+                    face.n *= -1.;
+                }
+            }
+            else {
+                throw MeshException("Mesh geometry: not realized face type.");
+            }
         }
     }
 
@@ -188,7 +224,7 @@ namespace charm{
         return cellGetVertices(cells[ic]);
     }
 
-    void Mesh::cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj) {
+    void Mesh::cellHexCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj) {
         Index                 ix, iy, iz, vindex;
         Real              wx[2], wy[2], wz[2];
         Real              xfactor, yfactor;
@@ -279,8 +315,12 @@ namespace charm{
 
 
     Points Mesh::cellGetFaceVertices(Cell &c, Index fi) {
+        return faceGetVertices(faces[c.facesInd[fi]]);
+    }
+
+
+    Points Mesh::faceGetVertices(Face &f) {
         Points vertices;
-        Face &f = faces[c.facesInd[fi]];
         for (auto i : f.nodesInd) {
             vertices.push_back(nodes[i]);
         }
@@ -340,15 +380,35 @@ namespace charm{
         this->cCountGhost  = msh.cCountGhost;
         this->cells.assign(msh.cells.begin(), msh.cells.end());
 
-        this->patchesCount = msh.patchesCount;
-        this->patches.assign(msh.patches.begin(), msh.patches.end());
-
         this->recvCount.assign(msh.recvCount.begin(), msh.recvCount.end());
         this->recvShift.assign(msh.recvShift.begin(), msh.recvShift.end());
         this->sendInd.resize(msh.sendInd.size());
         for (Index i = 0; i < this->sendInd.size(); i++) {
             this->sendInd[i].assign(msh.sendInd[i].begin(), msh.sendInd[i].end());
         }
+    }
+
+    Real Mesh::getCellVolume(Index iCell) {
+        return getCell(iCell).volume;
+    }
+
+    Cell &Mesh::getCell(Index iCell) {
+        assert(iCell < cCountGhost && "Wrong cell number for getCell().");
+        return cells[iCell];
+    }
+
+    Point &Mesh::getNode(Index iNode) {
+        assert(iNode < nCountGhost && "Wrong node number for getNode().");
+        return nodes[iNode];
+    }
+
+    Face &Mesh::getFace(Index iFace) {
+        assert(iFace < fCountGhost && "Wrong face number for getFace().");
+        return faces[iFace];
+    }
+
+    Real Mesh::getFaceArea(Index iFace) {
+        return getFace(iFace).area;
     }
 
 

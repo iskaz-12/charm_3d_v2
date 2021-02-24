@@ -30,7 +30,11 @@ namespace charm {
         } MlType;
 
         Real calcCp(Real t);
+        Real calcH(Real t);
         Real calcCpDt(Real t);
+
+        Real calcKp(Real t) const;
+        Real calcMl(Real t) const;
 
         String      name;
         Index       id;
@@ -48,6 +52,7 @@ namespace charm {
         ArrayReal   cp;
 
     };
+
 
 }
 

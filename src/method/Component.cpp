@@ -4,6 +4,7 @@
  */
 
 #include "Component.h"
+#include <cmath>
 
 namespace charm {
     Real Component::calcCp(Real t) {
@@ -39,6 +40,41 @@ namespace charm {
         return res;
     }
 
+    Real Component::calcH(Real t) {
+        double tRef = 298.15; // @todo
+//        double t1,t2;
+        Real h = h0;
+        for (int i = 0; i < cp.size(); i++){
+//            t2 = exp((i+1)*std::log(t))/(i+1);
+//            t1 = exp((i+1)*std::log(tRef))/(i+1);
+            h += cp[i]*(std::pow(t, i+1.)-std::pow(tRef, i+1.))/(i+1.);
+        }
+        return h;
+    }
+
+    Real Component::calcKp(Real t) const {
+        if (kpType == KP_CONST) {
+            return kp0;
+        }
+        else if (kpType == KP_SATHERLAND) {
+            return kp0 * sqrt( pow( t / t0, 3 ) ) * ( t0 + ts ) / ( t + ts );
+        }
+        else {
+            return kp0;
+        }
+    }
+
+    Real Component::calcMl(Real t) const {
+        if (mlType == ML_CONST) {
+            return ml0;
+        }
+        else if (mlType == ML_SATHERLAND) {
+            return ml0 * sqrt( pow( t / t0, 3 ) ) * ( t0 + ts ) / ( t + ts );
+        }
+        else {
+            return ml0;
+        }
+    }
 
 
 }

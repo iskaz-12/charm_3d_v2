@@ -7,9 +7,21 @@
 #include <fstream>
 #include "MeshReader.h"
 namespace charm {
+
+    struct Patch {
+        String name;
+        Int id;
+        Int dim;
+    };
+
+
+    /**
+     * Reader for GMSH format of mesh file (ver.2.2).
+     * See gmsh.info
+     */
     class MeshReaderMsh22ASCII : public MeshReader {
     public:
-        MeshReaderMsh22ASCII(Config *config);
+        MeshReaderMsh22ASCII(Config* config);
 
         virtual Mesh* read();
 
@@ -26,6 +38,9 @@ namespace charm {
          * getline function.
          */
         static String getlineUpper(std::fstream &stream);
+
+        Index               patchesCount = 0;       ///< Number of boundary patches.
+        Array<Patch>        patches;
 
     };
 

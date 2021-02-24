@@ -12,11 +12,11 @@
 namespace charm {
     class MeshReader {
     public:
-        static MeshReader *create(Config *config);
+        static MeshReader* create(Config* config);
 
         virtual Mesh* read() = 0;
 
-        void decomp(Mesh *mesh);
+        void decomp(Mesh* mesh);
 
 
     protected:
@@ -40,7 +40,7 @@ namespace charm {
     protected:
         //Mesh* mesh;
         String fileName;
-        Config *config;
+        Config* config;
     };
 }
 

@@ -7,9 +7,6 @@
 #define CHARM_3D_V2_METHOD_H
 
 #include "Config.h"
-#include "Data.h"
-#include "VtkWriter.h"
-//#include "VtkWriter.h"
 
 namespace charm {
 
@@ -17,27 +14,24 @@ namespace charm {
 
     class Method {
     public:
-        Method(Config *conf, Mesh *mesh);
+        VtkWriter* vtkWriter;
 
-        Config *conf;
-        Mesh *mesh;
-        VtkWriter *vtkWriter;
-
-        Mesh* getMesh() { return mesh; }
-        Config* getConfig() { return conf; }
-
+    public:
+        explicit Method(Config* conf) {}
         virtual void init() = 0;
-
         virtual void run() = 0;
-
         virtual void done() = 0;
+        virtual Prim getPrim(Index) = 0;
+        virtual void setCons(Index, const Prim&) = 0;
 
-        virtual Data *getData(Index iCell) = 0;
-
-        void exchange();
-
-        static Method *create(Config *conf, Mesh *mesh);
+        virtual Index getScalarFieldsCount() = 0;
+        virtual String getScalarFieldName(Index) = 0;
+        virtual Real getScalarFieldValue(Index, Index) = 0;
+        virtual Index getVectorFieldsCount() = 0;
+        virtual String getVectorFieldName(Index) = 0;
+        virtual Vector getVectorFieldValue(Index, Index) = 0;
     };
+
 
 }
 
