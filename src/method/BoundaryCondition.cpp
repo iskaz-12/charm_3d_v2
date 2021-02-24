@@ -110,17 +110,17 @@ namespace charm {
 
 
     void BoundaryConditionPressure::calc(charm::Prim &parIn, charm::Prim &parOut, charm::Vector &n) {
-
+        throw NotImplementedException();
     }
 
 
     void BoundaryConditionFreeStream::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
+        throw NotImplementedException();
     }
 
 
     void BoundaryConditionMassFlow::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
+        throw NotImplementedException();
     }
 
 
@@ -132,7 +132,7 @@ namespace charm {
 
 
     void BoundaryConditionWallNoSlip::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
+        throw NotImplementedException();
     }
 
 

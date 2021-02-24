@@ -2,6 +2,7 @@
 // Created by zhrv on 13.11.2020.
 //
 #include <iostream>
+#include <Parallel.h>
 #include "global.h"
 #include "MeshReader.h"
 #include "MeshReaderMsh22ASCII.h"
@@ -18,12 +19,12 @@ namespace charm {
 
 
 
-    MeshReader *MeshReader::create(Config *config) {
+    MeshReader* MeshReader::create(Config* config) {
         // @todo
         return new MeshReaderMsh22ASCII(config);
     }
 
-    void MeshReader::decomp(Mesh * mesh) {
+    void MeshReader::decomp(Mesh* mesh) {
         mesh->cCount = mesh->cCountGhost = mesh->cells.size();
         mesh->fCount = mesh->fCountGhost = mesh->faces.size();
         mesh->nCount = mesh->nCountGhost = mesh->nodes.size();
@@ -72,23 +73,23 @@ namespace charm {
         ProcMesh pm;
         buildProcMesh(mesh, epart, pm);
 
-        for (int p = 0; p < Parallel::procCount; p++) {
-            if (p == Parallel::procId) {
-                printf("PROC %d: cCount: %4lu; cCountGhost: %4lu\n", p, pm.cCount, pm.cCountEx);fflush(stdout);
-                printf("-------------------------------\n");fflush(stdout);
-                for (int i = 0; i < Parallel::procCount; i++) {
-                    printf("\t%d>> SEND: %3zu    RECV: %3lu\n", i, pm.sendInd[i].size(), pm.recvCount[i]);fflush(stdout);
-                    printf("\t\tCELLS TO SEND:");fflush(stdout);
-                    for (auto j: pm.sendInd[i]) {
-                        printf(" %3lu", j);fflush(stdout);
-                    }
-                    printf("\n");fflush(stdout);
-                }
-
-                printf("===============================\n\n");fflush(stdout);
-            }
-            Parallel::barrier();
-        }
+//        for (int p = 0; p < Parallel::procCount; p++) {
+//            if (p == Parallel::procId) {
+//                printf("PROC %d: cCount: %4lu; cCountGhost: %4lu\n", p, pm.cCount, pm.cCountEx);fflush(stdout);
+//                printf("-------------------------------\n");fflush(stdout);
+//                for (int i = 0; i < Parallel::procCount; i++) {
+//                    printf("\t%d>> SEND: %3zu    RECV: %3lu\n", i, pm.sendInd[i].size(), pm.recvCount[i]);fflush(stdout);
+//                    printf("\t\tCELLS TO SEND:");fflush(stdout);
+//                    for (auto j: pm.sendInd[i]) {
+//                        printf(" %3lu", j);fflush(stdout);
+//                    }
+//                    printf("\n");fflush(stdout);
+//                }
+//
+//                printf("===============================\n\n");fflush(stdout);
+//            }
+//            Parallel::barrier();
+//        }
 
 
 
@@ -106,8 +107,8 @@ namespace charm {
         locMesh.cCountGhost  = pm.cCountEx;
         locMesh.cells.resize(pm.cCountEx);
 
-        locMesh.patchesCount = mesh->patchesCount;
-        locMesh.patches.assign(mesh->patches.begin(), mesh->patches.end());
+//        locMesh.patchesCount = mesh->patchesCount;
+//        locMesh.patches.assign(mesh->patches.begin(), mesh->patches.end());
 
         for (Index i = 0; i < pm.nCountEx; i++) {
             locMesh.nodes[i] = mesh->nodes[pm.gNodes[i]];
@@ -154,6 +155,9 @@ namespace charm {
             locMesh.sendInd[i].assign(pm.sendInd[i].begin(), pm.sendInd[i].end());
         }
         mesh->assign(locMesh);
+
+
+
 
     }
 

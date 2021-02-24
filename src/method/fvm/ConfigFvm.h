@@ -14,13 +14,11 @@ namespace charm {
     public:
         ConfigFvm(const String &fileName) : Config(fileName) {}
 
-        virtual void read();
+        void read() override;
 
-        virtual Method* createMethod();
+        Method* createMethod() override;
 
-        Int     useVisc;
-        Int     useDiff;
-        Real    tRef;
+        bool useReconstruct;
     };
 
 }

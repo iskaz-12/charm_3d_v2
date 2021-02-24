@@ -29,8 +29,8 @@ namespace charm{
         center      = face.center;
         type        = face.type;
         bnd         = face.bnd;
-        gp.assign(face.gp.begin(), face.gp.end());
-        gw.assign(face.gw.begin(), face.gw.end());
+//        gp.assign(face.gp.begin(), face.gp.end());
+//        gw.assign(face.gw.begin(), face.gw.end());
 
         return *this;
     }

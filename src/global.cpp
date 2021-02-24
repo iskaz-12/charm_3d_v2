@@ -1,9 +1,21 @@
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
+
 /**
  * Created by zhrv on 17.11.2020.
  * @author R.V.Zhalnin, zhalnin@gmail.com
  */
 
-#include "global.h"
+#include <mesh/Mesh.h>
+#include <method/Config.h>
+//#include "global.h"
 
 namespace charm {
 
@@ -56,65 +68,6 @@ namespace charm {
         }
     }
 
-
-    MPI_Status mpiSt;
-    Int Parallel::procCount = 0;
-    Int Parallel::procId = 0;
-    Real * Parallel::buf;
-
-    void Parallel::init(Int* argc, char*** argv)
-    {
-        MPI_Init(argc, argv);
-        MPI_Comm_size(MPI_COMM_WORLD, &procCount);
-        MPI_Comm_rank(MPI_COMM_WORLD, &procId);
-    }
-
-    void Parallel::done()
-    {
-        MPI_Finalize();
-    }
-
-    void Parallel::send(Int pid, Int tag, Int n, Real* x)
-    {
-        MPI_Send(x, n, MPI_DOUBLE, pid, tag, MPI_COMM_WORLD);
-    }
-
-    void Parallel::send(Int pid, Int tag, Int n, Int* x)
-    {
-        MPI_Send(x, n, MPI_INT, pid, tag, MPI_COMM_WORLD);
-    }
-
-
-    void Parallel::recv(Int pid, Int tag, Int n, Real* x)
-    {
-        MPI_Recv(x, n, MPI_DOUBLE, pid, tag, MPI_COMM_WORLD, &mpiSt);
-    }
-
-    void Parallel::recv(Int pid, Int tag, Int n, Int* x)
-    {
-        MPI_Recv(x, n, MPI_INT, pid, tag, MPI_COMM_WORLD, &mpiSt);
-    }
-
-    void Parallel::bcast(Int root, Int n, Int* x) {
-        MPI_Bcast(x, n, MPI_INT, root, MPI_COMM_WORLD);
-    }
-
-    void Parallel::bcast(Int root, Int n, Index* x) {
-        MPI_Bcast(x, n, MPI_LONG_INT, root, MPI_COMM_WORLD);
-    }
-
-    void Parallel::bcast(Int root, Int n, Real* x)
-    {
-        MPI_Bcast(x, n, MPI_DOUBLE, root, MPI_COMM_WORLD);
-    }
-
-    void Parallel::send(Int pid, Int tag, Int n, Byte *data) {
-        MPI_Send(data, n, MPI_CHAR, pid, tag, MPI_COMM_WORLD);
-    }
-
-    void Parallel::recv(Int pid, Int tag, Int n, Byte *data) {
-        MPI_Recv(data, n, MPI_CHAR, pid, tag, MPI_COMM_WORLD, &mpiSt);
-    }
 
 
 //        void matrInv(charm_matr_t a_src, charm_matr_t am)

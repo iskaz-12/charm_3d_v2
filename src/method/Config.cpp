@@ -4,7 +4,10 @@
  */
 
 #include <iostream>
-#include <mesh/readers/MeshReader.h>
+#include <MeshReader.h>
+#include <ConfigFvmLMCh.h>
+#include <lmchem/ConfigFvmLMCh.h>
+#include <Log.h>
 #include "Config.h"
 #include "ConfigFvm.h"
 #include "Material.h"
@@ -59,7 +62,7 @@ namespace charm {
      * @param fileName
      * @return
      */
-    Config *Config::create(const String &fileName = "task.xml") {
+    Config* Config::create(const String &fileName = "task.xml") {
         YAML::Node node = YAML::LoadFile("task.yaml");
         String str = node["method"].as<std::string>();
 
@@ -69,6 +72,9 @@ namespace charm {
         String model = node["control"]["MODEL"]["name"].as<String>();
         if (model == "EULER_FVM") {
             config = new ConfigFvm(fileName);
+        }
+        else if (model == "LOW_MACH_CHEM_FVM") {
+            config = new ConfigFvmLMCh(fileName);
         }
         else {
             throw ConfigException("Wrong model name.");
@@ -163,11 +169,10 @@ namespace charm {
     {
         YAML::Node n1;
         Index id;
-        Index idx;
         Real c;
 
         String str;
-        auto *reg = new Region();
+        auto reg = new Region();
 
         reg->id     = node["id"].as<Int>();
         reg->name   = node["name"].as<std::string>();
@@ -198,8 +203,7 @@ namespace charm {
                 }
             }
             if (!found) {
-                std::cerr << ("Unknown component id %d for region '%s' in file 'task.yaml'\n", id, reg->name);
-                exit(1);
+                throw ConfigException("Unknown component id "+ std::to_string(id) +" for region '" + reg->name + "' in file 'task.yaml'");
             }
         }
 
@@ -208,8 +212,7 @@ namespace charm {
             c += reg->c[i];
         }
         if (fabs(c)-1. > EPS) {
-            std::cerr << "Sum of concentrations for region '" << reg->name << "' is not equal to 1.\n";
-            exit(1);
+            throw ConfigException("Sum of concentrations for region '" + reg->name + "' is not equal to 1.");
         }
         return reg;
     }
@@ -220,7 +223,7 @@ namespace charm {
      * @return
      */
     BoundaryCondition* Config::fetchBoundary(const YAML::Node &node) {
-        BoundaryCondition *bnd;
+        BoundaryCondition* bnd;
         YAML::Node n2, n3;
         BoundaryCondition::Type bndType = BoundaryCondition::getTypeByName(node["type"].as<std::string>().c_str());
         String bndName = node["name"].as<String>();
@@ -251,8 +254,7 @@ namespace charm {
                     }
                 }
                 if (!found) {
-                    std::cerr << "Unknown component id " << id << " for boundary condition '" << bndName << "'\n";
-                    exit(1);
+                    throw ConfigException("Unknown component id " + std::to_string(id) + " for boundary condition '" + bndName);
                 }
             }
 
@@ -261,8 +263,7 @@ namespace charm {
                 s += c[i];
             }
             if (fabs(s - 1.) > EPS) {
-                std::cerr << "Sum of concentrations for boundary '" << bndName << "' is not equal to 1\n";
-                exit(1);
+                throw ConfigException("Sum of concentrations for boundary '" + bndName + "' is not equal to 1");
             }
             bnd = new BoundaryConditionInlet(bndName, v, t, p, c, matId);
         }
@@ -402,8 +403,7 @@ namespace charm {
 //
 //        }
         else {
-                std::cerr << ("Unknown boundary type %s\n", bnd->name);
-                exit(1);
+            throw ConfigException("Unknown boundary type %s\n" + bnd->name);
         }
         return bnd;
     }
@@ -415,23 +415,19 @@ namespace charm {
      */
     Material* Config::fetchMaterial(const YAML::Node &node) {
         std::string str;
-        Material *mat;
+        Material* mat;
         str = node["eof_type"].as<std::string>();
         if (str == "IDEAL") {
             mat = new MaterialIdeal();
             if (components.size() > 1) {
-                std::cerr << ("WARNING! There is more than one componen. First component's parameters is used for EOS. \n");
+                Log::print("WARNING! There is more than one componen. First component's parameters is used for EOS.\n");
             }
         }
         else if (str == "MIX") {
             mat = new MaterialMix();
         }
-//        else if (str == "TABLE") { @todo
-//            mat = new MaterialTable();
-//        }
         else {
-            std::cerr << ("Unknown flux type '%s'. Use: LF, GODUNOV.", str.c_str());
-            exit(1);
+            throw ConfigException("Unknown EOS type '" + str + "'. Use: LF, GODUNOV.");
         }
         mat->id = node["id"].as<int>();
         mat->name = node["name"].as<std::string>();
@@ -446,7 +442,7 @@ namespace charm {
      */
     Component* Config::fetchComponent(const YAML::Node &node) {
         String str;
-        auto *comp = new Component();
+        auto comp = new Component();
         comp->id = node["id"].as<Int>();
         comp->name = node["name"].as<String>();
 
@@ -482,8 +478,7 @@ namespace charm {
             comp->mlType = Component::ML_SATHERLAND;
         }
         else {
-            std::cerr << ("Unknown ML type '%s'. Use: CONST, SATHERLAND.", str.c_str());
-            exit(1);
+            throw ConfigException("Unknown ML type '" + str + "'. Use: CONST, SATHERLAND.");
         }
 
         comp->m     = node["M"].as<Real>();
@@ -514,15 +509,15 @@ namespace charm {
     }
 
     Method* Config::createMethod() {
-        mesh = MeshReader::create(this)->read();
+        mesh = MeshReader::create(config)->read();
         return nullptr;
     }
 
-    Config *Config::get() {
+    Config& Config::get() {
         if (config == nullptr) {
             config = Config::create();
         }
-        return config;
+        return *config;
     }
 
 }

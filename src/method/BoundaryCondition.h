@@ -7,12 +7,12 @@
 #define CHARM_3D_V2_BOUNDARYCONDITION_H
 
 #include <map>
+#include <memory>
 #include "global.h"
 #include "Point.h"
-#include "DataFvm.h"
+#include "Prim.h"
 
 namespace charm {
-
 
     class BoundaryCondition {
     public:
@@ -43,7 +43,6 @@ namespace charm {
     typedef BoundaryCondition BC;
 
 
-
     class BoundaryConditionInlet : public BoundaryCondition {
     public:
         Index       matId;
@@ -53,21 +52,21 @@ namespace charm {
         ArrayReal   c;
 
         BoundaryConditionInlet(String name, Vector v, Real t, Real p, ArrayReal c, Index matId);
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionOutlet : public BoundaryCondition {
     public:
         explicit BoundaryConditionOutlet(String name);
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionWallSlip : public BoundaryCondition {
     public:
         explicit BoundaryConditionWallSlip(String name);
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
@@ -75,32 +74,32 @@ namespace charm {
     public:
         Real t;
         BoundaryConditionWallNoSlip(String name, Real t);
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionMassFlow : public BoundaryCondition {
     public:
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionSymmetry : public BoundaryCondition {
     public:
         explicit BoundaryConditionSymmetry(String name);
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionFreeStream : public BoundaryCondition {
     public:
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 
     class BoundaryConditionPressure : public BoundaryCondition {
     public:
-        virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 
 }
