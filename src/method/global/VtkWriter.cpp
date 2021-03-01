@@ -1,11 +1,16 @@
-/**
- * Created by zhrv on 10.12.2020.
- * @author R.V.Zhalnin, zhalnin@gmail.com
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
  */
 
+
 #include <iomanip>
-#include <Mesh.h>
-#include <Parallel.h>
+#include "Mesh.h"
+#include "Parallel.h"
 #include "VtkWriter.h"
 #include "Config.h"
 #include "MethodException.h"

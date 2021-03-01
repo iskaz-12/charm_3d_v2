@@ -8,19 +8,18 @@
  */
 
 
-#include "ConfigFvm.h"
-#include "MethodFvm.h"
+#ifndef CHARM_3D_V2_REACTION_H
+#define CHARM_3D_V2_REACTION_H
+
+#include <memory>
 
 namespace charm {
-    void ConfigFvm::read() {
-        Config::read();
-        YAML::Node model = confYaml["control"]["MODEL"];
-        useReconstruct = model["use_reconstruct"].as<bool>();
-    }
 
-    Method* ConfigFvm::createMethod() {
-        Config::createMethod();
-        return new MethodFvm(this);
-    }
+    class Reaction {
+
+    };
+
 
 }
+
+#endif //CHARM_3D_V2_REACTION_H

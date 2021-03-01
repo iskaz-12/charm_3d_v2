@@ -8,19 +8,25 @@
  */
 
 
-#include "ConfigFvm.h"
-#include "MethodFvm.h"
+#ifndef CHARM_3D_V2_VTKWRITER_H
+#define CHARM_3D_V2_VTKWRITER_H
+
+#include "global.h"
+#include "Method.h"
 
 namespace charm {
-    void ConfigFvm::read() {
-        Config::read();
-        YAML::Node model = confYaml["control"]["MODEL"];
-        useReconstruct = model["use_reconstruct"].as<bool>();
-    }
 
-    Method* ConfigFvm::createMethod() {
-        Config::createMethod();
-        return new MethodFvm(this);
-    }
+    class VtkWriter {
+    public:
+        VtkWriter(Method* method);
+
+        void write(Index step);
+
+    protected:
+        Method* method;
+    };
 
 }
+
+
+#endif //CHARM_3D_V2_VTKWRITER_H

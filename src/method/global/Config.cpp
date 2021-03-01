@@ -1,12 +1,16 @@
-/**
- * Created by zhrv on 18.11.2020.
- * @author R.V.Zhalnin, zhalnin@gmail.com
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
  */
+
 
 #include <iostream>
 #include <MeshReader.h>
 #include <ConfigFvmLMCh.h>
-#include <lmchem/ConfigFvmLMCh.h>
 #include <Log.h>
 #include "Config.h"
 #include "ConfigFvm.h"

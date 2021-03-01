@@ -1,10 +1,14 @@
-/**
- * Created by zhrv on 09.02.2021.
- * @author R.V.Zhalnin, zhalnin@gmail.com
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
  */
 
 #include <mesh/Mesh.h>
-#include <method/Config.h>
+#include <method/global/Config.h>
 #include "Parallel.h"
 
 

@@ -12,7 +12,7 @@
  * Created by zhrv on 19.12.2020.
  */
 
-#include <Config.h>
+#include "Config.h"
 #include "FluxFvmLMChLF.h"
 
 namespace charm {

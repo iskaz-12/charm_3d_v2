@@ -1,14 +1,17 @@
-//
-// Created by zhrv on 13.11.2020.
-//
+/*
+ *     ________  _____    ____  __  ___    _____ ____
+ *    / ____/ / / /   |  / __ \/  |/  /   |__  // __ \  __    __
+ *   / /   / /_/ / /| | / /_/ / /|_/ /     /_ </ / / /_/ /___/ /_
+ *  / /___/ __  / ___ |/ _, _/ /  / /    ___/ / /_/ /_  __/_  __/
+ *  \____/_/ /_/_/  |_/_/ |_/_/  /_/____/____/_____/ /_/   /_/
+ *
+ */
+
 
 #include "MeshReaderMsh22ASCII.h"
 #include "MeshReaderException.h"
-#include <sstream>
 #include <map>
 #include <set>
-#include <iostream>
-#include <iomanip>
 
 namespace charm {
 

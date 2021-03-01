@@ -7,8 +7,5 @@
  *
  */
 
-#include "Log.h"
 
-namespace charm {
-
-}
+#include "Region.h"

@@ -15,7 +15,7 @@
 #ifndef CHARM_3D_V2_METHODFVMLMCH_H
 #define CHARM_3D_V2_METHODFVMLMCH_H
 
-#include <Method.h>
+#include "Method.h"
 #include "FluxFvmLMCh.h"
 
 namespace charm {

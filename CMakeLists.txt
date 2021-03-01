@@ -47,7 +47,7 @@ set(CHARM_INCLUDE
         "${CMAKE_SOURCE_DIR}/src"
         "${CMAKE_SOURCE_DIR}/src/mesh"
         "${CMAKE_SOURCE_DIR}/src/mesh/readers"
-        "${CMAKE_SOURCE_DIR}/src/method"
+        "${CMAKE_SOURCE_DIR}/src/method/global"
         "${CMAKE_SOURCE_DIR}/src/method/fvm"
         "${CMAKE_SOURCE_DIR}/src/method/lmchem"
         )
@@ -82,28 +82,28 @@ add_executable( charm_3d_v2
         src/mesh/readers/MeshReaderMsh22ASCII.cpp
         src/mesh/readers/MeshReaderMsh22ASCII.h
 
-        src/method/Config.cpp
-        src/method/Config.h
-        src/method/Material.cpp
-        src/method/Material.h
-        src/method/Region.cpp
-        src/method/Region.h
-        src/method/Component.cpp
-        src/method/Component.h
-        src/method/Method.h
-        src/method/Reaction.cpp
-        src/method/Reaction.h
-        src/method/BoundaryCondition.cpp
-        src/method/BoundaryCondition.h
-        src/method/MethodException.cpp
-        src/method/MethodException.h
-        src/method/ConfigException.cpp
-        src/method/ConfigException.h
-        src/method/EosException.h
-        src/method/VtkWriter.cpp
-        src/method/VtkWriter.h
-        src/method/Prim.h
-        src/method/Prim.cpp
+        src/method/global/Config.cpp
+        src/method/global/Config.h
+        src/method/global/Material.cpp
+        src/method/global/Material.h
+        src/method/global/Region.cpp
+        src/method/global/Region.h
+        src/method/global/Component.cpp
+        src/method/global/Component.h
+        src/method/global/Method.h
+        src/method/global/Reaction.cpp
+        src/method/global/Reaction.h
+        src/method/global/BoundaryCondition.cpp
+        src/method/global/BoundaryCondition.h
+        src/method/global/MethodException.cpp
+        src/method/global/MethodException.h
+        src/method/global/ConfigException.cpp
+        src/method/global/ConfigException.h
+        src/method/global/EosException.h
+        src/method/global/VtkWriter.cpp
+        src/method/global/VtkWriter.h
+        src/method/global/Prim.h
+        src/method/global/Prim.cpp
 
         src/method/fvm/MethodFvm.cpp
         src/method/fvm/MethodFvm.h

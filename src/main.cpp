@@ -9,9 +9,9 @@
 
 
 #include <iostream>
-#include <ConfigException.h>
-#include "Config.h"
-#include "Method.h"
+#include <method/global/ConfigException.h>
+#include "method/global/Config.h"
+#include "method/global/Method.h"
 #include "Parallel.h"
 #include <fenv.h>
 

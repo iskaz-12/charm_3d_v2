@@ -8,14 +8,8 @@
  */
 
 
-/**
- * Created by zhrv on 17.11.2020.
- * @author R.V.Zhalnin, zhalnin@gmail.com
- */
-
-#include <mesh/Mesh.h>
-#include <method/Config.h>
-//#include "global.h"
+#include "Mesh.h"
+#include "Config.h"
 
 namespace charm {
 

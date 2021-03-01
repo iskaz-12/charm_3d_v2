@@ -8,23 +8,16 @@
  */
 
 
-//
-// Created by zhrv on 15.12.2020.
-//
+#ifndef CHARM_3D_V2_METHODEXCEPTION_H
+#define CHARM_3D_V2_METHODEXCEPTION_H
 
-#ifndef CHARM_3D_V2_METHODFVMLMCHEXCEPTION_H
-#define CHARM_3D_V2_METHODFVMLMCHEXCEPTION_H
-
-#include "MethodException.h"
+#include "global.h"
 
 namespace charm {
-
-    class MethodFvmLMChException : public MethodException {
+    class MethodException : public Exception {
     public:
-        explicit MethodFvmLMChException(String msg) : MethodException(msg) {}
+        MethodException(String msg): Exception(msg) {}
     };
-
 }
 
-
-#endif //CHARM_3D_V2_METHODFVMLMCHEXCEPTION_H
+#endif //CHARM_3D_V2_METHODEXCEPTION_H

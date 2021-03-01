@@ -12,7 +12,7 @@
 // Created by zhrv on 14.12.2020.
 //
 
-#include <Parallel.h>
+#include "Parallel.h"
 #include "MethodFvmLMCh.h"
 #include "FluxFvmLMChLF.h"
 #include "VtkWriter.h"

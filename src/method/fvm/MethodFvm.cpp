@@ -14,8 +14,6 @@
  */
 
 #include <FluxFvmHllc.h>
-#include <iomanip>
-#include <fstream>
 #include <iostream>
 #include <Parallel.h>
 #include <Log.h>

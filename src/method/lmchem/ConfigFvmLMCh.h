@@ -15,7 +15,7 @@
 #ifndef CHARM_3D_V2_CONFIGFVMLMCH_H
 #define CHARM_3D_V2_CONFIGFVMLMCH_H
 
-#include <Config.h>
+#include "Config.h"
 
 namespace charm {
     class ConfigFvmLMCh : public Config  {
