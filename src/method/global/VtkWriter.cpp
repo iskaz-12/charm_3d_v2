@@ -123,6 +123,14 @@ namespace charm {
                 offset += 4;
                 fprintf(fp, "%d ", offset);
             }
+            else if (c.type == Cell::CELL_TYPE_PYRAMID) {
+                offset += 5;
+                fprintf(fp, "%d ", offset);
+            }
+            else if (c.type == Cell::CELL_TYPE_PRISM) {
+                offset += 6;
+                fprintf(fp, "%d ", offset);
+            }
             else {
                 throw Exception("VTK writer: not realized cell type.");
             }
@@ -141,6 +149,14 @@ namespace charm {
             else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
                 fprintf(fp, "%lu %lu %lu %lu ", c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3]);
             }
+            else if (c.type == Cell::CELL_TYPE_PYRAMID) {
+                fprintf(fp, "%lu %lu %lu %lu %lu ", c.nodesInd[0], c.nodesInd[1], c.nodesInd[2], c.nodesInd[3], c.nodesInd[4]);
+            }
+            else if (c.type == Cell::CELL_TYPE_PRISM) {
+                fprintf(fp, "%lu %lu %lu %lu %lu %lu ",
+                        c.nodesInd[0], c.nodesInd[1], c.nodesInd[2],
+                        c.nodesInd[3], c.nodesInd[4], c.nodesInd[5]);
+            }
             else {
                 throw Exception("VTK writer: not realized cell type.");
             }
@@ -156,6 +172,12 @@ namespace charm {
             }
             else if (c.type == Cell::CELL_TYPE_TETRAHEDRON) {
                 fprintf(fp, "%d ", 10);
+            }
+            else if (c.type == Cell::CELL_TYPE_PYRAMID) {
+                fprintf(fp, "%d ", 14);
+            }
+            else if (c.type == Cell::CELL_TYPE_PRISM) {
+                fprintf(fp, "%d ", 13);
             }
             else {
                 throw Exception("VTK writer: not realized cell type.");
