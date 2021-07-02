@@ -9,6 +9,9 @@
 
 
 #include "BoundaryCondition.h"
+#include "Config.h"
+
+#include <utility>
 
 namespace charm {
 
@@ -20,7 +23,8 @@ namespace charm {
             {"BOUND_MASS_FLOW",     BoundaryCondition::MASS_FLOW},
             {"BOUND_SYMMETRY",      BoundaryCondition::SYMMETRY},
             {"BOUND_FREE_STREAM",   BoundaryCondition::FREE_STREAM},
-            {"BOUND_PRESSURE",      BoundaryCondition::PRESSURE}
+            {"BOUND_PRESSURE",      BoundaryCondition::PRESSURE},
+            {"BOUND_PRESSURE_SIN",  BoundaryCondition::PRESSURE_SIN}
     };
 
 
@@ -35,15 +39,12 @@ namespace charm {
     }
 
     BoundaryCondition::BoundaryCondition(String _name, BoundaryCondition::Type _type):
-        name(_name),
-        type(_type)
-    {
-
-    }
+        name(std::move(_name)),
+        type(_type) {}
 
 
      BoundaryConditionSymmetry::BoundaryConditionSymmetry(String _name):
-            BoundaryCondition(_name, BoundaryCondition::SYMMETRY) {}
+            BoundaryCondition(std::move(_name), BoundaryCondition::SYMMETRY) {}
 
 
     void BoundaryConditionSymmetry::calc(Prim &parIn, Prim &parOut, Vector &n) {
@@ -61,7 +62,7 @@ namespace charm {
 
 
     BoundaryConditionWallSlip::BoundaryConditionWallSlip(String _name):
-            BoundaryCondition(_name, BoundaryCondition::WALL_SLIP) {}
+            BoundaryCondition(std::move(_name), BoundaryCondition::WALL_SLIP) {}
 
 
     void BoundaryConditionWallSlip::calc(Prim &parIn, Prim &parOut, Vector &n) {
@@ -81,7 +82,7 @@ namespace charm {
 
 
     BoundaryConditionOutlet::BoundaryConditionOutlet(String _name):
-            BoundaryCondition(_name, BoundaryCondition::OUTLET) {}
+            BoundaryCondition(std::move(_name), BoundaryCondition::OUTLET) {}
 
 
     void BoundaryConditionOutlet::calc(Prim &parIn, Prim &parOut, Vector &n) {
@@ -92,7 +93,7 @@ namespace charm {
 
 
     BoundaryConditionInlet::BoundaryConditionInlet(String _name, Vector _v, Real _t, Real _p, ArrayReal _c, Index _matId):
-        BoundaryCondition(_name, BoundaryCondition::INLET),
+        BoundaryCondition(std::move(_name), BoundaryCondition::INLET),
         v(_v),
         t(_t),
         p(_p),
@@ -117,6 +118,33 @@ namespace charm {
     void BoundaryConditionPressure::calc(charm::Prim &parIn, charm::Prim &parOut, charm::Vector &n) {
         throw NotImplementedException();
     }
+
+
+    void BoundaryConditionPressureSin::calc(charm::Prim &parIn, charm::Prim &parOut, charm::Vector &n) {
+        Config& conf = Config::get();
+        parOut = parIn;
+        parOut.v = v;
+        parOut.t = t;
+        parOut.p = p+amplitude*sin(frequency*(conf.time+start));
+        parOut.matId = matId;
+        parOut.c.assign(c.begin(), c.end());
+        parOut.eos(Material::EOS_T_P_TO_R_CZ_E);
+        parOut.eTot = parOut.e + 0.5*parOut.v.sqr();
+
+    }
+
+    BoundaryConditionPressureSin::BoundaryConditionPressureSin(String _name, Vector _v, Real _t, Real _p, ArrayReal _c, Index _matId, Real _offset,
+                                                               Real _frequency, Real _amplitude, Real _start):
+        BoundaryCondition(std::move(_name), PRESSURE_SIN),
+        v(_v),
+        t(_t),
+        p(_p),
+        c(std::move(_c)),
+        matId(_matId),
+        offset(_offset),
+        frequency(_frequency),
+        amplitude(_amplitude),
+        start(_start) {}
 
 
     void BoundaryConditionFreeStream::calc(Prim &parIn, Prim &parOut, Vector &n) {

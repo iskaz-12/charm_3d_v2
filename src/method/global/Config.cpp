@@ -271,6 +271,45 @@ namespace charm {
             }
             bnd = new BoundaryConditionInlet(bndName, v, t, p, c, matId);
         }
+        else if (bndType == BoundaryCondition::PRESSURE_SIN) {
+            n2 = node["parameters"];
+            Vector v = {
+                    n2["V"]["x"].as<Real>(),
+                    n2["V"]["y"].as<Real>(),
+                    n2["V"]["z"].as<Real>()
+            };
+            Real t = n2["T"].as<Real>();
+            Real p = n2["P"].as<Real>();
+            auto matId = node["material_id"].as<Index>();
+
+            ArrayReal c;
+            c.resize(components.size());
+            n3 = node["components"];
+            for (auto it : n3) {
+                auto id = it["id"].as<Index>();
+                Real _c = it["concentration"].as<Real>();
+                bool found = false;
+
+                for (Index idx = 0; idx < components.size(); idx++) {
+                    if (components[idx]->id == id) {
+                        c[idx] = _c;
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    throw ConfigException("Unknown component id " + std::to_string(id) + " for boundary condition '" + bndName);
+                }
+            }
+
+            Real s = 0;
+            for (Index i = 0; i < components.size(); i++) {
+                s += c[i];
+            }
+            if (fabs(s - 1.) > EPS) {
+                throw ConfigException("Sum of concentrations for boundary '" + bndName + "' is not equal to 1");
+            }
+            bnd = new BoundaryConditionInlet(bndName, v, t, p, c, matId);
+        }
         else if (bndType == BoundaryCondition::OUTLET) {
             bnd = new BoundaryConditionOutlet(bndName);
         }
