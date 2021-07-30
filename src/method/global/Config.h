@@ -135,17 +135,17 @@ namespace charm {
 
         String      methodName;
         Real        maxErr;            ///< maximum allowed global interpolation error
-        Int         refinePeriod;      ///< the number of time steps between mesh refinement
-        Int         repartitionPeriod; ///< the number of time steps between repartitioning
-        Int         writePeriod;       ///< the number of time steps between writing vtk files
-        Int         restartPeriod;     ///< the number of time steps between writing restart files
-        Int         logPeriod;         ///< the number of time steps between writing log
+        Int         refinePeriod;      ///< the number of maxTime steps between mesh refinement
+        Int         repartitionPeriod; ///< the number of maxTime steps between repartitioning
+        Int         writePeriod;       ///< the number of maxTime steps between writing vtk files
+        Int         restartPeriod;     ///< the number of maxTime steps between writing restart files
+        Int         logPeriod;         ///< the number of maxTime steps between writing log
         Int         minLevel;          ///< the minimal level
         Int         maxLevel;          ///< the allowed level
         Real        cfl;               ///< the CFL
-        Real        dt;                ///< time step delta
-        Real        t;                 ///< the current time
-        Real        time;              ///< the max time
+        Real        dt;                ///< maxTime step delta
+        Real        t;                 ///< the current maxTime
+        Real        maxTime;              ///< the max maxTime
         Int         timestep;
 
         struct {

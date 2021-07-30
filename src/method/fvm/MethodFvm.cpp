@@ -167,7 +167,7 @@ namespace charm {
                 Log::print(ss.str());
             }
 
-            if (Config::get().t >= Config::get().time) {
+            if (Config::get().t >= Config::get().maxTime) {
                 break;
             }
         }

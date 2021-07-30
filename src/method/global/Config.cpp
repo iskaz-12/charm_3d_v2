@@ -49,7 +49,7 @@ namespace charm {
         logPeriod             = control["LOG_OUTPUT_STEP"].as<Int>();
         dt                    = control["TAU"].as<Real>();
         cfl                   = control["CFL"].as<Real>();
-        time                  = control["TMAX"].as<Real>();
+        maxTime               = control["TMAX"].as<Real>();
         timestep              = control["STEP_START"].as<Int>();
         t                     = control["TIME_START"].as<Real>();
 
@@ -273,14 +273,11 @@ namespace charm {
         }
         else if (bndType == BoundaryCondition::PRESSURE_SIN) {
             n2 = node["parameters"];
-            Vector v = {
-                    n2["V"]["x"].as<Real>(),
-                    n2["V"]["y"].as<Real>(),
-                    n2["V"]["z"].as<Real>()
-            };
+            Real p = n2["P_shift"].as<Real>();
+            Real pAmpl = n2["P_ampl"].as<Real>();
+            Real pFreq = n2["P_freq"].as<Real>();
+            Real pPh = n2["P_ph"].as<Real>();
             Real t = n2["T"].as<Real>();
-            Real p = n2["P"].as<Real>();
-            auto matId = node["material_id"].as<Index>();
 
             ArrayReal c;
             c.resize(components.size());
@@ -308,7 +305,7 @@ namespace charm {
             if (fabs(s - 1.) > EPS) {
                 throw ConfigException("Sum of concentrations for boundary '" + bndName + "' is not equal to 1");
             }
-            bnd = new BoundaryConditionInlet(bndName, v, t, p, c, matId);
+            bnd = new BoundaryConditionPressureSin(bndName, t, p, pFreq, pAmpl, pPh);
         }
         else if (bndType == BoundaryCondition::OUTLET) {
             bnd = new BoundaryConditionOutlet(bndName);

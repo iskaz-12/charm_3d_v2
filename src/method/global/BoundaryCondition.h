@@ -110,18 +110,13 @@ namespace charm {
 
     class BoundaryConditionPressureSin : public BoundaryCondition {
     public:
-        Index       matId;
-        Vector      v;
         Real        t;
         Real        p;
-        ArrayReal   c;
-        Real        offset;
-        Real        frequency;//  0.795774715; // 5/(2*pi)
-        Real        amplitude;//  1.E-01;
-        Real        start;//     -0.314159265; // pi/10   shift this for a Cosinus
+        Real        pFreq;//  0.795774715; // 5/(2*pi)
+        Real        pAmpl;//  1.E-01;
+        Real        pPh;//     -0.314159265; // pi/10   shift this for a Cosinus
 
-        BoundaryConditionPressureSin(String _name, Vector _v, Real _t, Real _p, ArrayReal _c, Index _matId, Real _offset,
-                                     Real _frequency, Real _amplitude, Real _start);
+        BoundaryConditionPressureSin(String _name, Real _t, Real _p, Real _pFreq, Real _pAmpl, Real _pPh);
         void calc(Prim &parIn, Prim &parOut, Vector &n) override;
     };
 

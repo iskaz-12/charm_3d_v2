@@ -112,7 +112,7 @@ namespace charm {
                 std::cout << "STEP: " << Config::get().timestep << std::endl;
             }
 
-            if (Config::get().t >= Config::get().time) {
+            if (Config::get().t >= Config::get().maxTime) {
                 break;
             }
         }
