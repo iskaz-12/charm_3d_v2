@@ -9,6 +9,7 @@
 
 
 #include <iomanip>
+#include <fstream>
 #include "Mesh.h"
 #include "Parallel.h"
 #include "VtkWriter.h"
@@ -71,7 +72,7 @@ namespace charm {
                 throw MethodException("Could not open VTK file.");
             }
             fprintf(fp, "<?xml version=\"1.0\"?>\n");
-            fprintf(fp, "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n");
+            fprintf(fp, "<VTKFile type=\"PUnstructuredGrid\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
             fprintf(fp, "  <PUnstructuredGrid GhostLevel=\"0\">\n");
             fprintf(fp, "    <PPoints><PDataArray type=\"Float32\" NumberOfComponents = \"3\" /></PPoints>\n");
             fprintf(fp, "    <PCellData Scalars=\"%s, ProcId\" Vectors=\"%s, ProcId\">\n", scalarFieldNamesStr.c_str(), vectorFieldNamesStr.c_str());
@@ -91,6 +92,47 @@ namespace charm {
 
             fprintf(fp, "</VTKFile>\n");
             fclose(fp);
+
+            Array<String> pvtuList;
+            String pvdName = Config::get().methodName + ".pvd";
+
+
+            {
+                std::ifstream pvdFileIn(pvdName);
+                if (!pvdFileIn.is_open() || Config::get().timestep == 0) {
+                    std::ofstream pvdFileOut(pvdName);
+                    pvdFileOut << "<?xml version=\"1.0\"?>\n";
+                    pvdFileOut << "<VTKFile type=\"Collection\" version=\"0.1\">\n";
+                    pvdFileOut << "  <Collection>\n";
+                    pvdFileOut << "  </Collection>\n";
+                    pvdFileOut << "</VTKFile>\n";
+                    pvdFileOut.close();
+                }
+            }
+            std::fstream pvdFile(pvdName);
+            std::streampos pos;
+            char line[1024];
+            while (!pvdFile.eof()) {
+                pos = pvdFile.tellg();
+                pvdFile.getline(line, 1024);
+                String str(line);
+                if (str.find("</Collection>") != String::npos) {
+                    break;
+                }
+            }
+            pvdFile.seekg(pos);
+
+            ss.str("");
+            ss << R"(    <DataSet timestep=")";
+            ss << Config::get().t;
+            ss << R"(" group="" part="0" file=")";
+            ss << fileName;
+            ss << R"("/>)" << std::endl;
+
+            pvdFile << ss.str();
+            pvdFile << "  </Collection>\n";
+            pvdFile << "</VTKFile>\n";
+            pvdFile.close();
         }
 
 
