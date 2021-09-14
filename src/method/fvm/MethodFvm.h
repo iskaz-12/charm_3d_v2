@@ -54,6 +54,12 @@ namespace charm {
 
         FluxFvm *flux;
 
+
+        struct {
+            Real currentDt;
+            Real elapsedTime;
+        } info;
+
         void zeroIntegrals();
 
         Prim getPrim(Index) override;
@@ -70,6 +76,8 @@ namespace charm {
         Vector getVectorFieldValue(Index, Index) override;
         void exchangeFields();
         void exchangeGrads();
+
+        void printInfo();
 
     };
 

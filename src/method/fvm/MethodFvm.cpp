@@ -17,6 +17,7 @@
 #include <iostream>
 #include <Parallel.h>
 #include <Log.h>
+#include <iomanip>
 #include "MethodFvm.h"
 #include "VtkWriter.h"
 #include "MethodException.h"
@@ -92,6 +93,7 @@ namespace charm {
         Mesh& mesh = Config::getMesh();
         Index compCount = Config::getCompCount();
         while (true) {
+            info.elapsedTime = MPI_Wtime();
             calcGrad();
             zeroIntegrals();
             for (Index iFace = 0; iFace < mesh.getFacesCount(); iFace++) {
@@ -156,16 +158,16 @@ namespace charm {
 
             exchangeFields();
 
-            Config::get().t += Config::get().dt;
+            Config::get().t += dt;
             Config::get().timestep++;
+
+            info.elapsedTime = MPI_Wtime() - info.elapsedTime;
+            info.currentDt = dt;
 
             save();
 
-            if (Config::get().timestep % Config::get().logPeriod == 0) {
-                std::stringstream ss;
-                ss << "STEP: " << Config::get().timestep << std::endl;
-                Log::print(ss.str());
-            }
+
+            printInfo();
 
             if (Config::get().t >= Config::get().maxTime) {
                 break;
@@ -487,6 +489,19 @@ namespace charm {
         Parallel::exchange(gradV);
         Parallel::exchange(gradW);
         Parallel::exchange(gradRC);
+    }
+
+    void MethodFvm::printInfo() {
+        if (Config::get().timestep % Config::get().logPeriod == 0) {
+            std::stringstream ss;
+            ss << std::setw(8) << Config::get().timestep;
+            ss << " | dt: " << std::setw(8) << info.currentDt;
+            ss << " | time: " << std::setw(8) << Config::get().t;
+            ss << " | elapsed time: " << std::setw(8) << info.elapsedTime;
+            ss << std::endl;
+            Log::print(ss.str());
+        }
+
     }
 
 }
