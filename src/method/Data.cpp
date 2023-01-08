@@ -22,6 +22,11 @@ namespace charm {
         matId       = prim.matId;
         c.assign(prim.c.begin(), prim.c.end());
 
+	//	UPDATE от 25.12.2022 - добавление qx, qy и qz в Prim
+	qx = prim.qx;
+	qy = prim.qy;
+	qz = prim.qz;
+
         return *this;
     }
 
@@ -68,9 +73,31 @@ namespace charm {
         p.v.y      = c.rv/p.r;
         p.v.z      = c.rw/p.r;
         p.eTot     = c.re/p.r;
+
         p.e        = p.eTot-0.5*p.v2();
+
+
+	//	UPDATE от 08.01.2023
+	
+	//std::cout<<c.rc[0]<<std::endl;
+
         if (p.e < EPS) {
-            throw MethodException("p.e < EPS");
+
+		/*
+		for (Index i = 0; i < cCount; i++) {
+			std::cout<<c.rc[i]<<std::endl;
+		}
+
+		std::cout<<p.r<<std::endl;
+
+		std::cout<<c.re<<std::endl;
+
+		std::cout<<p.eTot<<std::endl;
+
+		std::cout<<p.e<<std::endl;
+		*/
+	
+            //throw MethodException("p.e < EPS");
         }
 
         p.c.resize(cCount);
@@ -79,7 +106,11 @@ namespace charm {
             if (p.c[i] < 0.) p.c[i] = 0.; // @todo
             if (p.c[i] > 1.) p.c[i] = 1.;
         }
+
+	//	UPDATE от 08.01.2023
+
         p.eos(Material::EOS_R_E_TO_P_CZ_T);
+
         p.shrink();
         return p;
     }

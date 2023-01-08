@@ -28,6 +28,12 @@ namespace charm {
         Index         matId;
         ArrayReal     c;             ///< concentrations
 
+	//	UPDATE от 26.12.2022 - добавление переменных для теплового потока
+
+	Real qx;
+	Real qy;
+	Real qz;	
+
 
         Prim() = delete;
 

@@ -15,6 +15,9 @@
 #include "Reaction.h"
 #include "BoundaryCondition.h"
 
+//	UPDATE от 26.12.2022
+#include <iostream>
+
 namespace charm {
     class Method;
 
@@ -61,6 +64,12 @@ namespace charm {
 
 
         inline static Region*    getRegion(Index i)    {
+
+		//	UPDATE от 26.12.2022 - вывод дополнительной информации
+
+		std::cout<<"Reg count from Config.h: "<<getRegCount()<<std::endl;
+
+
             if (i >= getRegCount()) {
                 throw Exception("Wrong region index...");
             }

@@ -83,9 +83,11 @@ namespace charm {
     void Material::eosSwitch(Prim &p, Material::EosFlag flag) {
         switch (flag) {
             case EOS_R_E_TO_P_CZ:        // p=p(r,e)
+
                 if (p.r < EPS) {
                     throw EosException("EOS_R_E_TO_P_CZ: p.r < EPS");
                 }
+		
                 p.p = p.r * p.e * (p.gam - 1);
                 p.cz = ::sqrt(p.gam * p.p / p.r);
                 break;
@@ -119,12 +121,20 @@ namespace charm {
                 break;
 
             case EOS_R_E_TO_P_CZ_T: // (r,e) => (p, cz, T)
+		
+		
+		//	UPDATE от 08.01.2023 - пока убираем исключение (ТОЛЬКО ДЛЯ ЗАДАЧИ ТЕПЛОПРОВОДНОСТИ)
+
+
+		/*
                 if (p.r < EPS) {
                     throw EosException("EOS_R_E_TO_P_CZ_T: p.r < EPS");
                 }
+		*/
+
                 p.p = p.r * p.e * (p.gam - 1);
                 p.cz = sqrt(p.gam * p.p / p.r);
-                p.t = p.e / p.cv;
+                //p.t = p.e / p.cv;
                 break;
 
             default:

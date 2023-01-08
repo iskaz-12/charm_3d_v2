@@ -10,10 +10,23 @@ int main() {
         Config *conf = Config::create("task.yaml");
 //        conf->read();
 
+	//	UPDATE от 26.12.2022
+
+	std::cout<<"!"<<std::endl;
+
         Method *method = conf->createMethod();
 
+	std::cout<<"!!"<<std::endl;
+
         method->init();
+
+	std::cout<<"From main.cpp: init done!"<<std::endl;
+
+
         method->run();
+
+	std::cout<<"From main.cpp: run done!"<<std::endl;
+
         method->done();
 
     }

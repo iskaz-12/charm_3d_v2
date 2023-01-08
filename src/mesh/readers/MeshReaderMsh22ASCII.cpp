@@ -7,6 +7,10 @@
 #include <map>
 #include <set>
 
+//	UPDATE от 26.12.2022
+
+#include <iostream>
+
 namespace charm {
 
 
@@ -25,18 +29,41 @@ namespace charm {
             bndPatchMap[b->name] = b;
         }
 
+	//	UPDATE от 26.12.2022 - проверка, на каком моменте программа останавливается
+
+	std::cout<<"! Mesh 2.2"<<std::endl;
+
         while (1) {
             line = getlineUpper(fin);
 
             if (line == "") {
                 break;
             }
+
+		std::cout<<"!* Mesh 2.2"<<std::endl;
+
             if (line[0] == '$') {
+
+		
+		std::cout<<"!$ Mesh 2.2"<<std::endl;
+
                 if (line.find("$PHYSICALNAMES") != String::npos) {
+
+
+			std::cout<<"!*Phys Mesh 2.2"<<std::endl;
+
                     ss << getlineUpper(fin);
                     ss >> numPatches; //sscanf(line, "%d", &numPatches);
                     mesh->patches.resize(numPatches);
+
+			std::cout<<"!!*Phys Mesh 2.2"<<std::endl;
+
+
                     for (int i = 0; i < numPatches; i++) {
+
+			std::cout<<"!!!*Phys Mesh 2.2"<<std::endl;
+
+
                         ss << getlineUpper(fin);
                         Patch patch;
                         ss >> patch.dim >> patch.id >> patch.name;
@@ -44,7 +71,14 @@ namespace charm {
                         patch.id--;
                         mesh->patches[patch.id] = patch;
                     }
+
+		
+
+
                 } else if (line.find("$NODES") != String::npos) {
+
+			std::cout<<"!*Nodes Mesh 2.2"<<std::endl;
+
                     ss << getlineUpper(fin);
                     ss >> numVert;
                     mesh->nodes.resize(numVert);
@@ -56,7 +90,15 @@ namespace charm {
                         ss >> node >> p.x >> p.y >> p.z;
                         mesh->nodes[node-1] = p;
                     }
+
+		
+
                 } else if (line.find("$ELEMENTS") != String::npos) {
+
+			
+		std::cout<<"!*Elems Mesh 2.2"<<std::endl;
+
+
                     Index cid = 0;
                     ss << getlineUpper(fin);
                     ss >> numCells;
@@ -107,9 +149,13 @@ namespace charm {
                             faceMap[fNodes] = face;
                         }
                     }
+
+
                 }
             }
         }
+
+	std::cout<<"!! Mesh 2.2"<<std::endl;
 
         mesh->patchesCount = fid;
 

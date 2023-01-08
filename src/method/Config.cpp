@@ -11,6 +11,8 @@
 #include "BoundaryCondition.h"
 #include "ConfigException.h"
 
+//	Исправление от 03.12.22
+#include "ConfigFemDgHeat.h"
 
 namespace charm {
 
@@ -60,6 +62,7 @@ namespace charm {
      * @return
      */
     Config *Config::create(const String &fileName = "task.xml") {
+
         YAML::Node node = YAML::LoadFile("task.yaml");
         String str = node["method"].as<std::string>();
 
@@ -70,6 +73,15 @@ namespace charm {
         if (model == "EULER_FVM") {
             config = new ConfigFvm(fileName);
         }
+
+	
+	//	Исправление от 03.12.22
+	//	Цель - написать свой разрывный метод Галёркина для решения задач теплопроводности
+	else if (model == "HEAT_FEM_DG") {
+		config = new ConfigFemDgHeat(fileName);
+	}
+
+
         else {
             throw ConfigException("Wrong model name.");
         }
