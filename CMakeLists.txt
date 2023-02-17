@@ -94,7 +94,19 @@ add_executable( charm_3d_v2
         src/method/FluxLf.h
         src/method/EosException.cpp
         src/method/EosException.h
-        src/method/VtkWriter.cpp src/method/VtkWriter.h src/method/Data.h src/mesh/readers/MeshReaderException.h src/mesh/readers/MeshDecompException.h)
+        src/method/VtkWriter.cpp
+        src/method/VtkWriter.h
+        src/method/Data.h
+        src/mesh/readers/MeshReaderException.h
+        src/mesh/readers/MeshDecompException.h
+
+        src/method/fem-dg-heat/ConfigFemDgHeat.cpp
+        src/method/fem-dg-heat/ConfigFemDgHeat.h
+        src/method/fem-dg-heat/MethodFemDgHeat.cpp
+        src/method/fem-dg-heat/MethodFemDgHeat.h
+        src/method/fem-dg-heat/MethodFemDgHeatException.h
+        src/method/fem-dg-heat/MethodFemDgHeatException.cpp
+        src/method/fem-dg-heat/DataDgHeat.cpp src/method/fem-dg-heat/DataDgHeat.h)
 
 target_link_libraries(charm_3d_v2 yaml-cpp metis)
 add_dependencies(charm_3d_v2  yaml-cpp metis)

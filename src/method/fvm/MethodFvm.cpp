@@ -31,7 +31,7 @@ namespace charm {
             data[ic].setCons(p);
         }
 
-        integrals.resize(cN, Cons(compCount));
+        integrals.resize(cN, HeatDgFields(compCount));
         integrals.shrink_to_fit();
 
         flux = new FluxHllc(); ///< @todo @todo
@@ -65,7 +65,7 @@ namespace charm {
                     p2 = data[c2].getPrim();
                 }
 
-                Cons flx(compCount);
+                HeatDgFields flx(compCount);
 
                 flux->calc(p1, p2, flx, face.n);
                 flx *= face.area;
