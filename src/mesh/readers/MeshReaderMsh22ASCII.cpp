@@ -7,10 +7,6 @@
 #include <map>
 #include <set>
 
-//	UPDATE от 26.12.2022
-
-#include <iostream>
-
 namespace charm {
 
 
@@ -29,41 +25,18 @@ namespace charm {
             bndPatchMap[b->name] = b;
         }
 
-	//	UPDATE от 26.12.2022 - проверка, на каком моменте программа останавливается
-
-	std::cout<<"! Mesh 2.2"<<std::endl;
-
         while (1) {
             line = getlineUpper(fin);
 
             if (line == "") {
                 break;
             }
-
-		std::cout<<"!* Mesh 2.2"<<std::endl;
-
             if (line[0] == '$') {
-
-		
-		std::cout<<"!$ Mesh 2.2"<<std::endl;
-
                 if (line.find("$PHYSICALNAMES") != String::npos) {
-
-
-			std::cout<<"!*Phys Mesh 2.2"<<std::endl;
-
                     ss << getlineUpper(fin);
                     ss >> numPatches; //sscanf(line, "%d", &numPatches);
                     mesh->patches.resize(numPatches);
-
-			std::cout<<"!!*Phys Mesh 2.2"<<std::endl;
-
-
                     for (int i = 0; i < numPatches; i++) {
-
-			std::cout<<"!!!*Phys Mesh 2.2"<<std::endl;
-
-
                         ss << getlineUpper(fin);
                         Patch patch;
                         ss >> patch.dim >> patch.id >> patch.name;
@@ -71,14 +44,7 @@ namespace charm {
                         patch.id--;
                         mesh->patches[patch.id] = patch;
                     }
-
-		
-
-
                 } else if (line.find("$NODES") != String::npos) {
-
-			std::cout<<"!*Nodes Mesh 2.2"<<std::endl;
-
                     ss << getlineUpper(fin);
                     ss >> numVert;
                     mesh->nodes.resize(numVert);
@@ -90,15 +56,7 @@ namespace charm {
                         ss >> node >> p.x >> p.y >> p.z;
                         mesh->nodes[node-1] = p;
                     }
-
-		
-
                 } else if (line.find("$ELEMENTS") != String::npos) {
-
-			
-		std::cout<<"!*Elems Mesh 2.2"<<std::endl;
-
-
                     Index cid = 0;
                     ss << getlineUpper(fin);
                     ss >> numCells;
@@ -108,6 +66,8 @@ namespace charm {
                         Int node, type;
                         ss << line;
                         ss >> node >> type;
+
+                        //  UPDATE ON 18.06.2023 - обработка кубических ячеек
                         if (type == 5) {
                             Cell cell;
                             Index tag1, tag2;
@@ -129,6 +89,8 @@ namespace charm {
                             cell.id = cid++;
                             mesh->cells.push_back(cell);
                         }
+
+                        //  UPDATE ON 18.06.2023 - обработка граней - четырёхугольников
                         else if (type == 3) {
                             Face face;
                             Index tag1, tag2;
@@ -149,18 +111,17 @@ namespace charm {
                             faceMap[fNodes] = face;
                         }
                     }
-
-
                 }
             }
         }
-
-	std::cout<<"!! Mesh 2.2"<<std::endl;
 
         mesh->patchesCount = fid;
 
         for (int ic = 0; ic < mesh->cells.size(); ic++) {
             Cell &cell = mesh->cells[ic];
+
+            //  UPDATE ON 18.06.2023 - заполнение доп.информации о кубических ячейках и их гранях
+            //  (номера узлов, номера граней и т.д.)
             if (cell.type == 5) {
                 for (int i = 0; i < 6; i++) {
                     std::set<Index> fNodes;
@@ -212,7 +173,7 @@ namespace charm {
 
         for (;;) {
             c = stream.get(); //c = fgetc (stream);
-            c = toupper(c);
+            c = toupper(c); //  UPDATE ON 18.06.2023 -  перевод символа в верхний регистр
             if (c == EOF && linep == line) {
                 delete[] linep;
                 return "";

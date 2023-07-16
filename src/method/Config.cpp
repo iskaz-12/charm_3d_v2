@@ -11,7 +11,7 @@
 #include "BoundaryCondition.h"
 #include "ConfigException.h"
 
-//	Исправление от 03.12.22
+//  UPDATE ON 12.07.2023 - include ConfigFemDgHeat.h
 #include "ConfigFemDgHeat.h"
 
 namespace charm {
@@ -62,7 +62,6 @@ namespace charm {
      * @return
      */
     Config *Config::create(const String &fileName = "task.xml") {
-
         YAML::Node node = YAML::LoadFile("task.yaml");
         String str = node["method"].as<std::string>();
 
@@ -74,13 +73,10 @@ namespace charm {
             config = new ConfigFvm(fileName);
         }
 
-	
-	//	Исправление от 03.12.22
-	//	Цель - написать свой разрывный метод Галёркина для решения задач теплопроводности
-	else if (model == "HEAT_FEM_DG") {
-		config = new ConfigFemDgHeat(fileName);
-	}
-
+        //  UPDATE ON 12.07.2023 - добавляю модель HEAT_FEM_DG
+        else if (model == "HEAT_FEM_DG") {
+            config = new ConfigFemDgHeat(fileName);
+        }
 
         else {
             throw ConfigException("Wrong model name.");
@@ -442,7 +438,11 @@ namespace charm {
 //            mat = new MaterialTable();
 //        }
         else {
-            std::cerr << ("Unknown flux type '%s'. Use: LF, GODUNOV.", str.c_str());
+
+            //  UPDATE ON 02.07.2023 - неверный комментарий!!!
+            //std::cerr << ("Unknown flux type '%s'. Use: LF, GODUNOV.", str.c_str());
+
+            std::cerr << ("Unknown material type '%s'. Use: IDEAL, MIX.", str.c_str());
             exit(1);
         }
         mat->id = node["id"].as<int>();

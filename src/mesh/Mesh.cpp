@@ -45,6 +45,8 @@ namespace charm{
     void Mesh::calcGeom() {
         std::set<Index> doneFaces;
         Real l  = 1, l2 = l / 2.;;
+
+        //  UPDATE ON 13.06.2023 - точки на гранях куба
         const Point fc[6] = {
                 {0, l2, l2},
                 {l, l2, l2},
@@ -59,6 +61,9 @@ namespace charm{
             c.center = unitCubeToReal(vertices, 0.5, 0.5, 0.5);
 
             Real sqrt3 = 1./sqrt(3.);
+
+            //  UPDATE ON 14.06.2023 - коэффициенты для кубического мастер-элемента
+            //  см. https://ru.wikipedia.org/wiki/Список_квадратурных_формул
             Point t[8] = {
                     {-sqrt3, -sqrt3, -sqrt3},
                     { sqrt3, -sqrt3, -sqrt3},
@@ -124,6 +129,9 @@ namespace charm{
                     }
 
                     Point  pt[3];
+
+                    //  UPDATE ON 18.06.2023 - коэффициенты для формулы Гаусса для треугольных (???) граней
+                    //  Скорее всего, одна четырёхугольная грань разбивается на 2 треугольных
                     Real	a = 2.0/3.0;
                     Real	b = 1.0/6.0;
 

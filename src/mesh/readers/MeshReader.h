@@ -12,7 +12,7 @@
 namespace charm {
     class MeshReader {
     public:
-        static MeshReader *create(Config *config);
+        static MeshReader *create(Config *config);  //  UPDATE ON 18.06.2023 - создание сетки по содержимому файла
 
         virtual Mesh* read() = 0;
 

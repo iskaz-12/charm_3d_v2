@@ -12,6 +12,7 @@ namespace charm {
 
     class Component {
     public:
+        //  UPDATE ON 24.06.2023 - CP - выражение для теплоемкости при постоянном давлении
         typedef enum {
             CP_CONST,
             CP_POLYNOM
@@ -29,7 +30,9 @@ namespace charm {
             ML_NV
         } MlType;
 
+        //  UPDATE ON 24.06.2023 - вычисление Cp
         Real calcCp(Real t);
+        //  UPDATE ON 24.06.2023 - вычисление производной Cp по времени (в случае, если Cp задаётся полиномом)
         Real calcCpDt(Real t);
 
         String      name;

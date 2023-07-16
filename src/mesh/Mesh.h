@@ -36,17 +36,18 @@ namespace charm {
 
         void calcGeom();
 
-        Points cellGetVertices(Cell &c);
+        Points cellGetVertices(Cell &c);    //  UPDATE ON 13.06.2023 - получение узлов (вершин???) ячейки
         Points cellGetVertices(Index ci);
-        Points cellGetFaceVertices(Cell &c, Index fi);
+        Points cellGetFaceVertices(Cell &c, Index fi);  //  UPDATE ON 18.06.2023 - получение вершин грани
         Points cellGetFaceVertices(Index ci, Index fi);
         //void decomp();
 
-        static void cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);
+        static void cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);   //  UPDATE ON 14.06.2023 - вычисление точек Гаусса в точке
+                                                                                            //  (vertices - вершины ячейки, ref_p - относительная точка (???))
         static void cellCalcGp(Cell &cell);
-        static Point unitCubeToReal(Array<Point> vertices, Real x, Real y, Real z);
+        static Point unitCubeToReal(Array<Point> vertices, Real x, Real y, Real z); //  UPDATE ON 13.06.2023 - переход от единичного куба к точке (???)
 
-        static FileType getfileTypeByStr(String str);
+        static FileType getfileTypeByStr(String str);   //  UPDATE ON 18.06.2023 - получение расширения файла с сеткой
 
         Points        nodes;     ///< Mesh nodes.
         Array<Cell>         cells;     ///< Mesh cells.

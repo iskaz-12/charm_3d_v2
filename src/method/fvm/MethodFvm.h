@@ -15,13 +15,17 @@ namespace charm {
     public:
         explicit MethodFvm(Config *conf, Mesh *mesh): Method(conf, mesh) {}
 
+        //  UPDATE ON 02.07.2023 - инициализация метода конечных объёмов
         void init() override;
+        //  UPDATE ON 02.07.2023 - основной шаг работы метода
         void run() override;
         void done() override;
 
+        //  UPDATE ON 02.07.2023 - вычисление шага по времени (берётся либо TAU из task.yaml, либо вычисленное по числу Куранта)
         Real calcDt();
 
         void save();
+        //  UPDATE ON 02.07.2023 - сохранение результатов расчётов в vtk-файл для визуализации
         void saveVtk();
 
         Array<Data> data;
@@ -29,6 +33,7 @@ namespace charm {
 
         Flux *flux;
 
+        //  UPDATE ON 02.07.2023 - обнуление интегралов
         void seroIntegrals();
     };
 

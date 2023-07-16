@@ -5,10 +5,6 @@
 
 #include "BoundaryCondition.h"
 
-// UPDATE от 27.12.2022
-
-#include <iostream>
-
 namespace charm {
 
     const std::map<String, BoundaryCondition::Type> BoundaryCondition::TypeNames ={
@@ -27,7 +23,6 @@ namespace charm {
 
     BoundaryCondition::Type BoundaryCondition::getTypeByName(const String &name) {
         auto it = TypeNames.find(name);
-
         if (it != TypeNames.end()) {
             return it->second;
         }
@@ -47,11 +42,6 @@ namespace charm {
 
 
     void BoundaryConditionSymmetry::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
-	//	UPDATE от 27.12.2022
-
-	//std::cout<<"BCS From DoundaryCondition.cpp"<<std::endl;
-
         Vector v = parIn.v;
 
         parOut = parIn;
@@ -60,9 +50,19 @@ namespace charm {
         Vector vv = n;
         vv *= svn;
         v -= vv;
+
+        //  UPDATE ON 01.07.2023 - должна ли здесь вычитаться скорость дважды?
         v -= vv;
         parOut.v = v;
     }
+
+
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionSymmetry::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        parOut = parIn;
+    }
+
 
 
     BoundaryConditionWallSlip::BoundaryConditionWallSlip(String _name):
@@ -70,11 +70,6 @@ namespace charm {
 
 
     void BoundaryConditionWallSlip::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
-	//	UPDATE от 27.12.2022
-
-	//std::cout<<"BCWS From DoundaryCondition.cpp"<<std::endl;	
-
         Vector v = parIn.v;
 
         parOut = parIn;
@@ -83,10 +78,18 @@ namespace charm {
         Vector vv = n;
         vv *= svn;
         v -= vv;
+
+        //  UPDATE ON 01.07.2023 - должна ли здесь вычитаться скорость дважды?
         v -= vv;
         parOut.v = v;
     }
 
+
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionWallSlip::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        parOut = parIn;
+    }
 
 
 
@@ -95,14 +98,15 @@ namespace charm {
 
 
     void BoundaryConditionOutlet::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
-	//	UPDATE от 27.12.2022
-
-	//std::cout<<"BCO From DoundaryCondition.cpp"<<std::endl;
-
         parOut = parIn;
     }
 
+
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionOutlet::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        parOut = parIn;
+    }
 
 
 
@@ -116,22 +120,9 @@ namespace charm {
 
 
     void BoundaryConditionInlet::calc(Prim &parIn, Prim &parOut, Vector &n) {
-
-	//	UPDATE от 27.12.2022
-
-	//std::cout<<"BCI From DoundaryCondition.cpp"<<std::endl;
-
-	//	UPDATE от 08.01.2023 - пробуем вместо t явно указывать температуру 0!!!
-	//	ПОДХОДИТ ТОЛЬКО ДЛЯ ЭТОГО ТЕСТА
-
-	//std::cout<<"Boundary"<<std::endl;
-
         parOut = parIn;
         parOut.v = v;
-        //parOut.t = t;
-
-	parOut.t = 0;
-
+        parOut.t = t;
         parOut.p = p;
         parOut.matId = matId;
         parOut.c.assign(c.begin(), c.end());
@@ -140,10 +131,22 @@ namespace charm {
     }
 
 
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionInlet::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        parOut = parIn;
+    }
+
 
 
     void BoundaryConditionPressure::calc(charm::Prim &parIn, charm::Prim &parOut, charm::Vector &n) {
 
+    }
+
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionPressure::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        
     }
 
 
@@ -151,12 +154,22 @@ namespace charm {
 
     }
 
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionFreeStream::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        
+    }
+
 
     void BoundaryConditionMassFlow::calc(Prim &parIn, Prim &parOut, Vector &n) {
 
     }
 
-
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionMassFlow::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        
+    }
 
 
     BoundaryConditionWallNoSlip::BoundaryConditionWallNoSlip(String _name, Real _t):
@@ -166,6 +179,12 @@ namespace charm {
 
     void BoundaryConditionWallNoSlip::calc(Prim &parIn, Prim &parOut, Vector &n) {
 
+    }
+
+    //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
+    //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
+    void BoundaryConditionWallNoSlip::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        
     }
 
 

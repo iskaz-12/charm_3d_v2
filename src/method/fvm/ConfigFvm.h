@@ -14,6 +14,7 @@ namespace charm {
     public:
         ConfigFvm(const String &fileName) : Config(fileName) {}
 
+        //  UPDATE ON 02.07.2023 - считывание доп.информации о задаче из task.yaml
         virtual void read();
 
         virtual Method* createMethod();

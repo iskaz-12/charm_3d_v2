@@ -9,9 +9,9 @@
 namespace charm {
     class MeshReaderMsh22ASCII : public MeshReader {
     public:
-        MeshReaderMsh22ASCII(Config *config);
+        MeshReaderMsh22ASCII(Config *config);   //  UPDATE ON 18.06.2023 - конструктор сетки
 
-        virtual Mesh* read();
+        virtual Mesh* read();   //  UPDATE ON 18.06.2023 - генерация сетки по содержимому файла
 
     protected:
 
@@ -25,7 +25,7 @@ namespace charm {
          * Using this avoids a dependence on IEEE Std 1003.1-2008 (``POSIX.1'') for the
          * getline function.
          */
-        static String getlineUpper(std::fstream &stream);
+        static String getlineUpper(std::fstream &stream);   //  UPDATE ON 18.06.2023 - считывание строки и её перевод в верхний регистр
 
     };
 

@@ -15,9 +15,6 @@
 #include "Reaction.h"
 #include "BoundaryCondition.h"
 
-//	UPDATE от 26.12.2022
-#include <iostream>
-
 namespace charm {
     class Method;
 
@@ -25,6 +22,8 @@ namespace charm {
     public:
 
         Config(const String &fileName);
+
+        //  UPDATE ON 01.07.2023 - считывание условий задачи из yaml-файла
         virtual void read();
 
         static Config* get();
@@ -34,6 +33,7 @@ namespace charm {
          * @param fileName
          * @return
          */
+         // UPDATE ON 01.07.2023 - создание файла конфигурации
         static Config* create(const String &fileName);
 
         /**
@@ -64,12 +64,6 @@ namespace charm {
 
 
         inline static Region*    getRegion(Index i)    {
-
-		//	UPDATE от 26.12.2022 - вывод дополнительной информации
-
-		std::cout<<"Reg count from Config.h: "<<getRegCount()<<std::endl;
-
-
             if (i >= getRegCount()) {
                 throw Exception("Wrong region index...");
             }
@@ -92,6 +86,8 @@ namespace charm {
         }
 
     protected:
+
+        //  UPDATE ON 02.07.2023 - считывание информации о границах, материалах, веществах, регионах, сетке и реакциях
         void readBoundaries(const YAML::Node &node);
         void readMaterials(const YAML::Node &node);
         void readComponents(const YAML::Node &node);
@@ -99,6 +95,7 @@ namespace charm {
         void readMeshInfo(const YAML::Node &node);
         void readReactions(const YAML::Node &node); //@todo
 
+        //  UPDATE ON 02.07.2023 - получение параметров границ, регионов, материалов, веществ и реакций из task.yaml
         BoundaryCondition*    fetchBoundary(const YAML::Node &node);
         Region*     fetchRegion(const YAML::Node &node);
         Material*   fetchMaterial(const YAML::Node &node);

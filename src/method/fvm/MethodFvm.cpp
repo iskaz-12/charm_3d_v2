@@ -171,6 +171,8 @@ namespace charm {
 
         fout.open(fileName, std::ios_base::out);
         fout << "# vtk DataFile Version 3.0" << std::endl;
+
+        //  UPDATE ON 02.07.2023 - скорее всего, ошибочное название метода в результативном vtk-файле...
         fout << "3D RKDG method results for task '%s'." << std::endl;
         fout << "ASCII" << std::endl;
         fout << "DATASET UNSTRUCTURED_GRID" << std::endl;
@@ -234,7 +236,9 @@ namespace charm {
         for (int i = 0; i < cellsCount; i++)
         {
             Prim prim = data[i].getPrim();
-            fout << prim.r << " ";
+            //  UPDATE ON 02.07.2023 - вместо температуры выводится плотность!!!
+            //fout << prim.r << " ";
+            fout << prim.t << " ";
             if (i % 8 == 0  ||  i == cellsCount) {
                 fout << std::endl;
             }
@@ -291,13 +295,14 @@ namespace charm {
         for (int i = 0; i < cellsCount; i++)
         {
             Prim prim = data[i].getPrim();
+            //  UPDATE ON 02.07.2023 - вычисляется ли вообще температура в этом методе???
             fout << prim.t + 0.5 * prim.v2() / prim.cp << " ";
             if (i % 8 == 0  ||  i == cellsCount) {
                 fout << std::endl;
             }
         }
 
-        // Полная температура
+        // Полный объём
         fout << std::endl << "SCALARS Volume double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
         for (int i = 0; i < cellsCount; i++)
         {
@@ -307,7 +312,7 @@ namespace charm {
             }
         }
 
-        // Полная температура
+        // Идентификаторы ячеек
         fout << std::endl << "SCALARS CellId double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
         for (int i = 0; i < cellsCount; i++)
         {

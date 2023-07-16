@@ -28,12 +28,6 @@ namespace charm {
         Index         matId;
         ArrayReal     c;             ///< concentrations
 
-	//	UPDATE от 26.12.2022 - добавление переменных для теплового потока
-
-	Real qx;
-	Real qy;
-	Real qz;	
-
 
         Prim() = delete;
 
@@ -51,10 +45,12 @@ namespace charm {
         /**
          * 
          */
+         // UPDATE ON 19.06.2023 - сокращение памяти под массив концентраций
         inline void shrink() { c.shrink_to_fit(); }
 
         Prim& operator = (const Prim &p);
 
+        //  UPDATE ON 24.06.2023 - получение уравнения состояния
         void eos(Material::EosFlag flag);
     };
 
@@ -73,10 +69,12 @@ namespace charm {
 
         Cons(const Cons& cons) { *this = cons; }
 
+        // UPDATE ON 22.06.2023 - сокращение памяти под массив концентраций (для случая консервативных переменных)
         inline void shrink() { rc.shrink_to_fit(); }
 
         Cons& operator = (const Cons& cons);
 
+        //  UPDATE ON 24.06.2023 - нормализация консервативных переменных (малые значения (меньше eps) приравниваются к 0)
         void normalize();
 
     };
@@ -88,9 +86,13 @@ namespace charm {
 
         explicit Data(Index compCount): c(compCount) {}
         
+        //  UPDATE ON 24.06.2023 - получение примитивных переменных по консервативным
         void getPrim(Prim &p);
         Prim getPrim();
+
+        //  UPDATE ON 24.06.2023 - возвращение консервативных переменных
         Cons& getCons();
+        //  UPDATE ON 24.06.2023 - получение консервативных переменных по примитивным
         void setCons(const Prim &p);
     };
 

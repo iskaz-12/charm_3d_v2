@@ -12,6 +12,8 @@ namespace charm {
         v           = prim.v;
         e           = prim.e;
         eTot        = prim.eTot;
+
+        //  UPDATE ON 22.06.2023 - почему давление передается через указатель???
         this->p     = prim.p;
         t           = prim.t;
         cz          = prim.cz;
@@ -21,11 +23,6 @@ namespace charm {
         m           = prim.m;
         matId       = prim.matId;
         c.assign(prim.c.begin(), prim.c.end());
-
-	//	UPDATE от 25.12.2022 - добавление qx, qy и qz в Prim
-	qx = prim.qx;
-	qy = prim.qy;
-	qz = prim.qz;
 
         return *this;
     }
@@ -73,31 +70,9 @@ namespace charm {
         p.v.y      = c.rv/p.r;
         p.v.z      = c.rw/p.r;
         p.eTot     = c.re/p.r;
-
         p.e        = p.eTot-0.5*p.v2();
-
-
-	//	UPDATE от 08.01.2023
-	
-	//std::cout<<c.rc[0]<<std::endl;
-
         if (p.e < EPS) {
-
-		/*
-		for (Index i = 0; i < cCount; i++) {
-			std::cout<<c.rc[i]<<std::endl;
-		}
-
-		std::cout<<p.r<<std::endl;
-
-		std::cout<<c.re<<std::endl;
-
-		std::cout<<p.eTot<<std::endl;
-
-		std::cout<<p.e<<std::endl;
-		*/
-	
-            //throw MethodException("p.e < EPS");
+            throw MethodException("p.e < EPS");
         }
 
         p.c.resize(cCount);
@@ -106,11 +81,7 @@ namespace charm {
             if (p.c[i] < 0.) p.c[i] = 0.; // @todo
             if (p.c[i] > 1.) p.c[i] = 1.;
         }
-
-	//	UPDATE от 08.01.2023
-
         p.eos(Material::EOS_R_E_TO_P_CZ_T);
-
         p.shrink();
         return p;
     }
@@ -139,7 +110,7 @@ namespace charm {
      */
     void Data::setCons(const Prim &p) {
         Index count = p.c.size();
-        size_t i;
+        size_t i;   //  UPDATE ON 24.06.2023 - size_t - беззнаковый целочисленный тип данных (может хранить теоретически максимально возможное значение любого типа данных)
         c.matId = p.matId;
         c.ru = p.r * p.v.x;
         c.rv = p.r * p.v.y;

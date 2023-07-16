@@ -44,6 +44,7 @@ namespace charm{
             ff[2][i] = prim[i]->r*vn[i]*prim[i]->v.z+prim[i]->p*n[2];
             ff[3][i] = (prim[i]->r*prim[i]->eTot+prim[i]->p)*vn[i];
 
+            //  UPDATE ON 02.07.2023 - видимо, дополнительные уравнения в случае многокомпонентных смесей...
             for (Index j = 4; j < fCount; j++) {
                 uu[j][i] = prim[i]->r*prim[i]->c[j-4];
                 ff[j][i] = prim[i]->r*vn[i]*prim[i]->c[j-4];

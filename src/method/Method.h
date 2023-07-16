@@ -20,6 +20,7 @@ namespace charm{
         virtual void run() = 0;
         virtual void done() = 0;
 
+        //  UPDATE ON 02.07.2023 - создание экземпляра метода для решения задачи
         static Method* create(Config *conf, Mesh *mesh);
     };
 

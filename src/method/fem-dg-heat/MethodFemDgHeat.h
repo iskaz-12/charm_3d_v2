@@ -8,6 +8,7 @@
 
 #include <Flux.h>
 #include "Method.h"
+#include "DataDgHeat.h"
 
 //	UPDATE от 07.01.2022 - пытаюсь переделать код как в MethodFvm.h
 
@@ -46,6 +47,9 @@ namespace charm {
 		void run() override;
 		void done() override;
 
+		//	UPDATE ON 12.07.2023 - дополнительно определяю BASE_FUNC_COUNT в этом классе
+		Int BASE_FUNC_COUNT = 4;
+
 		//	UPDATE от 27.12.2022
 
 		/*
@@ -55,21 +59,20 @@ namespace charm {
 
 		
 		void save();
+        //  UPDATE ON 08.07.2023 - функция saveVtk все-таки нужна...
 		void saveVtk();
 		
 
 		Real calcDt();
 
 		//	Пока не уверена, что нужны переменные data, integrals и flux...
-		Array<Data> data;
-		//Array<Cons> integrals;
+		Array<DataDgHeat> data;
+		Array<HeatDgFields> integrals;
 
-		//	UPDATE от 25.12.2022 - пытаюсь разрешить коллизию между определениями функции потока flux!!!
 
-		//Flux* flux;
-
+		//	UPDATE ON 12.07.2023 - убираю область видимости protected, чтобы попробовать исправить ошибки...
 	
-	protected:
+	//protected:
 		
 		//	Вот эта часть целиком взята из nummeth2019
 
@@ -83,35 +86,40 @@ namespace charm {
 		double getQy(int iCell, Point pt);
 		double getQz(int iCell, Point pt);
 
-		double getF(int i, int iCell, Point pt);
+		//	UPDATE ON 08.07.2023 - эти 4 функции есть в DataDgHeat, убираю их из MethodFemDgHeat
+		//	UPDATE ON 12.07.2023 - переношу 4 функции ниже в том виде, в котором они определены в DataDgHeat
 
-		double getDfDx(int i, int iCell, Point pt);
-		double getDfDy(int i, int iCell, Point pt);
-		double getDfDz(int i, int iCell, Point pt);
+		Real getF(int i, Int iCell, Point pt);
+        Real getDfDx(int i, Int iCell, Point pt);
+        Real getDfDy(int i, Int iCell, Point pt);
+        Real getDfDz(int i, Int iCell, Point pt);
+
+        // double getF(int i, int iCell, Point pt);
+
+        // double getDfDx(int i, int iCell, Point pt);
+        // double getDfDy(int i, int iCell, Point pt);
+        // double getDfDz(int i, int iCell, Point pt);
 
 		void calcGradients();
-    		void calcDiffusionVol();
-    		void calcDiffusionSurf();
-    		void calcNewValues();
+        void calcDiffusionVol();
+        void calcDiffusionSurf();
+        void calcNewValues();
 
 		//void bnd(Face *f, Point pt, Prim p1, Prim &p2);
-		void convertToParam(int i, Point pt, Prim& p);
-		void flux(Prim pl, Prim pr, Vector n, double &fT, double &fqx, double &fqy, double &fqz);
+		//	UPDATE ON 13.07.2023 - в определении функции convertToParam меняю Prim на PrimHeat
+		//	void convertToParam(int i, Point pt, Prim& p);
+		void convertToParam(int i, Point pt, PrimHeat& p);
+
+		//	UPDATE ON 13.07.2023 - в определении функции flux меняю Prim на PrimHeat, Vector - на Point
+		//	void flux(Prim pl, Prim pr, Vector n, double &fT, double &fqx, double &fqy, double &fqz);
+		void flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz);
 		
 		//void saveVTK(int step);
 
 		//	Возможно, double можно заменить на Real
 
-		double **T;
-		double **qx;
-		double **qy;
-		double **qz;
 
-		double **intT;
-		double **intQx;
-		double **intQy;
-		double **intQz;
-
+		//	UPDATE ON 10.07.2023 - нужны ли матрицы A и invA???
 		double ***A;
 		double ***invA;
 
@@ -126,10 +134,18 @@ namespace charm {
 		//	TAU и TMAX точно задавались в task.yaml
 		//double TMAX;
 		//double TAU;
-		int BASE_FUNC_COUNT;
-		int GP_CELL_COUNT;
-		int GP_EDGE_COUNT;
 		double C11;
+
+		//	UPDATE ON 12.07.2023 - добавляю массивы для сохранения температуры и тепловых потоков по аналогии с nummeth2019
+		double **T;
+    	double **qx;
+    	double **qy;
+		double **qz;
+
+    	double **intT;
+    	double **intQx;
+    	double **intQy;
+		double **intQz;
 	
 	};
 	

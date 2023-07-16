@@ -11,6 +11,9 @@
 #include "Point.h"
 #include "Data.h"
 
+//  UPDATE ON 13.07.2023 - include DataDgHeat.h
+#include "DataDgHeat.h"
+
 namespace charm {
 
 
@@ -28,6 +31,7 @@ namespace charm {
             UNKNOWN
         } Type;
 
+        //  UPDATE ON 24.06.2023 - создание словаря вида: название граничного условия в yaml-файле - название переменной
         static const std::map<String, Type> TypeNames;
 
         String  name;
@@ -35,9 +39,13 @@ namespace charm {
 
         BoundaryCondition(String name, Type type);
 
+        //  UPDATE ON 01.07.2023 - получение типа граничного условия по имени
         static BoundaryCondition::Type getTypeByName(const String &name);
 
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n) = 0;
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) = 0;
     };
 
     typedef BoundaryCondition BC;
@@ -54,6 +62,9 @@ namespace charm {
 
         BoundaryConditionInlet(String name, Vector v, Real t, Real p, ArrayReal c, Index matId);
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
@@ -61,6 +72,9 @@ namespace charm {
     public:
         explicit BoundaryConditionOutlet(String name);
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
@@ -68,6 +82,9 @@ namespace charm {
     public:
         explicit BoundaryConditionWallSlip(String name);
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+        
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
@@ -76,12 +93,18 @@ namespace charm {
         Real t;
         BoundaryConditionWallNoSlip(String name, Real t);
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
     class BoundaryConditionMassFlow : public BoundaryCondition {
     public:
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
@@ -89,18 +112,27 @@ namespace charm {
     public:
         explicit BoundaryConditionSymmetry(String name);
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
     class BoundaryConditionFreeStream : public BoundaryCondition {
     public:
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 
     class BoundaryConditionPressure : public BoundaryCondition {
     public:
         virtual void calc(Prim &parIn, Prim &parOut, Vector &n);
+
+        //  UPDATE ON 13.07.2023 - добавляю дополнительную функцию calcHeat для обработки границ в случае задач теплопроводности
+        virtual void calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n);
     };
 
 }

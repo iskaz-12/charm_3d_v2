@@ -34,7 +34,7 @@ namespace charm {
             center          = c.center;
             gp.assign(c.gp.begin(), c.gp.end());
             gw.assign(c.gw.begin(), c.gw.end());
-            dh              = c.dh;
+            dh              = c.dh;     //  UPDATE ON 18.06.2023 - размеры ячейки
             flag            = c.flag;
             return *this;
         }

@@ -25,9 +25,9 @@ namespace charm {
 
         Int     id;
         String  name;
-        virtual void eos(Prim &p, EosFlag flag) = 0;
-        static void eosSwitch(Prim &p, EosFlag flag);
-        static void calcT(Prim &p);
+        virtual void eos(Prim &p, EosFlag flag) = 0;    //  UPDATE ON 19.06.2023 - определение недостающих параметров с использованием уравнения состояния
+        static void eosSwitch(Prim &p, EosFlag flag);   //  UPDATE ON 19.06.2023 - переключение флага, определяющего вид уравнений состояния
+        static void calcT(Prim &p); //  UPDATE ON 19.06.2023 - вычисление температуры (методом Ньютона (???))
     };
 
 

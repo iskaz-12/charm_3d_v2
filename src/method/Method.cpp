@@ -7,7 +7,7 @@
 #include <iostream>
 #include "Method.h"
 
-//	Исправление от 03.12.22
+//  UPDATE ON 12.07.2023 - include MethodFemDgHeat.h
 #include <MethodFemDgHeat.h>
 
 namespace charm {
@@ -18,12 +18,10 @@ namespace charm {
             return new MethodFvm(conf, mesh);
         }
 
-	//	Исправление от 03.12.22
-	//	Цель - написать свой разрывный метод Галёркина для решения задач теплопроводности
-	
-	else if (conf->methodName == "CHARM_FEM_DG_HEAT") {
-		return new MethodFemDgHeat(conf, mesh);
-	}
+        //  UPDATE ON 12.07.2023 - добавляем MethodFemDgHeat
+        else if (conf->methodName == "HEAT_FEM_DG") {
+            return new MethodFemDgHeat(conf, mesh);
+        }
 
         else {
             std::cerr << "Wrong method!!!\n";

@@ -32,6 +32,7 @@ set(CHARM_INCLUDE
         "${CMAKE_SOURCE_DIR}/src/mesh/readers"
         "${CMAKE_SOURCE_DIR}/src/method"
         "${CMAKE_SOURCE_DIR}/src/method/fvm"
+        "${CMAKE_SOURCE_DIR}/src/method/fem-dg-heat"
         )
 
 include_directories(${CHARM_INCLUDE})
@@ -54,6 +55,47 @@ add_executable( charm_3d_v2
         src/mesh/readers/MeshReader.h
         src/mesh/readers/MeshReaderMsh22ASCII.cpp
         src/mesh/readers/MeshReaderMsh22ASCII.h
-        src/method/Config.cpp src/method/Config.h src/method/Material.cpp src/method/Material.h src/method/Region.cpp src/method/Region.h src/method/Component.cpp src/method/Component.h src/method/Method.cpp src/method/Method.h src/method/fvm/MethodFvm.cpp src/method/fvm/MethodFvm.h src/method/fvm/ConfigFvm.cpp src/method/fvm/ConfigFvm.h src/method/Reaction.cpp src/method/Reaction.h src/method/BoundaryCondition.cpp src/method/BoundaryCondition.h src/method/MethodException.cpp src/method/MethodException.h src/method/fvm/MethodFvmException.cpp src/method/fvm/MethodFvmException.h src/method/ConfigException.cpp src/method/ConfigException.h src/method/Data.cpp src/method/Data.h src/method/Flux.cpp src/method/Flux.h src/method/FluxHllc.cpp src/method/FluxHllc.h src/method/FluxLf.cpp src/method/FluxLf.h src/method/EosException.cpp src/method/EosException.h)
+        src/method/Config.cpp
+        src/method/Config.h
+        src/method/Material.cpp
+        src/method/Material.h
+        src/method/Region.cpp
+        src/method/Region.h
+        src/method/Component.cpp
+        src/method/Component.h
+        src/method/Method.cpp
+        src/method/Method.h
+        src/method/fvm/MethodFvm.cpp
+        src/method/fvm/MethodFvm.h
+        src/method/fvm/ConfigFvm.cpp
+        src/method/fvm/ConfigFvm.h
+        src/method/Reaction.cpp
+        src/method/Reaction.h
+        src/method/BoundaryCondition.cpp
+        src/method/BoundaryCondition.h
+        src/method/MethodException.cpp
+        src/method/MethodException.h
+        src/method/fvm/MethodFvmException.cpp
+        src/method/fvm/MethodFvmException.h
+        src/method/ConfigException.cpp
+        src/method/ConfigException.h
+        src/method/Data.cpp
+        src/method/Data.h
+        src/method/Flux.cpp
+        src/method/Flux.h
+        src/method/FluxHllc.cpp
+        src/method/FluxHllc.h
+        src/method/FluxLf.cpp
+        src/method/FluxLf.h
+        src/method/EosException.cpp
+        src/method/EosException.h
+        src/method/fem-dg-heat/ConfigFemDgHeat.cpp
+        src/method/fem-dg-heat/ConfigFemDgHeat.h
+        src/method/fem-dg-heat/MethodFemDgHeatException.cpp
+        src/method/fem-dg-heat/MethodFemDgHeatException.h
+        src/method/fem-dg-heat/DataDgHeat.cpp
+        src/method/fem-dg-heat/DataDgHeat.h
+        src/method/fem-dg-heat/MethodFemDgHeat.cpp
+        src/method/fem-dg-heat/MethodFemDgHeat.h)
 
 target_link_libraries(charm_3d_v2 yaml-cpp)
