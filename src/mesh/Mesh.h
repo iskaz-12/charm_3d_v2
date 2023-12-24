@@ -44,6 +44,10 @@ namespace charm {
 
         static void cellCalcGpAtPoint(Points vertices, Point ref_p, Point &gp, Real &gj);   //  UPDATE ON 14.06.2023 - вычисление точек Гаусса в точке
                                                                                             //  (vertices - вершины ячейки, ref_p - относительная точка (???))
+
+        //  ---23.12.2023---
+        static void faceCalcGpAtPoint(Points vertices, Int face, Int i_gp, Point ref_p, Point &gp, Real &gj);
+
         static void cellCalcGp(Cell &cell);
         static Point unitCubeToReal(Array<Point> vertices, Real x, Real y, Real z); //  UPDATE ON 13.06.2023 - переход от единичного куба к точке (???)
 

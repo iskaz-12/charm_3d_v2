@@ -458,12 +458,19 @@ namespace charm {
             //  UPDATE ON 10.07.2023 - пробую заполнять массивы температуры и тепловых потоков без использования явных многомерных массивов
             //  UPDATE ON 13.07.2023 - пробую убрать круглые скобки при создании экземпляра класса PrimHeat
             //  PrimHeat p();
-            PrimHeat p;
+
+            // ---09.12.2023---
+            // Пробую сделать всё по аналогии с nummeth2019
+           /*  PrimHeat p;
             p.t = reg->t;
             //  UPDATE ON 10.07.2023 - принимаем, что в начальный момент времени тепловые потоки равны 0
             p.qx = 0.0;
             p.qy = 0.0;
-            p.qz = 0.0;
+            p.qz = 0.0; */
+
+            // ---10.12.2023---
+            PrimHeat p;
+            p.t     = reg->t;
 
             //  UPDATE ON 13.07.2023 - пока убираю этот фрагмент
             //  Может быть, он имел ключевое значение при передаче данных...
@@ -487,8 +494,25 @@ namespace charm {
             //  UPDATE ON 13.07.2023 - тест с нулевой температурой успешно пройден, приступаем к следующему
             //  Нулевая температура на границе и произведение синусов как начальное условие
             //  T[ic][0] = 0.0;
-            T[ic][0] = sin(M_PI * cell.center.x) * sin(M_PI * cell.center.y) * sin(M_PI * cell.center.z);
 
+            // ---10.12.2023---
+            // Такой вариант, вроде бы, сработал!!!
+            // Пробуем инициализацию из файла!!!
+            // T[ic][0] = sin(M_PI * cell.center.x) * sin(M_PI * cell.center.y) * sin(M_PI * cell.center.z);
+
+            //  ---23.12.2023---
+            // Тест: на границах - 100, внутри - 0
+            // Не особо похоже на правду...
+
+            // T[ic][0] = p.t;
+
+            //  --23.12.2023---
+            // Тест - на границах - 0, внутри - 1 (результат не очень)
+            // Новый тест: на границах - 1, внутри - 1
+            // T[ic][0] = 1.;
+
+
+            //  Внимательно проверить соответствие cellJ из nummeth2019!!!
 
 
             //  std::cout << cell.center.x << std::endl;
@@ -602,22 +626,27 @@ namespace charm {
 
     //	Переделала формулы под обозначения gw и gp в charm_3d_v2
     void MethodFemDgHeat::calcMassMatrix() {
-        for (int i = 0; i < mesh->cells.size(); i++) {
-            double **mA = A[i];
+
+        //  ---10.12.2023---
+        // Есть сомнения в том, что перепутаны индексы и i - разные
+        //  для внешнего и внутреннего цикла!!!
+
+        for (int ind = 0; ind < mesh->cells.size(); ind++) {
+            double **mA = A[ind];
 
             //  UPDATE ON 14.07.2023 - проверяем, какое значение принимает mA
             //  std::cout << i << ": " << **mA << std::endl;
 
-            double **invA_ = invA[i];
+            double **invA_ = invA[ind];
             for (int i = 0; i < BASE_FUNC_COUNT; i++) {
                 for (int j = 0; j < BASE_FUNC_COUNT; j++) {
                     mA[i][j] = 0.0;
                     //  UPDATE ON 10.07.2023 - меняем GP_CELL_COUNT на длину gp, вычисленного в классе Mesh
                     //  for (int iGP = 0; iGP < GP_CELL_COUNT; iGP++) {
-                    for (int iGP = 0; iGP < mesh->cells[i].gp.size(); iGP++) {
+                    for (int iGP = 0; iGP < mesh->cells[ind].gp.size(); iGP++) {
                         //mA[i][j] += cellGW[i][iGP] * getF(i, i, cellGP[ic][iGP]) * getF(j, i, cellGP[ic][iGP]);
-                        mA[i][j] += mesh->cells[i].gw[iGP] * getF(i, i, mesh->cells[i].gp[iGP]) *
-                                    getF(j, i, mesh->cells[i].gp[iGP]);
+                        mA[i][j] += mesh->cells[ind].gw[iGP] * getF(i, ind, mesh->cells[ind].gp[iGP]) *
+                                    getF(j, ind, mesh->cells[ind].gp[iGP]);
                     }
                     //mA[i][j] *= cellJ[i];
 
@@ -628,7 +657,12 @@ namespace charm {
                     //  std::cout << i << ": " << (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8. << std::endl;
 
                     //  mA[i][j] *= (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8.;
-                    mA[i][j] *= mesh->cells[i].volume / 8.;
+
+                    // ---10.12.2023---
+                    // Какой тут должен быть множитель???
+                    //  gw здесь - видимо, gj (или cellJ в nummeth2019)!!!
+
+                    // mA[i][j] *= mesh->cells[ind].volume / 8.;
 
                     //	UPDATE от 28.12.2022 - попытка отловить ошибку
 
@@ -645,11 +679,11 @@ namespace charm {
             //	Скорее всего, матрица invA_ составляется правильно...
 
             
-            for (int i = 0; i < BASE_FUNC_COUNT; i++) {
+            /* for (int i = 0; i < BASE_FUNC_COUNT; i++) {
                         for (int j = 0; j < BASE_FUNC_COUNT; j++) {
                     std::cout<<"invA_["<<i<<"]["<<j<<"] = "<<invA_[i][j]<<std::endl;
                 }
-            }
+            } */
             
 
         }
@@ -692,12 +726,16 @@ namespace charm {
 
                 //  UPDATE ON 16.07.2023 - меняю аналог cellJ
                 //  tmpIntQx *= (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8.;
-                tmpIntQx *= mesh->cells[i].volume / 8.;
+
+                // ---10.12.2023---
+                // Тут точно нужно делить на 8???
+
+                // tmpIntQx *= mesh->cells[i].volume / 8.;
 
                 //  tmpIntQy *= (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8.;
                 //  tmpIntQz *= (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8.;
-                tmpIntQy *= mesh->cells[i].volume / 8.;
-                tmpIntQz *= mesh->cells[i].volume / 8.;
+                // tmpIntQy *= mesh->cells[i].volume / 8.;
+                // tmpIntQz *= mesh->cells[i].volume / 8.;
 
                 //  std::cout << "From MethodFemDgHeat.cpp: calcGradients is continued cycle 2!" << std::endl;
 
@@ -814,7 +852,8 @@ namespace charm {
 
                         //  UPDATE ON 15.07.2023 - пробую занулять температуру на границах вручную...
                         
-                        p2.t = 0.;
+                        // ---10.12.2023---
+                        // p2.t = 0.;
                         //  p2.qx = 0.;
                         //  p2.qy = 0.;
                         //  p2.qz = 0.;
@@ -852,6 +891,17 @@ namespace charm {
                 }
 
 
+                //  ---23.12.2023---
+                tmpIntQx1 *= f.gj;
+                tmpIntQy1 *= f.gj;
+
+                tmpIntQz1 *= f.gj;
+
+                tmpIntQx2 *= f.gj;
+                tmpIntQy2 *= f.gj;
+                tmpIntQz2 *= f.gj;
+
+
                 //	правильно ли заменила edgeJ???
 
 
@@ -861,21 +911,41 @@ namespace charm {
                 //	UPDATE от 28.12.2022 - пробуем edgeJ ~ f.area/4.
                 //	БЫЛО: tmpIntQx1 *= f.area;
 
-                tmpIntQx1 *= f.area / 4.;
-                tmpIntQy1 *= f.area / 4.;
+                //  UPDATE ON 17.07.2023 - возможно, edgeJ ~ f.area (или f.area/2. или f.area*2.)
+                //  Лучше перепробовать все варианты по очереди...
+                //  При edgeJ ~ f.area слишком быстро изменяется температура в ячейках - скорее всего, неверный вариант!!!
+                //  ПРОВЕРИМ edgeJ ~ f.area / 8. (а вдруг...). ИТОГ - НЕ СРАБОТАЛО...
 
-                tmpIntQz1 *= f.area / 4.;
+                // ---10.12.2023---
+                // Тут точно нужно делить на 4???
 
-                tmpIntQx2 *= f.area / 4.;
-                tmpIntQy2 *= f.area / 4.;
+                // tmpIntQx1 *= f.area / 4.;
+                // tmpIntQy1 *= f.area / 4.;
 
-                tmpIntQz2 *= f.area / 4.;
+                // tmpIntQz1 *= f.area / 4.;
+
+                // tmpIntQx2 *= f.area / 4.;
+                // tmpIntQy2 *= f.area / 4.;
+
+                // tmpIntQz2 *= f.area / 4.;
+
+                //  tmpIntQx1 *= f.area / 8.;
+                //  tmpIntQy1 *= f.area / 8.;
+
+                //  tmpIntQz1 *= f.area / 8.;
+
+                //  tmpIntQx2 *= f.area / 8.;
+                //  tmpIntQy2 *= f.area / 8.;
+
+                //  tmpIntQz2 *= f.area / 8.;
 
 
                 intQx[c1][j] += tmpIntQx1;
                 intQy[c1][j] += tmpIntQy1;
 
                 intQz[c1][j] += tmpIntQz1;
+
+                // std::cout<<intQx[c1][j]<<std::endl;
 
                 if (!isBnd) {
                     intQx[c2][j] -= tmpIntQx2;
@@ -952,6 +1022,8 @@ namespace charm {
                 }
                 */
 
+                // std::cout<<qx[i][j]<<std::endl;
+
             }
         }
     }
@@ -975,7 +1047,13 @@ namespace charm {
 
                 //  UPDATE ON 16.07.2023 - меняю аналог cellJ
                 //  tmpIntT *= (mesh->cells[i].dh[0] * mesh->cells[i].dh[1] * mesh->cells[i].dh[2]) / 8.;
-                tmpIntT *= mesh->cells[i].volume / 8.;
+
+
+                //  ---10.12.2023---
+                //  Тут точно нужно делить на 8???
+                
+                //  ---24.12.2023---
+                //  tmpIntT *= mesh->cells[i].volume / 8.;
 
                 intT[i][j] -= tmpIntT;
 
@@ -985,6 +1063,12 @@ namespace charm {
                     std::cout<<"intT["<<i<<"]["<<j<<"] = "<<intT[i][j]<<std::endl;
                 }
                 */
+
+                //  --24.12.2023---
+                // Проверим значения в intT в методах calcDiffusionVol и calcDiffusionSurf (они должны зануляться, если температура внутри и на границах - одинаковая!!!)
+                /* if (i == 0 && j == 0) {
+                    std::cout<<"vol: intT[0][0] = "<<intT[i][j]<<std::endl;
+                } */
 
                 //  std::cout<<"intT["<<i<<"]["<<j<<"] = "<<intT[i][j]<<std::endl;
 
@@ -1031,7 +1115,7 @@ namespace charm {
                         f.bnd->calcHeat(p1, p2, f.n);
 
                         //  UPDATE ON 15.07.2023 - пробую занулять температуру на границах вручную...
-                        p2.t = 0.;
+                        //  p2.t = 0.;
                         //  p2.qx = 0.;
                         //  p2.qy = 0.;
                         //  p2.qz = 0.;
@@ -1056,18 +1140,42 @@ namespace charm {
                     }
                 }
 
+                //  ---24.12.2023---
+                tmpIntT1 *= f.gj;
+
+                tmpIntT2 *= f.gj;
+
+
                 //	UPDATE от 28.12.2022 - пробуем edgeJ ~ f.area/4.
                 //	БЫЛО: tmpIntT1 *= f.area;
 
-                tmpIntT1 *= f.area / 4.;
+                //  UPDATE ON 17.07.2023 - возможно, edgeJ ~ f.area (или f.area/2. или f.area*2.)
+                //  Лучше перепробовать все варианты по очереди...
+                //  При edgeJ ~ f.area слишком быстро изменяется температура в ячейках - скорее всего, неверный вариант!!!
+                //  ПРОВЕРИМ edgeJ ~ f.area / 8. (а вдруг...). ИТОГ - НЕ СРАБОТАЛО...
 
-                tmpIntT2 *= f.area / 4.;
+                // ---10.12.2023---
+                // Нужно ли делить area на 4???
+
+                // tmpIntT1 *= f.area / 4.;
+
+                // tmpIntT2 *= f.area / 4.;
+
+                //  tmpIntT1 *= f.area / 8.;
+
+                //  tmpIntT2 *= f.area / 8.;
 
                 intT[c1][j] += tmpIntT1;
 
                 if (!isBnd) {
                     intT[c2][j] -= tmpIntT2;
                 }
+
+                //  --24.12.2023---
+                // Проверим значения в intT в методах calcDiffusionVol и calcDiffusionSurf (они должны зануляться, если температура внутри и на границах - одинаковая!!!)
+                /* if (c1 == 0 && j == 0) {
+                    std::cout<<"surf: intT[0][0] = "<<intT[c1][j]<<std::endl;
+                } */
 
                 /*
                 if (intT[c1][j]!=0)
@@ -1127,15 +1235,22 @@ namespace charm {
 
             }
 
+            //  ---24.12.2023---
+            /* std::cout<<T[i][1]<<std::endl;
+            std::cout<<T[i][2]<<std::endl;
+            std::cout<<T[i][3]<<std::endl; */
 
-            Cell &cell = mesh->cells[i];
+
+            // Cell &cell = mesh->cells[i];
 
 
             //	UPDATE от 27.12.2022 - убираем обновление data
 
             //	UPDATE от 07.01.2023 - пробуем обновлять данные с помощью convertToParam()
 
-            convertToParam(i, cell.center, p);
+            //  ---10.12.2023---
+            // Пока уберём это!!!
+            // convertToParam(i, cell.center, p);
 
             //p.t = getT(i, mesh->cells[i].center);
 
@@ -1175,6 +1290,13 @@ namespace charm {
             //  memset(intQy, 0, sizeof intQy);
             //  memset(intQz, 0, sizeof intQz);
 
+            // ---10.12.2023---
+            Real dt = calcDt();
+
+
+            conf->t += conf->dt;
+            conf->timestep++;
+
             for (int i = 0; i < mesh->cells.size(); i++) {
                 for (int j = 0; j < BASE_FUNC_COUNT; j++) {
                     intT[i][j] = 0.;
@@ -1205,10 +1327,10 @@ namespace charm {
 
             calcNewValues();
 
-            Real dt = calcDt();
+            /* Real dt = calcDt();
 
             conf->t += conf->dt;
-            conf->timestep++;
+            conf->timestep++; */
 
             save();
 
@@ -1356,11 +1478,20 @@ namespace charm {
     //  UPDATE ON 12.07.2023 - меняю Vector на Point
     //  void MethodFemDgHeat::flux(Prim pl, Prim pr, Vector n, double &fT, double &fqx, double &fqy, double &fqz) {
     void MethodFemDgHeat::flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz) {
+
+        //  ---24.12.2023---
+        //fT = 0.5 * (pl.t - pr.t);
+
         fT = 0.5 * (pl.t + pr.t);
         fqx = 0.5 * (pl.qx + pr.qx) + C11 * (pr.t - pl.t) * n.x;
         fqy = 0.5 * (pl.qy + pr.qy) + C11 * (pr.t - pl.t) * n.y;
 
         fqz = 0.5 * (pl.qz + pr.qz) + C11 * (pr.t - pl.t) * n.z;
+
+        /* fqx = 0.5 * (pl.qx + pr.qx) - C11 * (pr.t - pl.t) * n.x;
+        fqy = 0.5 * (pl.qy + pr.qy) - C11 * (pr.t - pl.t) * n.y;
+
+        fqz = 0.5 * (pl.qz + pr.qz) - C11 * (pr.t - pl.t) * n.z; */
     }
 
     //	UPDATE от 26.12.2022 - переопределяю функции done, save, saveVtk!!!
@@ -1495,7 +1626,12 @@ namespace charm {
             //convertToParam(i, mesh->cells[i].center, p);
             //fout << p.t << " ";
 
+            //  ---24.12.2023---
+            // Пробую выводить только основную часть температуры...
+            // Результат такой же...
+
             fout << getT(i, mesh->cells[i].center) << " ";
+            //  fout << T[i][0] << " ";
 
             if (i % 8 == 0 || i == cellsCount) {
                 fout << std::endl;

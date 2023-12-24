@@ -38,6 +38,11 @@ namespace charm {
         Point               center;         // центр грани
         Points              gp;             //  UPDATE ON 13.06.2023 - точки Гаусса (для численного интегрирования)
         ArrayReal           gw;             //  UPDATE ON 13.06.2023 - веса, соответствующие точкам Гаусса
+
+        //  ---24.12.2023---
+        Real gj;
+
+
         Int                 type;           // тип грани (внутр., гранич.)
         BC                 *bnd = NULL;
 

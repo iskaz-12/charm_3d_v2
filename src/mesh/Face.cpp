@@ -35,6 +35,9 @@ namespace charm{
         gp.assign(face.gp.begin(), face.gp.end());
         gw.assign(face.gw.begin(), face.gw.end());
 
+        //  ---24.12.2023---
+        gj = face.gj;
+
         return *this;
     }
 

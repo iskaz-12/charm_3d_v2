@@ -134,7 +134,26 @@ namespace charm {
     //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
     //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
     void BoundaryConditionInlet::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+
+        // ---10.12.2023---
+        // Пусть пока тепловой поток = 0 (как в методе MethodHeatGalerkin::bnd в nummeth2019)
+        // То есть нулевое значение температуры на границе!!!
+        // parOut.t = 0.0;
+
+        // Задаём постоянный тепловой поток (например, 100)!!!
+        // Из файла данный метод не считывает!!!
+        // ---23.12.2023---
+        // Пусть тепловой поток равен 0
+        //  parOut.t = 100.0;
+        /* parOut.t = 1.1;
+
+        parOut.qx = parIn.qx;
+        parOut.qy = parIn.qy;
+        parOut.qz = parIn.qz; */
+
+        //  ---24.12.2023---
         parOut = parIn;
+        parOut.t = t;
     }
 
 
@@ -159,7 +178,6 @@ namespace charm {
     void BoundaryConditionFreeStream::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
         
     }
-
 
     void BoundaryConditionMassFlow::calc(Prim &parIn, Prim &parOut, Vector &n) {
 
