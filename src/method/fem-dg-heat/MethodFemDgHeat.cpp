@@ -850,6 +850,10 @@ namespace charm {
                         //  f.bnd->calc(p1, p2, f.n);
                         f.bnd->calcHeat(p1, p2, f.n);
 
+                        //  ---26.12.2023---
+                        /* std::cout << "cell: " << c1 << std::endl;
+                        std::cout << "f BC: " << f.bnd << std::endl; */
+
                         //  UPDATE ON 15.07.2023 - пробую занулять температуру на границах вручную...
                         
                         // ---10.12.2023---
@@ -1200,6 +1204,9 @@ namespace charm {
 
 
         Real dt = calcDt();
+
+        //  ---26.12.2023---
+        // std::cout<< dt <<std::endl;
 
 
         for (int i = 0; i < mesh->cells.size(); i++) {

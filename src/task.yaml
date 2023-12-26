@@ -12,9 +12,10 @@ control:
   MIN_LEVEL: 0
   MAX_LEVEL: 1
   CFL: 2.5e-5                    # число Куранта
-  TAU: 1.0e-9                # шаг по времени, используется меньшее значение из этого или из полученного из числа Куранта
-  TMAX: 0.02                 # время, до которго выполняется расчет
-  FILE_OUTPUT_STEP: 1000       # количество итераций, через которые выполняется вывод результатов в файл
+  # TAU: 1.0e-9                # шаг по времени, используется меньшее значение из этого или из полученного из числа Куранта
+  TAU: 1.0e-5
+  TMAX: 0.1                 # время, до которго выполняется расчет
+  FILE_OUTPUT_STEP: 50       # количество итераций, через которые выполняется вывод результатов в файл
   LOG_OUTPUT_STEP: 1         # интервал вывода краткой информации в лог-файл
   MODEL:
     name: HEAT_FEM_DG
@@ -110,56 +111,56 @@ boundaries:
       P: 101325.0
   -
     name: FRONT
-    type: BOUND_OUTLET
-    #type: BOUND_INLET
-    #material_id: 0
-    #components:
-    #  - {id: 0, concentration: 1}
-    #parameters:
-    #  V: {x: 0, y: 0, z: 0}
-    #  T: 100
-    #  P: 101325.0
+    # type: BOUND_OUTLET
+    type: BOUND_INLET
+    material_id: 0
+    components:
+      - {id: 0, concentration: 1}
+    parameters:
+      V: {x: 0, y: 0, z: 0}
+      T: 0
+      P: 101325.0
   -
     name: LEFT
-    type: BOUND_OUTLET
-    #type: BOUND_INLET
-    #material_id: 0
-    #components:
-    #  - {id: 0, concentration: 1}
-    #parameters:
-    #  V: {x: 0, y: 0, z: 0}
-    #  T: 100
-    #  P: 101325.0
+    # type: BOUND_OUTLET
+    type: BOUND_INLET
+    material_id: 0
+    components:
+      - {id: 0, concentration: 1}
+    parameters:
+      V: {x: 0, y: 0, z: 0}
+      T: 0
+      P: 101325.0
   -
     name: RIGHT
-    type: BOUND_OUTLET
-    #type: BOUND_INLET
-    #material_id: 0
-    #components:
-    #  - {id: 0, concentration: 1}
-    #parameters:
-    #  V: {x: 0, y: 0, z: 0}
-    #  T: 100
-    #  P: 101325.0
+    # type: BOUND_OUTLET
+    type: BOUND_INLET
+    material_id: 0
+    components:
+      - {id: 0, concentration: 1}
+    parameters:
+      V: {x: 0, y: 0, z: 0}
+      T: 0
+      P: 101325.0
   -
     name: TOP
-    type: BOUND_OUTLET
-    #type: BOUND_INLET
-    #material_id: 0
-    #components:
-    #  - {id: 0, concentration: 1}
-    #parameters:
-    #  V: {x: 0, y: 0, z: 0}
-    #  T: 100
-    #  P: 101325.0
+    # type: BOUND_OUTLET
+    type: BOUND_INLET
+    material_id: 0
+    components:
+      - {id: 0, concentration: 1}
+    parameters:
+      V: {x: 0, y: 0, z: 0}
+      T: 0
+      P: 101325.0
   -
     name: BOTTOM
-    type: BOUND_OUTLET
-    #type: BOUND_INLET
-    #material_id: 0
-    #components:
-    #  - {id: 0, concentration: 1}
-    #parameters:
-    #  V: {x: 0, y: 0, z: 0}
-    #  T: 100
-    #  P: 101325.0
+    # type: BOUND_OUTLET
+    type: BOUND_INLET
+    material_id: 0
+    components:
+      - {id: 0, concentration: 1}
+    parameters:
+      V: {x: 0, y: 0, z: 0}
+      T: 0
+      P: 101325.0
