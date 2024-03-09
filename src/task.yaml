@@ -35,6 +35,7 @@ control:
     t_ref: 298.15
 mesh:
   files_type: gmsh_msh
+  # name: test.msh       # имя файлов с данными сетки
   name: test.msh       # имя файлов с данными сетки
 components:
   -
@@ -107,6 +108,7 @@ boundaries:
       V: {x: 0, y: 0, z: 0}
 	# UPDATE ON 12.07.2023 - везде задаю нулевую температуру
       T: 1
+      # T: 0
       # T: 1.1
       P: 101325.0
   -

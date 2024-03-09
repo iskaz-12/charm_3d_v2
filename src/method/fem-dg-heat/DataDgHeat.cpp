@@ -9,12 +9,26 @@
 #include "MethodException.h"
 #include "ConfigFemDgHeat.h"
 
+//  ---08.03.2024---
+#include "MethodFemDgHeat.h"
+
+//  ---18.01.24---
+// Для избежания ошибок переполнения переделываю примитивные и консервативные переменные в РМГ по аналогии с fvm!!!
+
 namespace charm {
     PrimHeat& PrimHeat::operator = (const PrimHeat &flds) {
         t           = flds.t;
         qx          = flds.qx;
         qy          = flds.qy;
         qz          = flds.qz;
+
+        //  ---07.02.2024---
+        /* t.assign(flds.t.begin(), flds.t.end());
+        qx.assign(flds.qx.begin(), flds.qx.end());
+        qy.assign(flds.qy.begin(), flds.qy.end());
+        qz.assign(flds.qz.begin(), flds.qz.end()); */
+
+
         return *this;
     }
 
@@ -50,15 +64,34 @@ namespace charm {
     }
 
 
+    //  ---08.03.2024---
+    HeatDgFields& HeatDgFields::operator = (const HeatDgFields &flds) {
+
+        t.assign(flds.t.begin(), flds.t.end());
+        qx.assign(flds.qx.begin(), flds.qx.end());
+        qy.assign(flds.qy.begin(), flds.qy.end());
+        qz.assign(flds.qz.begin(), flds.qz.end());
+
+        intT.assign(flds.intT.begin(), flds.intT.end());
+        intQx.assign(flds.intQx.begin(), flds.intQx.end());
+        intQy.assign(flds.intQy.begin(), flds.intQy.end());
+        intQz.assign(flds.intQz.begin(), flds.intQz.end());
+
+
+        return *this;
+    }
+
 
     /**
      *
      * @param p
      */
     //  UPDATE ON 13.07.2023 - пока убираю функцию getVar
-    //  void DataDgHeat::getVar(PrimHeat &p) {
-    //      p = getVar();
-    //  }
+    //  ---18.01.24---
+    //  Возвращаю функцию обратно
+    void DataDgHeat::getVar(PrimHeat &p) {
+        p = getVar();
+    }
 
 
     /**
@@ -67,10 +100,38 @@ namespace charm {
      */
     //  UPDATE ON 12.07.2023 - что-то не так с синтаксисом данного класса...
     //  UPDATE ON 12.07.2023 - пока закомментирую данный класс...
+    //  ---18.01.24---
+    //  ИСПРАВИТЬ ДАННЫЙ КЛАСС!!!
     //  PrimHeat& DataDgHeat::getVar() {
-    //  PrimHeat DataDgHeat::getVar() {
-    //      return flds;
-    //  }
+    PrimHeat DataDgHeat::getVar() {
+
+        //  ---08.03.2024---
+        Index baseFuncCount = 4;
+
+        PrimHeat p(1);
+        
+        p.t = 0.;
+        p.qx = 0.;
+        p.qy = 0.;
+        p.qz = 0.;
+
+        //  ---08.03.2024---
+        // Пока оставляю зануление примитивных переменных, переносить буду в MethodFemDgHeat.cpp
+
+        /* for (Index i = 0; i < baseFuncCount; i++) {
+            p.t += flds.t[i] * ;
+            p.qx += flds.qx[i];
+            p.qy += flds.qy[i];
+            p.qz += flds.qz[i];
+        }
+
+        p.qx = flds.qx;
+        p.qy = flds.qy;
+        p.qz = flds.qz;
+
+        p.shrink(); */
+        return p;
+    }
 
     /**
      *

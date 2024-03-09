@@ -34,7 +34,7 @@ namespace charm {
 
     //  UPDATE ON 10.07.2023 - проверить вычисление определителя!!!
     // Добавляю вычисление определителя для матрицы 4*4
-    Real matr4Det(Real **a) {
+    /* Real matr4Det(Real **a) {
         Real det_a = a[0][3] * a[1][2] * a[2][1] * a[3][0] - a[0][2] * a[1][3] * a[2][1] * a[3][0] -
                      a[0][3] * a[1][1] * a[2][2] * a[3][0] + a[0][1] * a[1][3] * a[2][2] * a[3][0] +
                      a[0][2] * a[1][1] * a[2][3] * a[3][0] - a[0][1] * a[1][2] * a[2][3] * a[3][0] -
@@ -49,11 +49,30 @@ namespace charm {
                      a[0][1] * a[1][0] * a[2][2] * a[3][3] + a[0][0] * a[1][1] * a[2][2] * a[3][3];
 
         return det_a;
+    } */
+
+    //  ---22.01.24---
+
+    Real matr4Det(ArrayReal a) {
+        Real det_a = a[3] * a[6] * a[9] * a[12] - a[2] * a[7] * a[9] * a[12] -
+                     a[3] * a[5] * a[10] * a[12] + a[1] * a[7] * a[10] * a[12] +
+                     a[2] * a[5] * a[11] * a[12] - a[1] * a[6] * a[11] * a[12] -
+                     a[3] * a[6] * a[8] * a[13] + a[2] * a[7] * a[8] * a[13] +
+                     a[3] * a[4] * a[10] * a[13] - a[0] * a[7] * a[10] * a[13] -
+                     a[2] * a[4] * a[11] * a[13] + a[0] * a[6] * a[11] * a[13] +
+                     a[3] * a[5] * a[8] * a[14] - a[1] * a[7] * a[8] * a[14] -
+                     a[3] * a[4] * a[9] * a[14] + a[0] * a[7] * a[9] * a[14] +
+                     a[1] * a[4] * a[11] * a[14] - a[0] * a[5] * a[11] * a[14] -
+                     a[2] * a[5] * a[8] * a[15] + a[1] * a[6] * a[8] * a[15] +
+                     a[2] * a[4] * a[9] * a[15] - a[0] * a[6] * a[9] * a[15] -
+                     a[1] * a[4] * a[10] * a[15] + a[0] * a[5] * a[10] * a[15];
+
+        return det_a;
     }
 
     //	Добавляю инверсию матрицы 4*4, если буду брать 4 базисные функции в методе Галёркина!!!
 
-    void matr4Inv(Real **a, Real **a_inv) {
+    /* void matr4Inv(Real **a, Real **a_inv) {
         Real a_[4][4];
         int i, j;
         Real det_a = matr4Det(a);
@@ -115,13 +134,104 @@ namespace charm {
                 a_inv[i][j] = a_[i][j] / det_a;
             }
         }
+    } */
+
+    //  ---22.01.24---
+    //  ---09.03.2024---
+    //  void matr4Inv(ArrayReal a, ArrayReal a_inv) {
+    void matr4Inv(ArrayReal a, Cell& cell) {
+
+        ArrayReal a_;
+        int i, j;
+        Real det_a = matr4Det(a);
+
+        std::cout << "From matr4Inv: 0! " << det_a << std::endl;
+        std::cout << "From matr4Inv: 0! " << a[0] << std::endl;
+        std::cout << "From matr4Inv: 0! " << a[15] << std::endl;
+        std::cout << "From matr4Inv: 0! " << cell.A[0] << std::endl;
+
+        //CHARM_ASSERT(det_a != 0.);
+
+        //  ---08.03.2024---
+        a_.push_back(-a[7] * a[10] * a[13] + a[6] * a[11] * a[13] +
+                   a[7] * a[9] * a[14] - a[5] * a[11] * a[14] -
+                   a[6] * a[9] * a[15] + a[5] * a[10] * a[15]);
+
+        std::cout << "From matr4Inv: 1!" << std::endl;
+
+
+        a_.push_back(a[3] * a[10] * a[13] - a[2] * a[11] * a[13] -
+                   a[3] * a[9] * a[14] + a[1] * a[11] * a[14] +
+                   a[2] * a[9] * a[15] - a[1] * a[10] * a[15]);
+        a_.push_back(-a[3] * a[6] * a[13] + a[2] * a[7] * a[13] +
+                   a[3] * a[5] * a[14] - a[1] * a[7] * a[14] -
+                   a[2] * a[5] * a[15] + a[1] * a[6] * a[15]);
+        a_.push_back(a[3] * a[6] * a[9] - a[2] * a[7] * a[9] -
+                   a[3] * a[5] * a[10] + a[1] * a[7] * a[10] +
+                   a[2] * a[5] * a[11] - a[1] * a[6] * a[11]);
+        a_.push_back(a[7] * a[10] * a[12] - a[6] * a[11] * a[12] -
+                   a[7] * a[8] * a[14] + a[4] * a[11] * a[14] +
+                   a[6] * a[8] * a[15] - a[4] * a[10] * a[15]);
+        a_.push_back(-a[3] * a[10] * a[12] + a[2] * a[11] * a[12] +
+                   a[3] * a[8] * a[14] - a[0] * a[11] * a[14] -
+                   a[2] * a[8] * a[15] + a[0] * a[10] * a[15]);
+        a_.push_back(a[3] * a[6] * a[12] - a[2] * a[7] * a[12] -
+                   a[3] * a[4] * a[14] + a[0] * a[7] * a[14] +
+                   a[2] * a[4] * a[15] - a[0] * a[6] * a[15]);
+        a_.push_back(-a[3] * a[6] * a[8] + a[2] * a[7] * a[8] +
+                   a[3] * a[4] * a[10] - a[0] * a[7] * a[10] -
+                   a[2] * a[4] * a[11] + a[0] * a[6] * a[11]);
+        a_.push_back(-a[7] * a[9] * a[12] + a[5] * a[11] * a[12] +
+                   a[7] * a[8] * a[13] - a[4] * a[11] * a[13] -
+                   a[5] * a[8] * a[15] + a[4] * a[9] * a[15]);
+        a_.push_back(a[3] * a[9] * a[12] - a[1] * a[11] * a[12] -
+                   a[3] * a[8] * a[13] + a[0] * a[11] * a[13] +
+                   a[1] * a[8] * a[15] - a[0] * a[9] * a[15]);
+        a_.push_back(-a[3] * a[5] * a[12] + a[1] * a[7] * a[12] +
+                   a[3] * a[4] * a[13] - a[0] * a[7] * a[13] -
+                   a[1] * a[4] * a[15] + a[0] * a[5] * a[15]);
+        a_.push_back(a[3] * a[5] * a[8] - a[1] * a[7] * a[8] -
+                   a[3] * a[4] * a[9] + a[0] * a[7] * a[9] +
+                   a[1] * a[4] * a[11] - a[0] * a[5] * a[11]);
+        a_.push_back(a[6] * a[9] * a[12] - a[5] * a[10] * a[12] -
+                   a[6] * a[8] * a[13] + a[4] * a[10] * a[13] +
+                   a[5] * a[8] * a[14] - a[4] * a[9] * a[14]);
+        a_.push_back(-a[2] * a[9] * a[12] + a[1] * a[10] * a[12] +
+                   a[2] * a[8] * a[13] - a[0] * a[10] * a[13] -
+                   a[1] * a[8] * a[14] + a[0] * a[9] * a[14]);
+        a_.push_back(a[2] * a[5] * a[12] - a[1] * a[6] * a[12] -
+                   a[2] * a[4] * a[13] + a[0] * a[6] * a[13] +
+                   a[1] * a[4] * a[14] - a[0] * a[5] * a[14]);
+        a_.push_back(-a[2] * a[5] * a[8] + a[1] * a[6] * a[8] +
+                   a[2] * a[4] * a[9] - a[0] * a[6] * a[9] -
+                   a[1] * a[4] * a[10] + a[0] * a[5] * a[10]);
+
+
+        std::cout << "From matr4Inv: 2!" << std::endl;
+
+        //  UPDATE ON 16.07.2023 - возможно, ошибка была в этом: должен проходить цикл до 4!!!
+        for (i = 0; i < 4; i++) {
+            for (j = 0; j < 4; j++) {
+
+                std::cout << "From matr4Inv: cycle 0!" << std::endl;
+
+                //  ---09.03.2024---
+                //  a_inv[i * 4 + j] = a_[i * 4 + j] / det_a;
+                cell.invA[i * 4 + j] = a_[i * 4 + j] / det_a;
+
+                std::cout << "From matr4Inv: a_inv[i * 4 + j] " << cell.invA[i * 4 + j] << std::endl;
+
+            }
+        }
     }
+
+    //  ПЕРЕДЕЛАТЬ ОСТАВШИЕСЯ МЕТОДЫ!!!
 
     //	UPDATE от 07.01.2023 - пытаюсь переделать программу по образцу MethodFvm.cpp
 
     //  UPDATE ON 12.07.2023 - меняю Prim на PrimHeat
     //	Конвертация в примитивные переменные
-    void MethodFemDgHeat::convertToParam(int i, Point pt, PrimHeat &p) {
+    void MethodFemDgHeat::convertToParam(int i, Point pt, PrimHeat &p, HeatDgFields& flds) {
 
         //	UPDATE от 27.12.2022 - неиспользуемым переменным присваиваем произвольные значения
 
@@ -138,11 +248,17 @@ namespace charm {
         // UPDATE от 07.01.2023 - оставляем p.e таким
         //  p.e = 100.0;
 
-        p.t = getT(i, pt);
+        //  ---16.02.2024---
+        /* p.t = getT(i, pt);
         //p.M = 0.0;
         p.qx = getQx(i, pt);
         p.qy = getQy(i, pt);
-        p.qz = getQz(i, pt);
+        p.qz = getQz(i, pt); */
+
+        p.t = getT(i, pt, flds);
+        p.qx = getQx(i, pt, flds);
+        p.qy = getQy(i, pt, flds);
+        p.qz = getQz(i, pt, flds);
     }
 
 
@@ -279,10 +395,12 @@ namespace charm {
 
 
     //	Методы, реализующие получение значений из полей
-    double MethodFemDgHeat::getT(int iCell, Point pt) {
+    double MethodFemDgHeat::getT(int iCell, Point pt, HeatDgFields &flds) {
         double d = 0.;
         for (int i = 0; i < BASE_FUNC_COUNT; i++) {
-            d += T[iCell][i] * getF(i, iCell, pt);
+            //  ---22.01.24---
+            d += flds.t[i] * getF(i, iCell, pt);
+            //  d += T[iCell][i] * getF(i, iCell, pt);
         }
 
         //	UPDATE от 27.12.2022 - добавляю return
@@ -436,6 +554,9 @@ namespace charm {
         data.resize(cN, DataDgHeat(BASE_FUNC_COUNT));
 
         //  UPDATE ON 12.07.2023 - начальная инициализация массивов температуры и тепловых потоков
+        //  ---22.01.24---
+        //  Меняем инициализацию температуры и тепловых потоков (и интегралов)
+        /* 
         T = new double*[cN];
         qx = new double*[cN];
         qy = new double*[cN];
@@ -445,7 +566,7 @@ namespace charm {
         intQx = new double*[cN];
         intQy = new double*[cN];
         intQz = new double*[cN];
-
+        */
         std::cout << "From MethodFemDgHeat.cpp: init continued!" << std::endl;
         for (Index ic = 0; ic < cN; ic++) {
             std::cout << "From MethodFemDgHeat.cpp: init continued cycle 0!" << std::endl;
@@ -469,8 +590,23 @@ namespace charm {
             p.qz = 0.0; */
 
             // ---10.12.2023---
-            PrimHeat p;
-            p.t     = reg->t;
+            //  ---16.02.2024---
+            //  PrimHeat p;
+
+            //  ---08.03.2024---
+            //  PrimHeat p(BASE_FUNC_COUNT);
+
+
+            //  ---09.03.2024---
+            //  Возможно, начальную температуру стоит задавать через коэффициенты распределения температуры
+            //  (в консервативных переменных), а не в примитивных...
+            //  ПОКА ЗАДАЮ ТЕМПЕРАТУРУ НЕ ИЗ YAML-ФАЙЛА!!!
+
+            //  data[ic].p.t     = reg->t;
+            // data[ic].p.t = cos(M_PI * cell.center.x) * cos(M_PI * cell.center.y) * cos(M_PI * cell.center.z);
+            // data[ic].flds.t[0] = cos(M_PI * cell.center.x) * cos(M_PI * cell.center.y) * cos(M_PI * cell.center.z);
+
+
 
             //  UPDATE ON 13.07.2023 - пока убираю этот фрагмент
             //  Может быть, он имел ключевое значение при передаче данных...
@@ -483,8 +619,25 @@ namespace charm {
             //	Пытаюсь решить тест из статьи ИПМ им. Келдыша...
             //	Попробую оставить ненулевой только первый элемент T[ic]
 
-            T[ic] = new double[BASE_FUNC_COUNT];
-            memset(T[ic], 0.0, BASE_FUNC_COUNT * sizeof(double));
+            //  ---22.01.24---
+            //  T[ic] = new double[BASE_FUNC_COUNT];            
+            //  memset(T[ic], 0.0, BASE_FUNC_COUNT * sizeof(double));
+            for (Int ind_ = 0; ind_ < BASE_FUNC_COUNT; ind_++) {
+                //  ---08.03.2024---
+                //  data[ic].flds.t[ind_] = cos(M_PI * cell.center.x) * cos(M_PI * cell.center.y) * cos(M_PI * cell.center.z);
+                data[ic].flds.t[ind_] = 0.0;
+                data[ic].flds.qx[ind_] = 0.0;
+                data[ic].flds.qy[ind_] = 0.0;
+                data[ic].flds.qz[ind_] = 0.0;
+                data[ic].flds.intT[ind_] = 0.0;
+                data[ic].flds.intQx[ind_] = 0.0;
+                data[ic].flds.intQy[ind_] = 0.0;
+                data[ic].flds.intQz[ind_] = 0.0;
+            }
+
+            //  ---09.03.2024---
+            //  Пока температуру из YAML-файла переносим в перывй коэффициент разложения температуру
+            data[ic].flds.t[0] = reg->t;
 
             //  UPDATE ON 10.07.2023 - пробуем код на базовой задаче - сохранении нулевых условий
             //  UPDATE ON 10.07.2023 - каково соотношение примитивных и консервативных переменных???
@@ -525,14 +678,15 @@ namespace charm {
 
             //  UPDATE ON 12.07.2023 - лучше пока попробовать передавать данные через массивы
 
-            qx[ic] = new double[BASE_FUNC_COUNT];
+            //  ---22.01.24---
+            /* qx[ic] = new double[BASE_FUNC_COUNT];
             qy[ic] = new double[BASE_FUNC_COUNT];
             qz[ic] = new double[BASE_FUNC_COUNT];
 
             intT[ic] = new double[BASE_FUNC_COUNT];
             intQx[ic] = new double[BASE_FUNC_COUNT];
             intQy[ic] = new double[BASE_FUNC_COUNT];
-            intQz[ic] = new double[BASE_FUNC_COUNT];
+            intQz[ic] = new double[BASE_FUNC_COUNT]; */
 
             //cellGP[ic] = new Point[GP_CELL_COUNT];
             //cellGW[ic] = new double[GP_CELL_COUNT];
@@ -575,6 +729,35 @@ namespace charm {
             //	T[ic][j] = p.t;
             //}
 
+            //  ---08.03.2024---
+            /* std::cout << ":" << cell.A[0] << std::endl;
+            std::cout << ":" << cell.A[1] << std::endl;
+            std::cout << ":" << cell.A[2] << std::endl;
+            std::cout << ":" << cell.A[3] << std::endl;
+            std::cout << ":" << cell.A[4] << std::endl;
+            std::cout << ":" << cell.A[5] << std::endl;
+            std::cout << ":" << cell.A[6] << std::endl;
+            std::cout << ":" << cell.A[7] << std::endl;
+            std::cout << ":" << cell.A[8] << std::endl;
+            std::cout << ":" << cell.A[9] << std::endl;
+            std::cout << ":" << cell.A[10] << std::endl;
+            std::cout << ":" << cell.A[11] << std::endl;
+            std::cout << ":" << cell.A[12] << std::endl;
+            std::cout << ":" << cell.A[13] << std::endl;
+            std::cout << ":" << cell.A[14] << std::endl;
+            std::cout << ":" << cell.A[15] << std::endl; */
+
+
+
+            //  ---22.01.24---
+            for (Int ind_1 = 0; ind_1 < BASE_FUNC_COUNT; ind_1++) {
+                for (Int ind_2 = 0; ind_2 < BASE_FUNC_COUNT; ind_2++) {
+                    //  ---08.03.2024---
+                    cell.A.push_back(0.0);
+                    cell.invA.push_back(0.0);
+                }
+            }
+
             std::cout << "From MethodFemDgHeat.cpp: init continued cycle 4!" << std::endl;
 
         }
@@ -598,8 +781,8 @@ namespace charm {
 
         //calcGaussParam();
 
-
-        A = new double **[cN];
+        //  ---22.01.24---
+        /* A = new double **[cN];
         invA = new double **[cN];
         for (int i = 0; i < cN; i++) {
             A[i] = new double *[BASE_FUNC_COUNT];
@@ -608,7 +791,10 @@ namespace charm {
                 A[i][j] = new double[BASE_FUNC_COUNT];
                 invA[i][j] = new double[BASE_FUNC_COUNT];
             }
-        }
+        } */
+
+        
+
         calcMassMatrix();
 
 
@@ -623,6 +809,8 @@ namespace charm {
         //save(0);
     }
 
+    //  ---22.01.24---
+    //  НУЖНО ПЕРЕДЕЛАТЬ ВСЕ МЕТОДЫ, содержащие массивы температуры и тепловых потоков!!!
 
     //	Переделала формулы под обозначения gw и gp в charm_3d_v2
     void MethodFemDgHeat::calcMassMatrix() {
@@ -631,23 +819,60 @@ namespace charm {
         // Есть сомнения в том, что перепутаны индексы и i - разные
         //  для внешнего и внутреннего цикла!!!
 
+
+        //  ---08.03.2024---
+        std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0!" << std::endl;
+
+        //  ---22.01.24---
         for (int ind = 0; ind < mesh->cells.size(); ind++) {
-            double **mA = A[ind];
+
+            
+
+            //  ---09.03.2024---
+
+            //  ОБРАТИТЬ ВНИМАНИЕ!!!
+
+
+            Cell &cell = mesh->cells[ind];
+
+            //  double **mA = A[ind];
+            ArrayReal mA = cell.A;
+
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix cycle 0!" << std::endl;
+
 
             //  UPDATE ON 14.07.2023 - проверяем, какое значение принимает mA
             //  std::cout << i << ": " << **mA << std::endl;
 
-            double **invA_ = invA[ind];
+            //  double **invA_ = invA[ind];
+            ArrayReal invA_ = cell.invA;
             for (int i = 0; i < BASE_FUNC_COUNT; i++) {
                 for (int j = 0; j < BASE_FUNC_COUNT; j++) {
-                    mA[i][j] = 0.0;
+
+                    std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix cycle 1!" << std::endl;
+
+
+                    //  mA[i][j] = 0.0;
+                    // mesh->cells[ind].A.push_back(0.0);
+                    // mesh->cells[ind].invA.push_back(0.0);
+
+
+                    std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix cycle 1.1!" << std::endl;
+
+
+
                     //  UPDATE ON 10.07.2023 - меняем GP_CELL_COUNT на длину gp, вычисленного в классе Mesh
                     //  for (int iGP = 0; iGP < GP_CELL_COUNT; iGP++) {
+                    //  for (int iGP = 0; iGP < mesh->cells[ind].gp.size(); iGP++) {
                     for (int iGP = 0; iGP < mesh->cells[ind].gp.size(); iGP++) {
                         //mA[i][j] += cellGW[i][iGP] * getF(i, i, cellGP[ic][iGP]) * getF(j, i, cellGP[ic][iGP]);
-                        mA[i][j] += mesh->cells[ind].gw[iGP] * getF(i, ind, mesh->cells[ind].gp[iGP]) *
+                        cell.A[i * BASE_FUNC_COUNT + j] += mesh->cells[ind].gw[iGP] * getF(i, ind, mesh->cells[ind].gp[iGP]) *
                                     getF(j, ind, mesh->cells[ind].gp[iGP]);
                     }
+
+                    //  ---09.03.2024---
+                    std::cout << "! " << cell.A[i * BASE_FUNC_COUNT + j] << std::endl;
+
                     //mA[i][j] *= cellJ[i];
 
                     //  UPDATE ON 16.07.2023 - попробую в качестве аналога cellJ взять cell.volume / 8.
@@ -672,8 +897,18 @@ namespace charm {
 
                 }
             }
+
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0.0! " << mA[0] << std::endl;
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0.0! " << mA[15] << std::endl;
+
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0.0! " << invA_[0] << std::endl;
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0.0! " << invA_[15] << std::endl;
+
+
+            std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 0.1!" << std::endl;
+
             //inverseMatrix(mA, invA_, BASE_FUNC_COUNT);
-            matr4Inv(mA, invA_);
+            matr4Inv(cell.A, cell);
 
             //	UPDATE от 28.12.2022 - попытка отловить ошибку
             //	Скорее всего, матрица invA_ составляется правильно...
@@ -686,7 +921,13 @@ namespace charm {
             } */
             
 
+           //   ---09.03.2024---
+           std::cout<<"mesh->cells[ind].A[0] = "<<mesh->cells[ind].A[0]<<std::endl; 
+           std::cout<<"mesh->cells[ind].invA[0] = "<<mesh->cells[ind].invA[0]<<std::endl; 
+
         }
+
+        std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix 1!" << std::endl;
     }
 
     void MethodFemDgHeat::calcGradients() {
@@ -707,12 +948,12 @@ namespace charm {
                 for (int z = 0; z < mesh->cells[i].gp.size(); z++) {
                     //tmpIntQx += cellGW[i][z] * getT(i, cellGP[i][z]) * getDfDx(j, i, cellGP[i][z]);
                     tmpIntQx +=
-                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z]) * getDfDx(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z], data[i].flds) * getDfDx(j, i, mesh->cells[i].gp[z]);
                     tmpIntQy +=
-                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z]) * getDfDy(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z], data[i].flds) * getDfDy(j, i, mesh->cells[i].gp[z]);
 
                     tmpIntQz +=
-                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z]) * getDfDz(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z], data[i].flds) * getDfDz(j, i, mesh->cells[i].gp[z]);
                 }
 
                 // Так ли посчитан cellJ???
@@ -744,10 +985,15 @@ namespace charm {
                 //  UPDATE ON 13.07.2023 - проверяем величину tmpIntQx
                 //  std::cout << "tmpIntQx = " << tmpIntQx << std::endl;
 
-                intQx[i][j] -= tmpIntQx;
-                intQy[i][j] -= tmpIntQy;
+                //  ---08.03.2024---
+                data[i].flds.intQx[j] -= tmpIntQx;
+                data[i].flds.intQy[j] -= tmpIntQy;
 
-                intQz[i][j] -= tmpIntQz;
+                data[i].flds.intQz[j] -= tmpIntQz;
+
+                //  ---09.03.2024---
+                //  std::cout << "intQx["<<i<<"]["<<j<<"] = " << data[i].flds.intQx[j] << std::endl;
+
 
                 //  std::cout << "From MethodFemDgHeat.cpp: calcGradients is continued cycle 2.1!" << std::endl;
 
@@ -829,13 +1075,15 @@ namespace charm {
                     //  Это действие может существенно повлиять на работу программы...
                     //  PrimHeat p1 = data[c1].getFields();
 
-                    PrimHeat p1;
+                    //  ---08.03.2024---
+                    //  Сделать конструктор так, чтобы не нужно было передавать параметр!!!
+                    PrimHeat p1(BASE_FUNC_COUNT);
 
 
                     //  Prim p2(cCount);
                     //  PrimHeat p2();
-                    PrimHeat p2;
-                    convertToParam(c1, pt, p1);
+                    PrimHeat p2(BASE_FUNC_COUNT);
+                    convertToParam(c1, pt, p1, data[c1].flds);
 
                     //std::cout<<"From MethodFemDgHeat.cpp: calcGradients continued 1 cycle 0 cycle 1!"<<std::endl;
 
@@ -862,6 +1110,11 @@ namespace charm {
                         //  p2.qy = 0.;
                         //  p2.qz = 0.;
 
+                        //  ---09.03.2024---
+                        /* if (p2.t != 0.) {
+                            std::cout<<"calcGradients: p2.t bnd = "<<p2.t<<std::endl;
+                        } */
+
                     } else {
 
                         //std::cout<<i<<": Not isBnd: From MethodFemDgHeat.cpp: calcGradients continued 1 cycle 0 cycle 1!"<<std::endl;
@@ -872,8 +1125,15 @@ namespace charm {
                         //	UPDATE от 08.01.2023 - пока убираем определение p2 через getPrim()...
 
                         //p2 = data[c2].getPrim();
-                        convertToParam(c2, pt, p2);
+                        convertToParam(c2, pt, p2, data[c2].flds);                      
+                        
+                        //  ---09.03.2024---
+                        /* if (p2.t != 0.) {
+                            std::cout<<"calcGradients: p2.t = "<<p2.t<<std::endl;
+                        } */
+
                     }
+
 
                     //std::cout<<"From MethodFemDgHeat.cpp: calcGradients continued 1 cycle 0 cycle 2!"<<std::endl;
 
@@ -885,6 +1145,9 @@ namespace charm {
                     tmpIntQy1 += f.n.y * fT * getF(j, c1, pt) * f.gw[iGP];
 
                     tmpIntQz1 += f.n.z * fT * getF(j, c1, pt) * f.gw[iGP];
+
+                    //  ---09.03.2024---
+                    //  std::cout<<"calcGradients: tmpIntQx1 = "<<tmpIntQx1<<std::endl;
 
                     if (!isBnd) {
                         tmpIntQx2 += f.n.x * fT * getF(j, c2, pt) * f.gw[iGP];
@@ -909,7 +1172,7 @@ namespace charm {
                 //	правильно ли заменила edgeJ???
 
 
-                //std::cout<<"f.area = "<<f.area<<"; edgeJ = "<<(mesh->cells[i].dh[0]*mesh->cells[i].dh[1]) / 4.<<std::endl;
+                // std::cout<<"f.area = "<<f.area<<"; edgeJ = "<<(mesh->cells[i].dh[0]*mesh->cells[i].dh[1]) / 4.<<std::endl;
 
 
                 //	UPDATE от 28.12.2022 - пробуем edgeJ ~ f.area/4.
@@ -943,19 +1206,23 @@ namespace charm {
 
                 //  tmpIntQz2 *= f.area / 8.;
 
+                //  ---08.03.2024---
+                data[c1].flds.intQx[j] += tmpIntQx1;
+                data[c1].flds.intQy[j] += tmpIntQy1;
 
-                intQx[c1][j] += tmpIntQx1;
-                intQy[c1][j] += tmpIntQy1;
+                data[c1].flds.intQz[j] += tmpIntQz1;
 
-                intQz[c1][j] += tmpIntQz1;
+                //  ---09.03.2024---
+                //  std::cout<<"calcGradients: data[c1].flds.intQx[j] = "<<data[c1].flds.intQx[j]<<std::endl;
+
 
                 // std::cout<<intQx[c1][j]<<std::endl;
 
                 if (!isBnd) {
-                    intQx[c2][j] -= tmpIntQx2;
-                    intQy[c2][j] -= tmpIntQy2;
+                    data[c2].flds.intQx[j] -= tmpIntQx2;
+                    data[c2].flds.intQy[j] -= tmpIntQy2;
 
-                    intQz[c2][j] -= tmpIntQz2;
+                    data[c2].flds.intQz[j] -= tmpIntQz2;
                 }
 
                 //  std::cout << "! intQx["<<c1<<"]["<<j<<"] = " << intQx[c1][j] << std::endl;
@@ -971,6 +1238,9 @@ namespace charm {
 
         }
 
+        //  ---09.03.2024---
+        std::cout<<"calcGradients: data[0].flds.intQx[0] = "<<data[0].flds.intQx[0]<<std::endl;
+
         //std::cout<<"From MethodFemDgHeat.cpp: calcGradients continued 2!"<<std::endl;
 
         //вычисляем градиенты на новом шаге по времени
@@ -984,10 +1254,11 @@ namespace charm {
                     //  UPDATE ON 14.07.2023 - В КАКОМ МЕСТЕ ПРОГРАММЫ ЗАПОЛНЯЕТСЯ МАТРИЦА invA???
                     //  ВОЗМОЖНО, ОШИБКА В НЕЙ... ЕСТЬ КАК ОЧЕНЬ БОЛЬШИЕ, ТАК И ОЧЕНЬ МАЛЕНЬКИЕ ЗНАЧЕНИЯ...
 
-                    tmpQx += invA[i][j][z] * intQx[i][z];
-                    tmpQy += invA[i][j][z] * intQy[i][z];
+                    //  ---08.03.2024---
+                    tmpQx += mesh->cells[i].invA[j*BASE_FUNC_COUNT + z] * data[i].flds.intQx[z];
+                    tmpQy += mesh->cells[i].invA[j*BASE_FUNC_COUNT + z] * data[i].flds.intQy[z];
 
-                    tmpQz += invA[i][j][z] * intQz[i][z];
+                    tmpQz += mesh->cells[i].invA[j*BASE_FUNC_COUNT + z] * data[i].flds.intQz[z];
 
                     //  UPDATE ON 13.07.2023 - лучше проверить, чем заполнена матрица invA...
                     //  std::cout<<"invA["<<i<<"]["<<j<<"]["<<z<<"] = "<<invA[i][j][z]<<std::endl;
@@ -1001,12 +1272,23 @@ namespace charm {
                     }
                     */
 
+                    //  std::cout<<"calcGradients: mesh->cells[i].A[j*BASE_FUNC_COUNT + z]= "<<mesh->cells[i].A[j*BASE_FUNC_COUNT + z]<<std::endl;
+
+                    //  ---09.03.2024---
+                    if (i == 0) {
+                        std::cout<<"calcGradients: mesh->cells[i].invA[j*BASE_FUNC_COUNT + z] = "<<mesh->cells[i].invA[j*BASE_FUNC_COUNT + z]<<std::endl;
+                    }
+
+
                 }
-                qx[i][j] = tmpQx;
-                qy[i][j] = tmpQy;
+                data[i].flds.qx[j] = tmpQx;
+                data[i].flds.qy[j] = tmpQy;
 
-                qz[i][j] = tmpQz;
+                data[i].flds.qz[j] = tmpQz;
 
+                //   ---09.03.2024---
+                //  std::cout<<"calcGradients: tmpQx = "<<tmpQx<<std::endl;
+        
                 //  UPDATE ON 13.07.2023 - пробую вывести qx[i][j], чтобы определить место, где программа начинает выдавать слишком большие числа...
                 //  std::cout<<"qx["<<i<<"]["<<j<<"] = "<<qx[i][j]<<std::endl;
 
@@ -1028,6 +1310,14 @@ namespace charm {
 
                 // std::cout<<qx[i][j]<<std::endl;
 
+                
+                //   ---09.03.2024---
+                //  ПОЧЕМУ-ТО ВСЕ ТЕПЛОВЫЕ ПОТОКИ РАВНЫ 0...
+                // std::cout<<"calcGradients: qx = "<<data[i].flds.qx[j]<<std::endl;
+                // std::cout<<"calcGradients: qy = "<<data[i].flds.qy[j]<<std::endl;
+                // std::cout<<"calcGradients: qz = "<<data[i].flds.qz[j]<<std::endl;
+
+
             }
         }
     }
@@ -1041,12 +1331,12 @@ namespace charm {
                 //  for (int z = 0; z < GP_CELL_COUNT; z++) {
                 for (int z = 0; z < mesh->cells[i].gp.size(); z++) {
                     tmpIntT +=
-                            mesh->cells[i].gw[z] * getQx(i, mesh->cells[i].gp[z]) * getDfDx(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getQx(i, mesh->cells[i].gp[z], data[i].flds) * getDfDx(j, i, mesh->cells[i].gp[z]);
                     tmpIntT +=
-                            mesh->cells[i].gw[z] * getQy(i, mesh->cells[i].gp[z]) * getDfDy(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getQy(i, mesh->cells[i].gp[z], data[i].flds) * getDfDy(j, i, mesh->cells[i].gp[z]);
 
                     tmpIntT +=
-                            mesh->cells[i].gw[z] * getQz(i, mesh->cells[i].gp[z]) * getDfDz(j, i, mesh->cells[i].gp[z]);
+                            mesh->cells[i].gw[z] * getQz(i, mesh->cells[i].gp[z], data[i].flds) * getDfDz(j, i, mesh->cells[i].gp[z]);
                 }
 
                 //  UPDATE ON 16.07.2023 - меняю аналог cellJ
@@ -1059,7 +1349,7 @@ namespace charm {
                 //  ---24.12.2023---
                 //  tmpIntT *= mesh->cells[i].volume / 8.;
 
-                intT[i][j] -= tmpIntT;
+                data[i].flds.intT[j] -= tmpIntT;
 
                 /*
                 if (intT[i][j]!=0)
@@ -1075,6 +1365,12 @@ namespace charm {
                 } */
 
                 //  std::cout<<"intT["<<i<<"]["<<j<<"] = "<<intT[i][j]<<std::endl;
+
+
+                //   ---09.03.2024---
+                //  ПОЧЕМУ-ТО ВСЕ КОЭФФИЦИЕНТ ИНТЕГРАЛА ТЕМПЕРАТУРЫ РАВЕН 0...
+                // std::cout<<"calcDiffusionVol: intT = "<<data[i].flds.intT[j]<<std::endl;
+
 
             }
         }
@@ -1106,13 +1402,13 @@ namespace charm {
 
                     //  UPDATE ON 13.07.2023 - оставляю просто инициализацию переменной класса PrimHeat
                     //  PrimHeat p1 = data[c1].getPrim();
-                    PrimHeat p1;
+                    PrimHeat p1(BASE_FUNC_COUNT);
 
                     //  UPDATE ON 12.07.2023 - пока нам не нужно количество компонентов
                     //  Prim p2(cCount);
-                    PrimHeat p2;
+                    PrimHeat p2(BASE_FUNC_COUNT);
 
-                    convertToParam(c1, pt, p1);
+                    convertToParam(c1, pt, p1, data[c1].flds);
                     if (isBnd) {
                         //  UPDATE ON 13.07.2023 - создала специальную функцию calcHeat
                         //  f.bnd->calc(p1, p2, f.n);
@@ -1126,7 +1422,7 @@ namespace charm {
 
                     } else {
                         c2 = f.cells[1];
-                        convertToParam(c2, pt, p2);
+                        convertToParam(c2, pt, p2, data[c2].flds);
                     }
                     double fT, fqx, fqy, fqz;
                     flux(p1, p2, f.n, fT, fqx, fqy, fqz);
@@ -1169,10 +1465,10 @@ namespace charm {
 
                 //  tmpIntT2 *= f.area / 8.;
 
-                intT[c1][j] += tmpIntT1;
+                data[c1].flds.intT[j] += tmpIntT1;
 
                 if (!isBnd) {
-                    intT[c2][j] -= tmpIntT2;
+                    data[c2].flds.intT[j] -= tmpIntT2;
                 }
 
                 //  --24.12.2023---
@@ -1189,6 +1485,11 @@ namespace charm {
                 */
 
                 //  std::cout<<"intT["<<c1<<"]["<<j<<"] = "<<intT[c1][j]<<std::endl;
+
+                //   ---09.03.2024---
+                //  ПОЧЕМУ-ТО ВСЕ КОЭФФИЦИЕНТ ИНТЕГРАЛА ТЕМПЕРАТУРЫ РАВЕН 0...
+                //  std::cout<<"calcDiffusionSurf: intT = "<<data[c1].flds.intT[j]<<std::endl;
+
 
             }
 
@@ -1213,16 +1514,21 @@ namespace charm {
 
             //  UPDATE ON 13.07.2023 - меняю Prim на PrimHeat
             //  Prim p(cCount);
-            PrimHeat p;
+            PrimHeat p(BASE_FUNC_COUNT);
 
             for (int j = 0; j < BASE_FUNC_COUNT; j++) {
                 double tmpT = 0.0;
                 for (int z = 0; z < BASE_FUNC_COUNT; z++) {
-                    tmpT += invA[i][j][z] * intT[i][z];
+                    tmpT += mesh->cells[i].invA[j*BASE_FUNC_COUNT + z] * data[i].flds.intT[z];
                 }
                 //T[i][j] += TAU*tmpT;
 
-                T[i][j] += dt * tmpT;
+                //  ---09.03.2024---
+                data[i].flds.t[j] += dt * tmpT;
+                //  std::cout<< data[i].flds.t[j] <<std::endl;
+
+
+                convertToParam(i, mesh->cells[i].center, data[i].p, data[i].flds);
 
                 //	UPDATE от 29.12.2022 - пока убираем вспомогательный вывод...
 
@@ -1306,10 +1612,10 @@ namespace charm {
 
             for (int i = 0; i < mesh->cells.size(); i++) {
                 for (int j = 0; j < BASE_FUNC_COUNT; j++) {
-                    intT[i][j] = 0.;
-                    intQx[i][j] = 0.;
-                    intQy[i][j] = 0.;
-                    intQz[i][j] = 0.;
+                    data[i].flds.intT[j] = 0.;
+                    data[i].flds.intQx[j] = 0.;
+                    data[i].flds.intQy[j] = 0.;
+                    data[i].flds.intQz[j] = 0.;
                 }
             }
 
@@ -1434,26 +1740,26 @@ namespace charm {
     */
 
 
-    double MethodFemDgHeat::getQx(int iCell, Point pt) {
+    double MethodFemDgHeat::getQx(int iCell, Point pt, HeatDgFields &flds) {
         double d = 0.0;
         for (int i = 0; i < BASE_FUNC_COUNT; i++) {
-            d += qx[iCell][i] * getF(i, iCell, pt);
+            d += flds.qx[i] * getF(i, iCell, pt);
         }
         return d;
     }
 
-    double MethodFemDgHeat::getQy(int iCell, Point pt) {
+    double MethodFemDgHeat::getQy(int iCell, Point pt, HeatDgFields &flds) {
         double d = 0.0;
         for (int i = 0; i < BASE_FUNC_COUNT; i++) {
-            d += qy[iCell][i] * getF(i, iCell, pt);
+            d += flds.qy[i] * getF(i, iCell, pt);
         }
         return d;
     }
 
-    double MethodFemDgHeat::getQz(int iCell, Point pt) {
+    double MethodFemDgHeat::getQz(int iCell, Point pt, HeatDgFields &flds) {
         double d = 0.0;
         for (int i = 0; i < BASE_FUNC_COUNT; i++) {
-            d += qz[iCell][i] * getF(i, iCell, pt);
+            d += flds.qz[i] * getF(i, iCell, pt);
         }
         return d;
     }
@@ -1499,6 +1805,14 @@ namespace charm {
         fqy = 0.5 * (pl.qy + pr.qy) - C11 * (pr.t - pl.t) * n.y;
 
         fqz = 0.5 * (pl.qz + pr.qz) - C11 * (pr.t - pl.t) * n.z; */
+
+        //   ---09.03.2024---
+        //  ПОЧЕМУ-ТО ВСЕ КОЭФФИЦИЕНТ ИНТЕГРАЛА ТЕМПЕРАТУРЫ РАВЕН 0...
+        // std::cout<<"flux: fT = "<<fT<<std::endl;
+        // std::cout<<"flux: fqx = "<<fqx<<std::endl;
+        // std::cout<<"flux: fqy = "<<fqy<<std::endl;
+        // std::cout<<"flux: fqz = "<<fqz<<std::endl;
+
     }
 
     //	UPDATE от 26.12.2022 - переопределяю функции done, save, saveVtk!!!
@@ -1637,7 +1951,10 @@ namespace charm {
             // Пробую выводить только основную часть температуры...
             // Результат такой же...
 
-            fout << getT(i, mesh->cells[i].center) << " ";
+            //  ---08.03.2024---
+            fout << getT(i, mesh->cells[i].center, data[i].flds) << " ";
+            //  fout << data[i].p.t << " ";
+
             //  fout << T[i][0] << " ";
 
             if (i % 8 == 0 || i == cellsCount) {

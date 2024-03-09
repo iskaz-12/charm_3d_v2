@@ -36,6 +36,25 @@ namespace charm {
             gw.assign(c.gw.begin(), c.gw.end());
             dh              = c.dh;     //  UPDATE ON 18.06.2023 - размеры ячейки
             flag            = c.flag;
+
+
+            //  ---08.03.2024---
+            A.assign(c.A.begin(), c.A.end());
+            invA.assign(c.invA.begin(), c.invA.end());
+
+            //  ---22.01.24---
+            //  Добавляем инициализацию
+            /* t.assign(c.t.begin(), c.t.end());
+            qx.assign(c.qx.begin(), c.qx.end());
+            qy.assign(c.qy.begin(), c.qy.end());
+            qz.assign(c.qz.begin(), c.qz.end());           
+            A.assign(c.A.begin(), c.A.end());
+            invA.assign(c.invA.begin(), c.invA.end());
+            intT.assign(c.intT.begin(), c.intT.end());
+            intQx.assign(c.intQx.begin(), c.intQx.end());
+            intQy.assign(c.intQy.begin(), c.intQy.end());
+            intQz.assign(c.intQz.begin(), c.intQz.end());   */
+
             return *this;
         }
 
@@ -50,6 +69,12 @@ namespace charm {
         ArrayReal           gw;
         Point               dh;
         Uint                flag;
+
+        //  ---22.01.24---
+        // Добавляем матрицу масс A
+        ArrayReal  A;
+        ArrayReal  invA;
+
 
         friend class Mesh;
 

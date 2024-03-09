@@ -81,10 +81,10 @@ namespace charm {
 		//	UPDATE от 26.12.2022 - комментируем не используемые в cpp-файле функции
 
 		//void calcGaussParam();
-		double getT(int iCell, Point pt);
-		double getQx(int iCell, Point pt);
-		double getQy(int iCell, Point pt);
-		double getQz(int iCell, Point pt);
+		double getT(int iCell, Point pt, HeatDgFields &flds);
+		double getQx(int iCell, Point pt, HeatDgFields &flds);
+		double getQy(int iCell, Point pt, HeatDgFields &flds);
+		double getQz(int iCell, Point pt, HeatDgFields &flds);
 
 		//	UPDATE ON 08.07.2023 - эти 4 функции есть в DataDgHeat, убираю их из MethodFemDgHeat
 		//	UPDATE ON 12.07.2023 - переношу 4 функции ниже в том виде, в котором они определены в DataDgHeat
@@ -108,7 +108,7 @@ namespace charm {
 		//void bnd(Face *f, Point pt, Prim p1, Prim &p2);
 		//	UPDATE ON 13.07.2023 - в определении функции convertToParam меняю Prim на PrimHeat
 		//	void convertToParam(int i, Point pt, Prim& p);
-		void convertToParam(int i, Point pt, PrimHeat& p);
+		void convertToParam(int i, Point pt, PrimHeat& p, HeatDgFields& flds);
 
 		//	UPDATE ON 13.07.2023 - в определении функции flux меняю Prim на PrimHeat, Vector - на Point
 		//	void flux(Prim pl, Prim pr, Vector n, double &fT, double &fqx, double &fqy, double &fqz);
@@ -120,8 +120,9 @@ namespace charm {
 
 
 		//	UPDATE ON 10.07.2023 - нужны ли матрицы A и invA???
-		double ***A;
-		double ***invA;
+		//	---08.03.2024---
+		//	double ***A;
+		//	double ***invA;
 
 		//	Может, эти переменные уже задавались в основном коде в другой форме...
 		//double **cellGW;
@@ -137,15 +138,16 @@ namespace charm {
 		double C11;
 
 		//	UPDATE ON 12.07.2023 - добавляю массивы для сохранения температуры и тепловых потоков по аналогии с nummeth2019
-		double **T;
-    	double **qx;
-    	double **qy;
-		double **qz;
+		//	---08.03.2024---
+		//	double **T;
+    	//	double **qx;
+    	//	double **qy;
+		//	double **qz;
 
-    	double **intT;
-    	double **intQx;
-    	double **intQy;
-		double **intQz;
+    	//	double **intT;
+    	//	double **intQx;
+    	//	double **intQy;
+		//	double **intQz;
 	
 	};
 	

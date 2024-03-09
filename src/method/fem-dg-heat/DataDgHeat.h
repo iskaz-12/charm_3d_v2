@@ -16,6 +16,8 @@
 //  UPDATE ON 04.07.2023 - пока убираю mpi.h, т.к. параллельность не обязательна...
 //  #include "mpi.h"
 
+//  ---18.01.24---
+// Для избежания ошибок переполнения переделываю примитивные и консервативные переменные в РМГ по аналогии с fvm!!!
 
 namespace charm {
 
@@ -27,11 +29,25 @@ namespace charm {
         Real        qy;
         Real        qz;
 
+        //  ---08.03.2024---
+        // Вспомогательная переменная (для корректного определения конструктора в getVar)...
+        Real helpVar;
 
-        PrimHeat() {}
+        /* ArrayReal        t; 
+        ArrayReal        qx;
+        ArrayReal        qy;
+        ArrayReal        qz; */
+
+        // PrimHeat() {}
+
+        PrimHeat(Index compCount): helpVar(0.) {}
 
 
         PrimHeat(const PrimHeat& VarHeat) { *this = VarHeat; }
+
+        //  ---07.02.2024---
+        // inline void shrink() { t.shrink_to_fit(); qx.shrink_to_fit(); qy.shrink_to_fit(); qz.shrink_to_fit(); }
+
 
 
         //  UPDATE ON 04.07.2023 - реализация операторов присвоения значения, сложения, вычитания и умножения на число примитивных переменных
@@ -58,6 +74,7 @@ namespace charm {
     };
 
 
+    //  Консервативные переменные
     class HeatDgFields
     {
     public:
@@ -66,17 +83,25 @@ namespace charm {
         ArrayReal        qy;
         ArrayReal        qz;
 
+        //  ---08.03.2024---
+        ArrayReal       intT;
+        ArrayReal       intQx;
+        ArrayReal       intQy;
+        ArrayReal       intQz;
 
-        explicit HeatDgFields(Index bfCount): t(bfCount), qx(bfCount), qy(bfCount), qz(bfCount) {}
+
+        explicit HeatDgFields(Index bfCount): t(bfCount), qx(bfCount), qy(bfCount), qz(bfCount), intT(bfCount), intQx(bfCount), intQy(bfCount), intQz(bfCount) {}
 
         HeatDgFields(const HeatDgFields& cons) { *this = cons; }
 
         //  UPDATE ON 13.07.2023 - пока пробую убрать переопределение данных операторов, чтобы избежать ошибок...
-        //  HeatDgFields& operator  = (const HeatDgFields& cons);
-        //  HeatDgFields& operator  = (const Real& a);
-        //  HeatDgFields& operator += (const HeatDgFields& cons);
-        //  HeatDgFields& operator -= (const HeatDgFields& cons);
-        //  HeatDgFields& operator *= (const Real& a);
+        //  ---18.01.24---
+        //  Возвращаю методы обратно!!!
+        HeatDgFields& operator  = (const HeatDgFields& cons);
+        HeatDgFields& operator  = (const Real& a);
+        HeatDgFields& operator += (const HeatDgFields& cons);
+        HeatDgFields& operator -= (const HeatDgFields& cons);
+        HeatDgFields& operator *= (const Real& a);
 
         void normalize();
 
@@ -93,9 +118,10 @@ namespace charm {
         HeatDgFields    flds;
         Cell           *cell;
 
-        //  
+        // ---08.03.2024---
+        PrimHeat        p; 
 
-        explicit DataDgHeat(Index bfCount): flds(bfCount) {}
+        explicit DataDgHeat(Index bfCount): flds(bfCount), p(bfCount) {}
 
         //  UPDATE ON 05.07.2023 - получение примитивных переменных из консервативных
         //  Лучше поменять название на getVar, как в cpp-файле...
@@ -104,11 +130,13 @@ namespace charm {
         //  PrimHeat getPrim(Point pt);
 
         //  UPDATE ON 13.07.2023 - пока комментирую функции getVar и setVar
-        //  void getVar(PrimHeat &p);
+        //  ---18.01.24---
+        //  Возвращаю функции
+        void getVar(PrimHeat &p);
 
         //  UPDATE ON 05.07.2023 - меняю название getPrim на getVar...
         //  PrimHeat getPrim();
-        //  PrimHeat getVar();
+        PrimHeat getVar();
 
         //  UPDATE ON 05.07.2023 - заполнение консервативных переменных примитивными
         //  (НЕ БЫЛО ЭТОЙ ФУНКЦИИ в DataDgHeat.h)

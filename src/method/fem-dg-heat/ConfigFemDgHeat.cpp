@@ -16,7 +16,7 @@ namespace charm {
 
 		//	UPDATE ON 10.07.2023 - меняю название на BASE_FUNC_COUNT
         //	baseFuncCount = 4; // TODO
-		//	BASE_FUNC_COUNT = 4;
+		// BASE_FUNC_COUNT = 4;
 	}
 
 	Method *ConfigFemDgHeat::createMethod() {

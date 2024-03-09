@@ -25,7 +25,7 @@ namespace charm {
         //	static Int baseFuncCount;
 
 		//	UPDATE ON 13.07.2023 - пока попробую убрать из классов ConfigFemDgHeat.h и ConfigFemDgHeat.cpp переменную BASE_FUNC_COUNT
-		//	static Int BASE_FUNC_COUNT;
+		// static Int BASE_FUNC_COUNT;
         static int gpCellCount;
         static int gpEdgeCount;
 
