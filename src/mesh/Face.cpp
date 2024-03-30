@@ -30,12 +30,9 @@ namespace charm{
         type        = face.type;
         bnd         = face.bnd;
 
-        //  UPDATE ON 13.06.2023
-        //  Нужно восстановить gp и gw для РМГ
         gp.assign(face.gp.begin(), face.gp.end());
         gw.assign(face.gw.begin(), face.gw.end());
 
-        //  ---24.12.2023---
         gj = face.gj;
 
         return *this;

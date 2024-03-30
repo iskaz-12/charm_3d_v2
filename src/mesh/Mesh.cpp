@@ -116,11 +116,6 @@ namespace charm{
                     Point v[2];
                     Points fv = cellGetFaceVertices(c, fi);
 
-                    //  ---23.12.2023---
-                    /* for (auto fv_: fv) {
-                        std::cout<<fv_[0]<<std::endl;
-                    }
-                    std::cout<<"---------------"<<std::endl; */
 
                     v[0] = fv[1]; v[0] -= fv[0];
                     v[1] = fv[2]; v[1] -= fv[0];
@@ -142,21 +137,10 @@ namespace charm{
                         face.n *= -1.;
                     }
 
-                    //  UPDATE ON ---23.12.2023---
-                    //  В коде charm_3d используется pt[3][3]... Проверить, заработает ли!!!
-                    //  Ничего не изменилось!!!
-
-                    //  Point  pt[3];
                     Real  pt[3][3];
 
-                    //  UPDATE ON 18.06.2023 - коэффициенты для формулы Гаусса для треугольных (???) граней
+                    //  UPDATE ON 18.06.2023 - коэффициенты для формулы Гаусса для треугольных граней
                     //  Скорее всего, одна четырёхугольная грань разбивается на 2 треугольных
-
-                    //  ---23.12.2023---
-                    //  СДЕЛАТЬ АНАЛОГ cellCalcGpAtPoint для faces!!!
-                    // Стало работать ещё хуже, чем было...
-
-
                     Real	a = 2.0/3.0;
                     Real	b = 1.0/6.0;
 
@@ -168,11 +152,9 @@ namespace charm{
                     face.gp.resize(6); // @todo
                     for (Index  i = 0; i < 2; i++) {
                         for (Index j = 0; j < 3; j++) {
-                            //  UPDATE ON ---23.12.2023---
                             for (Index k = 0; k < 3; k++) {
                                 pt[j][k] = fv[i + j][k];
                             }
-                            // pt[j] = fv[i + j];
                         }
 
                         Real a1 = pt[0][0] - pt[2][0];	Real a2 = pt[1][0] - pt[2][0];	Real a3 = pt[2][0];
@@ -200,7 +182,6 @@ namespace charm{
                         face.gp[3*i+2][1] = b * b1 + b * b2 + b3;
                         face.gp[3*i+2][2] = b * c1 + b * c2 + c3;
 
-                        //  ---24.12.2023---
                         face.gj = gj;
                     }
                     face.area = 0.;
@@ -208,79 +189,9 @@ namespace charm{
                         face.area += gw;
                     }
 
-                    //  ---24.12.2023---
                     for (Index i = 0; i < 6; i++) {
                         face.gw[i] = 1.0/6.0;
                     }
-
-
-                    /* // Real v[8][3];
-                    Real ref_gp[6][4][3] = {
-                            {
-                                    {-1., -sqrt3, -sqrt3},
-                                    {-1.,  sqrt3, -sqrt3},
-                                    {-1., -sqrt3,  sqrt3},
-                                    {-1.,  sqrt3,  sqrt3}
-                            },
-                            {
-                                    { 1., -sqrt3, -sqrt3},
-                                    { 1.,  sqrt3, -sqrt3},
-                                    { 1., -sqrt3,  sqrt3},
-                                    { 1.,  sqrt3,  sqrt3}
-                            },
-                            {
-                                    {-sqrt3, -1., -sqrt3},
-                                    { sqrt3, -1., -sqrt3},
-                                    {-sqrt3, -1.,  sqrt3},
-                                    { sqrt3, -1.,  sqrt3}
-                            },
-                            {
-                                    {-sqrt3,  1., -sqrt3},
-                                    { sqrt3,  1., -sqrt3},
-                                    {-sqrt3,  1.,  sqrt3},
-                                    { sqrt3,  1.,  sqrt3}
-                            },
-                            {
-                                    {-sqrt3, -sqrt3, -1.},
-                                    { sqrt3, -sqrt3, -1.},
-                                    {-sqrt3,  sqrt3, -1.},
-                                    { sqrt3,  sqrt3, -1.}
-                            },
-                            {
-                                    {-sqrt3, -sqrt3,  1.},
-                                    { sqrt3, -sqrt3,  1.},
-                                    {-sqrt3,  sqrt3,  1.},
-                                    { sqrt3,  sqrt3,  1.}
-                            }
-                    };
-
-                    //  charm_quad_get_vertices(p4est, q, treeid, v);
-
-                    for (int i = 0; i < 4; i++) {
-
-                        Point gp;
-                        Real gw;
-
-                        Point point_;
-                        point_[0] = ref_gp[fi][i][0];
-                        point_[1] = ref_gp[fi][i][1];
-                        point_[2] = ref_gp[fi][i][2];
-                        
-                        faceCalcGpAtPoint(fv, fi, i, point_, gp, gw);
-
-                        face.gp.push_back(gp);
-                        face.gw.push_back(gw);
-
-                        //face.gw[i] = 1.;
-                    }
-
-                    face.area = 0.;
-                    for (auto gw: face.gw) {
-                        face.area += gw;
-                    }
-
-                    //std::cout << face.gp[0][0] << std::endl; */
-
 
                 }
                 
