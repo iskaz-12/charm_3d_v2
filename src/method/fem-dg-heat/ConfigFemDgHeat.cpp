@@ -13,10 +13,6 @@ namespace charm {
         useVisc = model["use_visc"].as<Int>();
         useDiff = model["use_diffusion"].as<Int>();
         tRef    = model["t_ref"].as<Real>();
-
-		//	UPDATE ON 10.07.2023 - меняю название на BASE_FUNC_COUNT
-        //	baseFuncCount = 4; // TODO
-		// BASE_FUNC_COUNT = 4;
 	}
 
 	Method *ConfigFemDgHeat::createMethod() {

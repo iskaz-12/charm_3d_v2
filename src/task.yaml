@@ -13,9 +13,9 @@ control:
   MAX_LEVEL: 1
   CFL: 2.5e-5                    # число Куранта
   # TAU: 1.0e-9                # шаг по времени, используется меньшее значение из этого или из полученного из числа Куранта
-  TAU: 1.0e-5
-  TMAX: 0.1                 # время, до которго выполняется расчет
-  FILE_OUTPUT_STEP: 50       # количество итераций, через которые выполняется вывод результатов в файл
+  TAU: 7.8125e-6
+  TMAX: 0.005                 # время, до которого выполняется расчет
+  FILE_OUTPUT_STEP: 40       # количество итераций, через которые выполняется вывод результатов в файл
   LOG_OUTPUT_STEP: 1         # интервал вывода краткой информации в лог-файл
   MODEL:
     name: HEAT_FEM_DG
@@ -36,7 +36,7 @@ control:
 mesh:
   files_type: gmsh_msh
   # name: test.msh       # имя файлов с данными сетки
-  name: test.msh       # имя файлов с данными сетки
+  name: test_h_0.025.msh       # имя файлов с данными сетки
 components:
   -
 
@@ -100,21 +100,22 @@ boundaries:
 	# UPDATE от 01.01.2023 - везде добавляем BOUND_INLET
 
     name: BACK
-    type: BOUND_INLET
+    # z = 0
+    type: BOUND_OUTLET
     material_id: 0
     components:
       - {id: 0, concentration: 1}
     parameters:
       V: {x: 0, y: 0, z: 0}
 	# UPDATE ON 12.07.2023 - везде задаю нулевую температуру
-      T: 1
-      # T: 0
+      # T: 1
+      T: 0
       # T: 1.1
       P: 101325.0
   -
     name: FRONT
-    # type: BOUND_OUTLET
-    type: BOUND_INLET
+    # z = 1
+    type: BOUND_SYMMETRY
     material_id: 0
     components:
       - {id: 0, concentration: 1}
@@ -124,7 +125,8 @@ boundaries:
       P: 101325.0
   -
     name: LEFT
-    # type: BOUND_OUTLET
+    # x = 0
+    type: BOUND_OUTLET
     type: BOUND_INLET
     material_id: 0
     components:
@@ -135,8 +137,8 @@ boundaries:
       P: 101325.0
   -
     name: RIGHT
-    # type: BOUND_OUTLET
-    type: BOUND_INLET
+    # x = 1
+    type: BOUND_SYMMETRY
     material_id: 0
     components:
       - {id: 0, concentration: 1}
@@ -146,8 +148,8 @@ boundaries:
       P: 101325.0
   -
     name: TOP
-    # type: BOUND_OUTLET
-    type: BOUND_INLET
+    # y = 1
+    type: BOUND_SYMMETRY
     material_id: 0
     components:
       - {id: 0, concentration: 1}
@@ -157,7 +159,8 @@ boundaries:
       P: 101325.0
   -
     name: BOTTOM
-    # type: BOUND_OUTLET
+    # y = 0
+    type: BOUND_OUTLET
     type: BOUND_INLET
     material_id: 0
     components:

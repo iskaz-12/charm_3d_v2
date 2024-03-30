@@ -29,26 +29,14 @@ namespace charm {
         Real        qy;
         Real        qz;
 
-        //  ---08.03.2024---
         // Вспомогательная переменная (для корректного определения конструктора в getVar)...
         Real helpVar;
-
-        /* ArrayReal        t; 
-        ArrayReal        qx;
-        ArrayReal        qy;
-        ArrayReal        qz; */
 
         // PrimHeat() {}
 
         PrimHeat(Index compCount): helpVar(0.) {}
 
-
         PrimHeat(const PrimHeat& VarHeat) { *this = VarHeat; }
-
-        //  ---07.02.2024---
-        // inline void shrink() { t.shrink_to_fit(); qx.shrink_to_fit(); qy.shrink_to_fit(); qz.shrink_to_fit(); }
-
-
 
         //  UPDATE ON 04.07.2023 - реализация операторов присвоения значения, сложения, вычитания и умножения на число примитивных переменных
         PrimHeat& operator  = (const PrimHeat& var);
@@ -83,7 +71,6 @@ namespace charm {
         ArrayReal        qy;
         ArrayReal        qz;
 
-        //  ---08.03.2024---
         ArrayReal       intT;
         ArrayReal       intQx;
         ArrayReal       intQy;
@@ -94,9 +81,6 @@ namespace charm {
 
         HeatDgFields(const HeatDgFields& cons) { *this = cons; }
 
-        //  UPDATE ON 13.07.2023 - пока пробую убрать переопределение данных операторов, чтобы избежать ошибок...
-        //  ---18.01.24---
-        //  Возвращаю методы обратно!!!
         HeatDgFields& operator  = (const HeatDgFields& cons);
         HeatDgFields& operator  = (const Real& a);
         HeatDgFields& operator += (const HeatDgFields& cons);
@@ -109,38 +93,20 @@ namespace charm {
 
     };
 
-    //  UPDATE ON 12.07.2023 - чтобы исправить ошибку, пробуем сделать так, чтобы класс DataDgHeat не наследовал класс Data
 
-    //  class DataDgHeat : public Data {
     class DataDgHeat
     {
     public:
         HeatDgFields    flds;
         Cell           *cell;
 
-        // ---08.03.2024---
         PrimHeat        p; 
 
         explicit DataDgHeat(Index bfCount): flds(bfCount), p(bfCount) {}
 
-        //  UPDATE ON 05.07.2023 - получение примитивных переменных из консервативных
-        //  Лучше поменять название на getVar, как в cpp-файле...
-        //  Пока параметр Point не применяем...
-        //  void getPrim(Point pt, PrimHeat &p);
-        //  PrimHeat getPrim(Point pt);
-
-        //  UPDATE ON 13.07.2023 - пока комментирую функции getVar и setVar
-        //  ---18.01.24---
-        //  Возвращаю функции
         void getVar(PrimHeat &p);
 
-        //  UPDATE ON 05.07.2023 - меняю название getPrim на getVar...
-        //  PrimHeat getPrim();
         PrimHeat getVar();
-
-        //  UPDATE ON 05.07.2023 - заполнение консервативных переменных примитивными
-        //  (НЕ БЫЛО ЭТОЙ ФУНКЦИИ в DataDgHeat.h)
-        //  void setVar(const PrimHeat &p);
 
         Real getT(Point pt);
         Vector getGradT(Point pt);
@@ -148,49 +114,24 @@ namespace charm {
         Real getTAvg();
         Vector getGradTAvg();
 
-        //  UPDATE ON 08.07.2023 - пробую переделать функции ниже по образцу из nummeth2019
-        //  ИТОГ - оставляю, как было
-        //  UPDATE ON 08.07.2023 - меняю double на Real
-        //  UPDATE ON 12.07.2023 - возникает ошибка, добавляю индекс ячейки в аргументы функций ниже
-        //  UPDATE ON 12.07.2023 - также пробую добавить в качестве аргумента Mesh mesh
-        //  Real getF(int i, Int iCell, Point pt);
-        //Real getF(int i, Int iCell, Point pt, Mesh mesh);
-        
-        //  Real getDfDx(int i, Int iCell, Point pt);
-        //Real getDfDx(int i, Int iCell, Point pt, Mesh mesh);
-        //  Real getDfDy(int i, Int iCell, Point pt);
-        //Real getDfDy(int i, Int iCell, Point pt, Mesh mesh);
-        //  Real getDfDz(int i, Int iCell, Point pt);
-        //Real getDfDz(int i, Int iCell, Point pt, Mesh mesh);
-
         //  UPDATE ON 06.07.2023 - получение консервативных переменных
         HeatDgFields& getFields();
         //  UPDATE ON 06.07.2023 - заполнение примитивных переменных консервативными
         void setFields(const PrimHeat &p);
 
-        //  UPDATE ON 12.07.2023 - убираю пометку override
-
         //  UPDATE ON 05.07.2023 - внесение температуры и тепловых потоков (из консервативных переменных) в переменную-буфер
-        //  void getBuffer(Byte *) override;
         void getBuffer(Byte *);
         //  UPDATE ON 06.07.2023 - получение температуры и тепловых потоков (из консервативных переменных) из переменной-буфера
-        //  void setBuffer(Byte *) override;
         void setBuffer(Byte *);
-        //  Index size() override { return flds.size(); }
+
         Index size() { return flds.size(); }
 
         //  UPDATE ON 06.07.2023 - функции для получения количества элементов, названий и значений скалярных и векторных консервативных переменных
-        //  Index getScalarFieldsCount() override;
         Index getScalarFieldsCount();
-        //  String getScalarFieldName(Index) override;
         String getScalarFieldName(Index);
-        //  Real getScalarFieldValue(Index) override;
         Real getScalarFieldValue(Index);
-        //  Index getVectorFieldsCount() override;
         Index getVectorFieldsCount();
-        //  String getVectorFieldName(Index) override;
         String getVectorFieldName(Index);
-        //  Vector getVectorFieldValue(Index) override;
         Vector getVectorFieldValue(Index);
 
     };
