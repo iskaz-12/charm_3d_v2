@@ -60,6 +60,9 @@ namespace charm {
     //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
     //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
     void BoundaryConditionSymmetry::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+        //  ---23.04.2024---
+        //  Для условия задания температуры на границах в виде полинома
+        //  Температура будет вычисляться в основном методе...
         parOut = parIn;
     }
 
@@ -105,7 +108,13 @@ namespace charm {
     //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
     //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
     void BoundaryConditionOutlet::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
+
+    //  Условие на нулевой тепловой поток (dT/dn = 0)
         parOut = parIn;
+        parOut.qx = 0;
+        parOut.qy = 0;
+        parOut.qz = 0;
+
     }
 
 
@@ -150,8 +159,6 @@ namespace charm {
     //  UPDATE ON 13.07.2023 - добавляю функцию - реализацию метода calcHeat
     //  ВОПРОС: так ли реализовано в случае температуры и тепловых потоков???
     void BoundaryConditionPressure::calcHeat(PrimHeat &parIn, PrimHeat &parOut, Vector &n) {
-        //  ---31.03.2024---
-        //  Нулевой тепловой поток на границах
         parOut = parIn;
     }
 

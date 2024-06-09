@@ -127,7 +127,6 @@ boundaries:
     name: LEFT
     # x = 0
     type: BOUND_OUTLET
-    type: BOUND_INLET
     material_id: 0
     components:
       - {id: 0, concentration: 1}
@@ -161,7 +160,6 @@ boundaries:
     name: BOTTOM
     # y = 0
     type: BOUND_OUTLET
-    type: BOUND_INLET
     material_id: 0
     components:
       - {id: 0, concentration: 1}

@@ -281,6 +281,14 @@ namespace charm {
             //  Пока температуру из YAML-файла переносим в первый коэффициент разложения температуры
             data[ic].flds.t[0] = reg->t;
 
+            //  ---21.04.2024---
+            //  Пробую решить тестовую задачу из статьи prep2016_66
+            //  data[ic].flds.t[0] = cos(M_PI * cell.center.x) * cos(M_PI * cell.center.y) * cos(M_PI * cell.center.z);
+
+            //  ---23.04.2024---
+            //  Пробую решить тестовую задачу из статьи (задача №3)
+            data[ic].flds.t[0] = 1. + cell.center.x * cell.center.x + cell.center.y * cell.center.y + cell.center.z * cell.center.z;
+
             //  Внимательно проверить соответствие cellJ из nummeth2019!!!
 
             for (Int ind_1 = 0; ind_1 < BASE_FUNC_COUNT; ind_1++) {
@@ -394,6 +402,13 @@ namespace charm {
                     if (isBnd) {
 
                         f.bnd->calcHeat(p1, p2, f.n);
+
+                        //  ---23.04.2024---
+                        //  Дополнительное условие для задачи из статьи
+                        //  с граничным условием для температуры, задаваемым через полином
+                        if (f.bnd->name == "FRONT" || f.bnd->name == "RIGHT" || f.bnd->name == "TOP") {
+                            p2.t = 1 + pt.x * pt.x + pt.y * pt.y + pt.z * pt.z;
+                        }
 
                     } else {
 
@@ -526,6 +541,13 @@ namespace charm {
                     convertToParam(c1, pt, p1, data[c1].flds);
                     if (isBnd) {
                         f.bnd->calcHeat(p1, p2, f.n);
+
+                        //  ---24.04.2024---
+                        //  Дополнительное условие для задачи из статьи
+                        //  с граничным условием для температуры, задаваемым через полином
+                        if (f.bnd->name == "FRONT" || f.bnd->name == "RIGHT" || f.bnd->name == "TOP") {
+                            p2.t = 1 + pt.x * pt.x + pt.y * pt.y + pt.z * pt.z;
+                        }
 
                     } else {
                         c2 = f.cells[1];
@@ -684,13 +706,36 @@ namespace charm {
 
 
     //	UPDATE от 07.01.2023 - так ли рассчитывается поток в разрывном методе Галёркина???
-    void MethodFemDgHeat::flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz) {
+    /* void MethodFemDgHeat::flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz) {
 
         fT = 0.5 * (pl.t + pr.t);
         fqx = 0.5 * (pl.qx + pr.qx) + C11 * (pr.t - pl.t) * n.x;
         fqy = 0.5 * (pl.qy + pr.qy) + C11 * (pr.t - pl.t) * n.y;
 
         fqz = 0.5 * (pl.qz + pr.qz) + C11 * (pr.t - pl.t) * n.z;
+
+    } */
+
+    //  ---10.05.2024---
+    //  В источнике Zhang было рекомендовано использовать не центральные потоки, а чередовать значения слева и справа для T и q, соответственно
+    // T - снаружи, q - внутри
+    /* void MethodFemDgHeat::flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz) {
+
+        fT = pr.t;
+        fqx = pl.qx;
+        fqy = pl.qy;
+        fqz = pl.qz;
+
+    } */
+
+    //  ---10.05.2024---
+    //  T - внутри, q - снаружи
+    void MethodFemDgHeat::flux(PrimHeat pl, PrimHeat pr, Point n, double &fT, double &fqx, double &fqy, double &fqz) {
+
+        fT = pl.t;
+        fqx = pr.qx;
+        fqy = pr.qy;
+        fqz = pr.qz;
 
     }
 
@@ -769,6 +814,47 @@ namespace charm {
         for (int i = 0; i < cellsCount; i++) {
 
             fout << getT(i, mesh->cells[i].center, data[i].flds) << " ";
+            if (i % 8 == 0 || i == cellsCount) {
+                fout << std::endl;
+            }
+        }
+
+        //  ---01.04.2024---
+        // Вектор градиента температуры
+        fout << std::endl << "VECTORS TotalTemperatureGradient double" << std::endl;
+        for (int i = 0; i < cellsCount; i++)
+        {
+            fout << getQx(i, mesh->cells[i].center, data[i].flds) << " " << getQy(i, mesh->cells[i].center, data[i].flds) << " " << getQz(i, mesh->cells[i].center, data[i].flds) << " ";
+            if (i % 8 == 0  ||  i == cellsCount) {
+                fout << std::endl;
+            }
+        }
+
+        //  x-координата градиента температуры
+        fout << std::endl << "SCALARS TemperatureGradientX double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+        for (int i = 0; i < cellsCount; i++) {
+
+            fout << getQx(i, mesh->cells[i].center, data[i].flds) << " ";
+            if (i % 8 == 0 || i == cellsCount) {
+                fout << std::endl;
+            }
+        }
+
+        //  y-координата градиента температуры
+        fout << std::endl << "SCALARS TemperatureGradientY double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+        for (int i = 0; i < cellsCount; i++) {
+
+            fout << getQy(i, mesh->cells[i].center, data[i].flds) << " ";
+            if (i % 8 == 0 || i == cellsCount) {
+                fout << std::endl;
+            }
+        }
+
+        //  z-координата градиента температуры
+        fout << std::endl << "SCALARS TemperatureGradientZ double 1" << std::endl << "LOOKUP_TABLE default" << std::endl;
+        for (int i = 0; i < cellsCount; i++) {
+
+            fout << getQz(i, mesh->cells[i].center, data[i].flds) << " ";
             if (i % 8 == 0 || i == cellsCount) {
                 fout << std::endl;
             }
