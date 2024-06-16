@@ -289,8 +289,6 @@ namespace charm {
             //  Пробую решить тестовую задачу из статьи (задача №3)
             data[ic].flds.t[0] = 1. + cell.center.x * cell.center.x + cell.center.y * cell.center.y + cell.center.z * cell.center.z;
 
-            //  Внимательно проверить соответствие cellJ из nummeth2019!!!
-
             for (Int ind_1 = 0; ind_1 < BASE_FUNC_COUNT; ind_1++) {
                 for (Int ind_2 = 0; ind_2 < BASE_FUNC_COUNT; ind_2++) {
                     cell.A.push_back(0.0);
@@ -310,17 +308,12 @@ namespace charm {
     }
 
 
-    //  ---22.01.24---
-    //  НУЖНО ПЕРЕДЕЛАТЬ ВСЕ МЕТОДЫ, содержащие массивы температуры и тепловых потоков!!!
-
     //	Переделала формулы под обозначения gw и gp в charm_3d_v2
     void MethodFemDgHeat::calcMassMatrix() {
 
         std::cout << "From MethodFemDgHeat.cpp: calcMAssMatrix is started!" << std::endl;
 
         for (int ind = 0; ind < mesh->cells.size(); ind++) {         
-            //  ---09.03.2024---
-            //  ОБРАТИТЬ ВНИМАНИЕ!!!
 
             Cell &cell = mesh->cells[ind];
 
@@ -347,7 +340,7 @@ namespace charm {
 
     void MethodFemDgHeat::calcGradients() {
 
-        // поверхностные интегралы (в нашем случае - объёмные???)
+        // объёмные интегралы
         for (int i = 0; i < mesh->cells.size(); i++) {
             for (int j = 0; j < BASE_FUNC_COUNT; j++) {
                 double tmpIntQx = 0.0, tmpIntQy = 0.0, tmpIntQz = 0.0;
@@ -361,7 +354,6 @@ namespace charm {
                             mesh->cells[i].gw[z] * getT(i, mesh->cells[i].gp[z], data[i].flds) * getDfDz(j, i, mesh->cells[i].gp[z]);
                 }
 
-                // Так ли посчитан cellJ???
                 //tmpIntQx *= cellJ[i];
 
                 data[i].flds.intQx[j] -= tmpIntQx;
@@ -372,7 +364,7 @@ namespace charm {
         }
 
 
-        // криволинейные интегралы (в нашем случае - поверхностные???)
+        // поверхностные интегралы
         Index cCount = Config::getCompCount();
 
         for (int i = 0; i < mesh->faces.size(); i++) {
@@ -393,7 +385,6 @@ namespace charm {
                     Point &pt = f.gp[iGP];
 
                     //  ---08.03.2024---
-                    //  Сделать конструктор так, чтобы не нужно было передавать параметр!!!
                     PrimHeat p1(BASE_FUNC_COUNT);
 
                     PrimHeat p2(BASE_FUNC_COUNT);
@@ -442,9 +433,6 @@ namespace charm {
                 tmpIntQx2 *= f.gj;
                 tmpIntQy2 *= f.gj;
                 tmpIntQz2 *= f.gj;
-
-
-                //	правильно ли заменила edgeJ???
 
                 data[c1].flds.intQx[j] += tmpIntQx1;
                 data[c1].flds.intQy[j] += tmpIntQy1;
@@ -499,20 +487,6 @@ namespace charm {
                 }
 
                 data[i].flds.intT[j] -= tmpIntT;
-
-                //  --24.12.2023---
-                // Проверим значения в intT в методах calcDiffusionVol и calcDiffusionSurf (они должны зануляться, если температура внутри и на границах - одинаковая!!!)
-                /* if (i == 0 && j == 0) {
-                    std::cout<<"vol: intT[0][0] = "<<intT[i][j]<<std::endl;
-                } */
-
-                //  std::cout<<"intT["<<i<<"]["<<j<<"] = "<<intT[i][j]<<std::endl;
-
-
-                //   ---09.03.2024---
-                //  ПОЧЕМУ-ТО ВСЕ КОЭФФИЦИЕНТ ИНТЕГРАЛА ТЕМПЕРАТУРЫ РАВЕН 0...
-                // std::cout<<"calcDiffusionVol: intT = "<<data[i].flds.intT[j]<<std::endl;
-
             }
         }
     }
@@ -578,13 +552,6 @@ namespace charm {
                 if (!isBnd) {
                     data[c2].flds.intT[j] -= tmpIntT2;
                 }
-
-                //  --24.12.2023---
-                // Проверим значения в intT в методах calcDiffusionVol и calcDiffusionSurf (они должны зануляться, если температура внутри и на границах - одинаковая!!!)
-                /* if (c1 == 0 && j == 0) {
-                    std::cout<<"surf: intT[0][0] = "<<intT[c1][j]<<std::endl;
-                } */
-
             }
 
         }
@@ -669,7 +636,6 @@ namespace charm {
 
 
     //	UPDATE от 07.01.2023 - переделанная версия функции расчёта временного шага из MethodFvm.cpp
-    //  UPDATE ON 12.07.2023 - пока оставляем функцию для расчёта времени такой, нужно подумать, как рассчитать число Куранта!!!
     Real MethodFemDgHeat::calcDt() {
         Config *conf = Config::get();
         Real dt = conf->dt;

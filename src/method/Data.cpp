@@ -13,7 +13,6 @@ namespace charm {
         e           = prim.e;
         eTot        = prim.eTot;
 
-        //  UPDATE ON 22.06.2023 - почему давление передается через указатель???
         this->p     = prim.p;
         t           = prim.t;
         cz          = prim.cz;

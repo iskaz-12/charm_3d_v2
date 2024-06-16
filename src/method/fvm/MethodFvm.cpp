@@ -295,7 +295,6 @@ namespace charm {
         for (int i = 0; i < cellsCount; i++)
         {
             Prim prim = data[i].getPrim();
-            //  UPDATE ON 02.07.2023 - вычисляется ли вообще температура в этом методе???
             fout << prim.t + 0.5 * prim.v2() / prim.cp << " ";
             if (i % 8 == 0  ||  i == cellsCount) {
                 fout << std::endl;

@@ -32,16 +32,9 @@ namespace charm {
 
 		Real calcDt();
 
-		//	Пока не уверена, что нужны переменные data, integrals и flux...
 		Array<DataDgHeat> data;
 		Array<HeatDgFields> integrals;
 
-
-		//	UPDATE ON 12.07.2023 - убираю область видимости protected, чтобы попробовать исправить ошибки...
-	
-	//protected:
-		
-		//	Вот эта часть целиком взята из nummeth2019
 
 		void calcMassMatrix();
 
